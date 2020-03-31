@@ -1,0 +1,25 @@
+{
+  "name": "ap2020bot",
+  "version": "1.0.0",
+  "description": "bot for ap2020",
+  "keywords": ["bot", "slack"],
+  "author": "ap2020",
+  "repository": "https://github.com/ap2020/ap2020bot.git",
+  "homepage": "https://github.com/ap2020/ap2020bot",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.8.0",
+    "tsscmp": "^1.0.6"
+  },
+  "devDependencies": {
+    "@azure/functions": "^1.0.2-beta2",
+    "typescript": "^3.3.3"
+  }
+}
