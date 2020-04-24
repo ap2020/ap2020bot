@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "schedule": "0 */10 * * * *",
+      "name": "myTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "runOnStartup": true
+  }
+  ],
+  "scriptFile": "../dist/CheckDriveUpdate/index.js"
+}
