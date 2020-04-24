@@ -1,0 +1,26 @@
+{
+  "bindings": [
+    {
+      "schedule": "0 */10 * * * *",
+      "name": "timer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "runOnStartup": true
+    },
+    {
+      "name": "oldData",
+      "type": "blob",
+      "path": "ap2020bot/watch-mipro",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    },
+    {
+      "name": "$return",
+      "type": "blob",
+      "path": "ap2020bot/watch-mipro",
+      "connection": "AzureWebJobsStorage",
+      "direction": "out"
+    }
+  ],
+  "scriptFile": "../dist/watch-mipro/index.js"
+}

@@ -93,5 +93,10 @@ obj
 appsettings.json
 local.settings.json
 
+# Azurite
+__azurite_*
+__blobstorage__
+__queuestorage__
+
 # Others
 /tmp/
