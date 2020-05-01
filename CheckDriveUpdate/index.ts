@@ -3,6 +3,9 @@ import {google, driveactivity_v2} from 'googleapis';
 import {getGoogleClient} from '../utils/google-client';
 import {ignoredActions} from './config';
 
+import {promises as fs} from 'fs';
+import path from 'path';
+
 const main: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
     // await checkUpdate();
 };
@@ -13,6 +16,15 @@ const fetchAllDriveActivities = async (
     driveActivity: driveactivity_v2.Driveactivity,
     since: Date,
 ): Promise<driveactivity_v2.Schema$DriveActivity[]> => {
+
+    if (process.env.NODE_ENV === 'development') {
+        try {
+            return JSON.parse(await fs.readFile(path.join(__dirname, '..', 'tmp', 'drive-activity-api-cache.json'), {encoding: 'utf-8'}));
+        } catch (e) {
+            console.warn('Failed to load cache.\nFetching...')
+        }
+    }
+
     // may take a while. 
     const root_folder_id = process.env.GOOGLE_ROOT_FOLDER_ID;
     let activities: driveactivity_v2.Schema$DriveActivity[] = [];
@@ -30,6 +42,14 @@ const fetchAllDriveActivities = async (
         activities = activities.concat(response.activities);
     } while (response.nextPageToken);
     
+    if (process.env.NODE_ENV === 'development') {
+        try {
+            await fs.writeFile(path.join(__dirname, '..', 'tmp', 'drive-activity-api-cache.json'), JSON.stringify(activities));
+        } catch (e) {
+            console.error('Error while caching API response', e);
+        }
+    }
+
     return activities;
 };
     
@@ -58,8 +78,11 @@ const checkUpdate = async (since: Date) => {
     for (const activity of activities) {
         if (!activity) continue;
         const actionName = getActionName(activity.primaryActionDetail);
-        if (ignoredActions.indexOf(actionName) !== -1) {
+        if (ignoredActions.includes(actionName)) {
             continue;
         }
+        console.log(activity);
     }
 }
+
+checkUpdate(new Date(Date.now() - 1000*60*60*24));
