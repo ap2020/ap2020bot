@@ -166,16 +166,23 @@ const checkUpdate = async (since: Date): Promise<Date> => {
 
     const lastChecked = new Date();
     const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
-    for (const activity of activities) { // TODO: use Promise.all
-        if (!activity) continue;
+    await Promise.all(activities.reverse().map(async activity => {
+        // not notified in order!
+        // maybe chat.scheduleMessage is useful to imitate notification in order
+        // but I think the inorderness is ignorable if the frequency of execution is high enough
+        if (!activity) {
+            return;
+        };
         const actionName = getActionName(activity.primaryActionDetail);
         if (ignoredActions.includes(actionName)) {
-            continue;
+            return;
         }
         const targets: driveactivity_v2.Schema$Target[] = activity.targets/*.filter(
             target => !isIgnoredItem(getDriveItemfromTarget(target))
         )*/; // TODO
-        if (targets.length === 0) continue;
+        if (targets.length === 0) {
+            return;
+        }
         const actorsText = (await Promise.all(
             activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
         )).join(', ');
@@ -195,7 +202,6 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                 title_link: item.content.webViewLink
               };
             }));
-            // TODO: this await might be bad for performance?
             await slack.bot.chat.postMessage({
                 channel: drivelogId,
                 text, 
@@ -217,8 +223,13 @@ const checkUpdate = async (since: Date): Promise<Date> => {
             })) as any).file.permalink;
             // TODO: not checked!
         }
-    }
+    }));
     return lastChecked;
 }
 
-// checkUpdate(new Date(Date.now() - 1000*60*60*24));
+// (async () => {
+//     const start = Date.now();
+//     await checkUpdate(new Date(Date.now() - 1000*60*60*24));
+//     const end = Date.now();
+//     console.log('elapsed time:', end - start);
+// })();
