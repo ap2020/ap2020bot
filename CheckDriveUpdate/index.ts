@@ -5,6 +5,7 @@ import {ignoredActions, japaneseTranslations, colors} from './config';
 import {stripIndent} from 'common-tags';
 import moment from 'moment-timezone';
 import {slack} from '../utils/slack';
+import {fetchDriveItem, DriveItem} from './drive-api';
 
 // import {promises as fs} from 'fs';
 // import path from 'path';
@@ -105,49 +106,49 @@ const getDriveItemId = (target: driveactivity_v2.Schema$Target): string => {
  * folderId => path
  */
 const paths = new Map<string, string>();
-const getPath = async (client: drive_v3.Drive, rootFolderId: string, item: drive_v3.Schema$File): Promise<string> => {
-    if (paths.has(item.id)) {
-        return paths.get(item.id);
+const getPath = async (client: drive_v3.Drive, rootFolderId: string, item: DriveItem): Promise<string> => {
+    if (paths.has(item.content.id)) {
+        return paths.get(item.content.id);
     }
-    if (item.id == rootFolderId) {
+    if (item.content.id == rootFolderId) {
         return '/';
     }
     /**
      * path: path to item
      * valid: true if path has rootFolderId in ancestor
      */
-    const rec = async (folder: drive_v3.Schema$File): Promise<{path: string | null; valid: boolean}> => {
+    const rec = async (folder: DriveItem): Promise<{path: string | null; valid: boolean}> => {
         // I want to use Promise.any...
-        if (!folder.parents) {
+        if (!folder.content.parents) {
             // folder is root of drive
             return { path: null, valid: false };
         }
-        const parentPaths = (await Promise.all(folder.parents.map(async parentId => {
+        const parentPaths = (await Promise.all(folder.content.parents.map(async parentId => {
             if (paths.has(parentId)) {
                 return { path: paths.get(parentId)!, valid: true };
             }
             if (parentId == rootFolderId) {
                 return { path: '/', valid: true };
             }
-            const parent = (await client.files.get({fileId: parentId, fields: 'id,name,parents,mimeType'})).data;
+            const parent = await fetchDriveItem(client, parentId);
             return rec(parent)
         }))).filter(({valid}) => valid);
         if (parentPaths.length > 0) {
-            const isFolder = folder.mimeType === 'application/vnd.google-apps.folder';
+            const isFolder = folder.content.mimeType === 'application/vnd.google-apps.folder';
             // folder has one or more parents that is child of rootFolderId
-            const path = `${parentPaths[0].path}${folder.name}${isFolder? '/': ''}`;
-            paths.set(folder.id, path);
+            const path = `${parentPaths[0].path}${folder.content.name}${isFolder? '/': ''}`;
+            paths.set(folder.content.id, path);
             return { path, valid: true };
         } else {
             return { path: null, valid: false };
         }
     };
     const path = await rec(item);
-    return path.valid? path.path: item.name;
+    return path.valid? path.path: item.content.name;
 };
 
-const getEmoji = (item: drive_v3.Schema$File): string => {
-    switch (item.mimeType) {
+const getEmoji = (item: DriveItem): string => {
+    switch (item.content.mimeType) {
         case 'application/vnd.google-apps.folder':
             return ':file_folder:';
         default:
@@ -186,12 +187,12 @@ const checkUpdate = async (since: Date): Promise<Date> => {
         if (targets.length <= 20) {
             // attachments
             const attachments = await Promise.all(targets.map(async target => {
-              const item = (await drive.files.get({fileId: getDriveItemId(target), fields: 'id,parents,name,mimeType,webViewLink'})).data; // TODO: cache files.get?
+              const item = await fetchDriveItem(drive, getDriveItemId(target));
               return {
                 color: colors[actionName],
                 title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, rootFolderId, item)}`,
                 text: '', // TODO: include details
-                title_link: item.webViewLink
+                title_link: item.content.webViewLink
               };
             }));
             // TODO: this await might be bad for performance?
@@ -208,8 +209,8 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                 channels: [drivelogId].join(','),
                 content: (await Promise.all(targets.map(
                     async target => {
-                        const item = (await drive.files.get({fileId: getDriveItemId(target), fields: 'id,name,parents,mimeType,webViewLink'})).data;
-                        return `${japaneseTranslations[actionName]}: ${getPath(drive, rootFolderId, item)} (${item.webViewLink})`
+                        const item = await fetchDriveItem(drive, getDriveItemId(target));
+                        return `${japaneseTranslations[actionName]}: ${getPath(drive, rootFolderId, item)} (${item.content.webViewLink})`
                     },
                     ))).join('\n'),
                 text,
