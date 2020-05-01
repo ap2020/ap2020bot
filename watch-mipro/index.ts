@@ -8,7 +8,7 @@ import { slack } from "../utils/slack";
 const disjoint = <T>(A: Set<T>, B: Set<T>): Set<T> =>
     new Set([...A].filter(x => !B.has(x)));
 
-const check: AzureFunction = async function (context: Context, timer: any, oldData: string): Promise<string> {
+const check: AzureFunction = async function (context: Context, timer: any, oldData: string[]): Promise<string[]> {
     context.log('last data:', oldData);
     const oldProblems = new Set(oldData === undefined? [] : oldData);
     const {problems} = (await scrapeIt<{ problems: string[] }>("http://133.11.136.29/public/", {
@@ -37,7 +37,7 @@ const check: AzureFunction = async function (context: Context, timer: any, oldDa
         });
     }
 
-    return JSON.stringify(problems);
+    return problems;
 };
 
 export default check;
