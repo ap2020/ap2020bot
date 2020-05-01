@@ -21,6 +21,7 @@
   "dependencies": {
     "@slack/web-api": "^5.8.0",
     "googleapis": "^49.0.0",
+    "scrape-it": "^5.2.3",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {

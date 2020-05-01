@@ -1,7 +1,7 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import * as handlers from "./handlers";
-import * as crypto from "crypto";
-import * as timingSafeCompare from "tsscmp";
+import crypto from "crypto";
+import timingSafeCompare from "tsscmp";
 
 const verify = (req: HttpRequest) => {
     const version = 'v0';
