@@ -2,10 +2,24 @@
   "bindings": [
     {
       "schedule": "0 */10 * * * *",
-      "name": "myTimer",
+      "name": "timer",
       "type": "timerTrigger",
       "direction": "in",
       "runOnStartup": true
+  },
+  {
+    "name": "lastDate",
+    "type": "blob",
+    "path": "ap2020bot/CheckDriveUpdate",
+    "connection": "AzureWebJobsStorage",
+    "direction": "in"
+  },
+  {
+    "name": "$return",
+    "type": "blob",
+    "path": "ap2020bot/CheckDriveUpdate",
+    "connection": "AzureWebJobsStorage",
+    "direction": "out"
   }
   ],
   "scriptFile": "../dist/CheckDriveUpdate/index.js"

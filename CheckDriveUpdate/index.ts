@@ -9,8 +9,8 @@ import {slack} from '../utils/slack';
 // import {promises as fs} from 'fs';
 // import path from 'path';
 
-const main: AzureFunction = async (context: Context, myTimer: any): Promise<void> => {
-    // await checkUpdate();
+const main: AzureFunction = async (context: Context, timer: any, lastDate: {ts: number},): Promise<{ts: number}> => {
+    return {ts: (await checkUpdate(new Date(lastDate.ts))).getTime()};
 };
 
 export default main;
@@ -155,7 +155,7 @@ const getEmoji = (item: drive_v3.Schema$File): string => {
     }
 };
 
-const checkUpdate = async (since: Date) => {
+const checkUpdate = async (since: Date): Promise<Date> => {
     const auth = getGoogleClient();
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
@@ -163,7 +163,7 @@ const checkUpdate = async (since: Date) => {
     const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
     const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
 
-    const lastChecked = Date.now();
+    const lastChecked = new Date();
     const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
     for (const activity of activities) { // TODO: use Promise.all
         if (!activity) continue;
@@ -215,8 +215,9 @@ const checkUpdate = async (since: Date) => {
                 text,
             })) as any).file.permalink;
             // TODO: not checked!
-          }
+        }
     }
+    return lastChecked;
 }
 
-checkUpdate(new Date(Date.now() - 1000*60*60*24));
+// checkUpdate(new Date(Date.now() - 1000*60*60*24));
