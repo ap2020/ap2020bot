@@ -4,6 +4,7 @@ import {getGoogleClient} from '../utils/google-client';
 import {ignoredActions, japaneseTranslations, colors} from './config';
 import {stripIndent} from 'common-tags';
 import moment from 'moment-timezone';
+import {flatten} from 'lodash';
 import {slack} from '../utils/slack';
 import {fetchDriveItem, DriveItem} from './drive-api';
 import {cacheCalls} from '../utils/utils';
@@ -171,6 +172,9 @@ const getEmoji = (item: DriveItem): string => {
 };
 
 const notifyActivity = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, drivelogId: string) => {
+    // not notified in order!
+    // maybe chat.scheduleMessage is useful to imitate notification in order
+    // but I think the inorderness is ignorable if the frequency of execution is high enough
     const actionName = getActionName(activity.primaryActionDetail);
     if (ignoredActions.includes(actionName)) {
         return;
@@ -241,18 +245,24 @@ const checkUpdate = async (since: Date): Promise<Date> => {
 
     const lastChecked = new Date();
     const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
-    await Promise.all(activities.reverse().map(async activity => {
-        // not notified in order!
-        // maybe chat.scheduleMessage is useful to imitate notification in order
-        // but I think the inorderness is ignorable if the frequency of execution is high enough
-        await notifyActivity(clients, activity, drivelogId);
-    }));
+    const hooks: ((activity: driveactivity_v2.Schema$DriveActivity) =>  unknown)[] = [
+        async (activity) => await notifyActivity(clients, activity, drivelogId),
+    ]
+    await Promise.all(
+        flatten(
+            activities
+                .reverse()
+                .map(async activity => (
+                    hooks.map(async hook => await hook(activity))
+                ))
+        )
+    );
     return lastChecked;
 }
 
-(async () => {
-    const start = Date.now();
-    await checkUpdate(new Date(Date.now() - 1000*60*60*24));
-    const end = Date.now();
-    console.log('elapsed time:', end - start);
-})();
+// (async () => {
+//     const start = Date.now();
+//     await checkUpdate(new Date(Date.now() - 1000*60*60*24));
+//     const end = Date.now();
+//     console.log('elapsed time:', end - start);
+// })();
