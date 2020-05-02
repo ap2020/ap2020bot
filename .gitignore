@@ -98,5 +98,8 @@ __azurite_*
 __blobstorage__
 __queuestorage__
 
+# Tests
+/coverage/
+
 # Others
 /tmp/
