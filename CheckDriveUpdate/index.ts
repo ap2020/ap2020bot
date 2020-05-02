@@ -46,7 +46,9 @@ const fetchAllDriveActivities = async (
                 consolidationStrategy: { legacy: {} }
             }
         })).data;
-        activities = activities.concat(response.activities);
+        if (response.activities !== undefined) {
+            activities = activities.concat(response.activities);
+        }
     } while (response.nextPageToken);
     
     // if (process.env.NODE_ENV === 'development') {
@@ -174,9 +176,6 @@ const checkUpdate = async (since: Date): Promise<Date> => {
         // not notified in order!
         // maybe chat.scheduleMessage is useful to imitate notification in order
         // but I think the inorderness is ignorable if the frequency of execution is high enough
-        if (!activity) {
-            return;
-        };
         const actionName = getActionName(activity.primaryActionDetail);
         if (ignoredActions.includes(actionName)) {
             return;
