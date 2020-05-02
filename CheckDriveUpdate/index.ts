@@ -200,7 +200,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                 attachments: attachments,
             });
         } else {
-            // snippet
+            // post snippet
             fileURL = ((await slack.bot.files.upload({
                 channels: [drivelogId].join(','),
                 content: (await Promise.all(targets.map(
@@ -209,9 +209,8 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                         return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
                     },
                     ))).join('\n'),
-                text,
+                initial_comment: text,
             })) as any).file.permalink;
-            // TODO: not checked!
         }
     }));
     return lastChecked;
