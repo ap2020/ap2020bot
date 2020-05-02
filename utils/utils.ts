@@ -1,8 +1,8 @@
 export const cacheCalls = <A extends any[], B, K extends string | number>
-(func: (...args: A) => Promise<B>, getKey: (...args: A) => K, )
+(func: (...args: A) => Promise<B>, getKey: (...args: A) => K, initialCache: [K, Promise<B>][] = [], )
 : (...args: A) => Promise<B> =>
     (new class {
-        cache: Map<K, Promise<B>> = new Map();
+        cache: Map<K, Promise<B>> = new Map(initialCache);
         call = async (...args: A): Promise<B> => {
             const key = getKey(...args);
             if (this.cache.has(key)) {
