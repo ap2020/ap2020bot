@@ -17,12 +17,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - run: nvmrc=$(cat .nvmrc)
+    - name: Read .nvmrc
+      run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      id: nvm
 
-    - name: Use Node.js 10.x
+    - name: Use Node.js ${{ steps.nvm.outputs.NVMRC }}
       uses: actions/setup-node@v1
       with:
-        node-version: $nvmrc
+        node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
     - run: npm ci
 
