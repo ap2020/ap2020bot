@@ -28,4 +28,7 @@ jobs:
 
     - run: npm test
     
-    - run: npx codecov
+    - uses: codecov/codecov-action@v1
+      with:
+        flags: unittests
+        fail_ci_if_error: true
