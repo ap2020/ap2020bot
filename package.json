@@ -16,7 +16,8 @@
     "prestart": "npm run build",
     "start": "func start",
     "dev": "ts-node -r ./utils-dev/loadenv",
-    "test": "echo \"No tests yet...\""
+    "test": "jest --verbose --coverage",
+    "test-dev": "jest --verbose"
   },
   "dependencies": {
     "@slack/web-api": "^5.8.0",
