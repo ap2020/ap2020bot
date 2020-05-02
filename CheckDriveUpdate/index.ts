@@ -19,6 +19,13 @@ export default main;
 
 const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
 
+interface Clients {
+    slack: typeof slack;
+    drive: drive_v3.Drive;
+    driveActivity: driveactivity_v2.Driveactivity;
+    people: people_v1.People;
+}
+
 const fetchAllDriveActivities = async (
     driveActivity: driveactivity_v2.Driveactivity,
     folderId: string,
@@ -163,12 +170,74 @@ const getEmoji = (item: DriveItem): string => {
     }
 };
 
+const notifyActivity = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, drivelogId: string) => {
+    const actionName = getActionName(activity.primaryActionDetail);
+    if (ignoredActions.includes(actionName)) {
+        return;
+    }
+    const targets: driveactivity_v2.Schema$Target[] = (
+        (await Promise.all(activity.targets.map(
+            async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
+        )))
+        .filter(({ignored}) => !ignored)
+        .map(({target}) => target)
+    );
+    if (targets.length === 0) {
+        return;
+    }
+    const actorsText = (await Promise.all(
+        activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
+    )).join(', ');
+    const text = stripIndent`
+        ${actorsText}が *${activity.targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
+        発生日時: ${getDate(activity)}
+    `;
+    let fileURL: string | undefined = undefined;
+    if (targets.length <= 20) {
+        // attachments
+        const attachments = await Promise.all(targets.map(async target => {
+            const item = await fetchDriveItem(drive, getDriveItemId(target));
+            return {
+            color: colors[actionName],
+            title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, item)}`,
+            text: '', // TODO: include details
+            title_link: item.content.webViewLink
+            };
+        }));
+        await slack.bot.chat.postMessage({
+            channel: drivelogId,
+            text, 
+            icon_emoji: ':google_drive:',
+            username: 'UpdateNotifier',
+            attachments: attachments,
+        });
+    } else {
+        // post snippet
+        fileURL = ((await slack.bot.files.upload({
+            channels: [drivelogId].join(','),
+            content: (await Promise.all(targets.map(
+                async target => {
+                    const item = await fetchDriveItem(drive, getDriveItemId(target));
+                    return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
+                },
+                ))).join('\n'),
+            initial_comment: text,
+        })) as any).file.permalink;
+    }
+}
+
 const checkUpdate = async (since: Date): Promise<Date> => {
     const auth = getGoogleClient();
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
     const peopleAPI = google.people({version: 'v1', auth});
     const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
+    const clients: Clients = {
+        slack,
+        drive,
+        driveActivity,
+        people: peopleAPI,
+    }
 
     const lastChecked = new Date();
     const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
@@ -176,66 +245,14 @@ const checkUpdate = async (since: Date): Promise<Date> => {
         // not notified in order!
         // maybe chat.scheduleMessage is useful to imitate notification in order
         // but I think the inorderness is ignorable if the frequency of execution is high enough
-        const actionName = getActionName(activity.primaryActionDetail);
-        if (ignoredActions.includes(actionName)) {
-            return;
-        }
-        const targets: driveactivity_v2.Schema$Target[] = (
-            (await Promise.all(activity.targets.map(
-                async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
-            )))
-            .filter(({ignored}) => !ignored)
-            .map(({target}) => target)
-        );
-        if (targets.length === 0) {
-            return;
-        }
-        const actorsText = (await Promise.all(
-            activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
-        )).join(', ');
-        const text = stripIndent`
-            ${actorsText}が *${activity.targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
-            発生日時: ${getDate(activity)}
-        `;
-        let fileURL: string | undefined = undefined;
-        if (targets.length <= 20) {
-            // attachments
-            const attachments = await Promise.all(targets.map(async target => {
-              const item = await fetchDriveItem(drive, getDriveItemId(target));
-              return {
-                color: colors[actionName],
-                title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, item)}`,
-                text: '', // TODO: include details
-                title_link: item.content.webViewLink
-              };
-            }));
-            await slack.bot.chat.postMessage({
-                channel: drivelogId,
-                text, 
-                icon_emoji: ':google_drive:',
-                username: 'UpdateNotifier',
-                attachments: attachments,
-            });
-        } else {
-            // post snippet
-            fileURL = ((await slack.bot.files.upload({
-                channels: [drivelogId].join(','),
-                content: (await Promise.all(targets.map(
-                    async target => {
-                        const item = await fetchDriveItem(drive, getDriveItemId(target));
-                        return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
-                    },
-                    ))).join('\n'),
-                initial_comment: text,
-            })) as any).file.permalink;
-        }
+        await notifyActivity(clients, activity, drivelogId);
     }));
     return lastChecked;
 }
 
-// (async () => {
-//     const start = Date.now();
-//     await checkUpdate(new Date(Date.now() - 1000*60*60*24));
-//     const end = Date.now();
-//     console.log('elapsed time:', end - start);
-// })();
+(async () => {
+    const start = Date.now();
+    await checkUpdate(new Date(Date.now() - 1000*60*60*24));
+    const end = Date.now();
+    console.log('elapsed time:', end - start);
+})();
