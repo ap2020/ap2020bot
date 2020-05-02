@@ -181,8 +181,12 @@ const checkUpdate = async (since: Date): Promise<Date> => {
         if (ignoredActions.includes(actionName)) {
             return;
         }
-        const targets: driveactivity_v2.Schema$Target[] = activity.targets.filter(
-            target => !isIgnored(drive, getDriveItemId(target))
+        const targets: driveactivity_v2.Schema$Target[] = (
+            (await Promise.all(activity.targets.map(
+                async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
+            )))
+            .filter(({ignored}) => !ignored)
+            .map(({target}) => target)
         );
         if (targets.length === 0) {
             return;
