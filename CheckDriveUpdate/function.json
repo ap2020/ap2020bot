@@ -5,7 +5,7 @@
       "name": "timer",
       "type": "timerTrigger",
       "direction": "in",
-      "runOnStartup": true
+      "runOnStartup": false
   },
   {
     "name": "lastDate",
