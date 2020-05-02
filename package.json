@@ -12,11 +12,12 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "dry-build": "tsc --noEmit",
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
     "dev": "ts-node -r ./utils-dev/loadenv",
-    "test": "jest --verbose --coverage",
+    "test": "npm run dry-build && jest --verbose --coverage",
     "test-dev": "jest --verbose"
   },
   "dependencies": {
