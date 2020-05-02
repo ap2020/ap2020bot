@@ -138,6 +138,20 @@ const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<string>
     return path.valid? path.path: item.content.name;
 };
 
+const isIgnored = cacheCalls(async (client: drive_v3.Drive, itemId: string): Promise<boolean> => {
+    const item = await fetchDriveItem(client, itemId);
+    if (item.content.parents.length === 0) {
+        // we don't need to ignore this
+        return false;
+    }
+    const isParentsIgnored = await Promise.all(item.content.parents.map(async parentId => isIgnored(client, parentId)));
+    // 全ての親がignoredならtrue
+    return isParentsIgnored.every((x) => x);
+}, (c, id) => id, new Map([
+    ...(process.env.GOOGLE_DRIVE_IGNORED_IDS.split(',').map(s => [s.trim(), Promise.resolve(true)] as [string, Promise<boolean>])),
+    [rootFolderId, Promise.resolve(false)],
+]));
+
 const getEmoji = (item: DriveItem): string => {
     switch (item.content.mimeType) {
         case 'application/vnd.google-apps.folder':
@@ -167,9 +181,13 @@ const checkUpdate = async (since: Date): Promise<Date> => {
         if (ignoredActions.includes(actionName)) {
             return;
         }
-        const targets: driveactivity_v2.Schema$Target[] = activity.targets/*.filter(
-            target => !isIgnoredItem(getDriveItemfromTarget(target))
-        )*/; // TODO
+        const targets: driveactivity_v2.Schema$Target[] = (
+            (await Promise.all(activity.targets.map(
+                async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
+            )))
+            .filter(({ignored}) => !ignored)
+            .map(({target}) => target)
+        );
         if (targets.length === 0) {
             return;
         }
