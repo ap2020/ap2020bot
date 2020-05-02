@@ -5,8 +5,6 @@ name: Test
 
 on:
   push:
-    branches-ignore: [ master ] # because deploy workflow runs test for master
-  
   pull_request:
     branches: [ master ]
 
@@ -29,3 +27,5 @@ jobs:
     - run: npm ci
 
     - run: npm test
+    
+    - run: npx codecov
