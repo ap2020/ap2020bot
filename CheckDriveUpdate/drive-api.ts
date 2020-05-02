@@ -1,6 +1,6 @@
 import {drive_v3} from 'googleapis';
 
-const driveItems = new Map<string, DriveItem>()
+const driveItems = new Map<string, Promise<DriveItem>>()
 
 const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID; // TODO: is this global variable good?
 
@@ -17,7 +17,13 @@ export class DriveItem {
 }
 
 export const fetchDriveItem = async (client: drive_v3.Drive, id: string) => {
-    return driveItems.has(id) ? // TODO: race condition
-        driveItems.get(id):
-        new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink'})).data);
+    if (driveItems.has(id)) {
+        return driveItems.get(id);
+    } else {
+        const driveItemPromise = (async () =>
+            new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink'})).data)
+        )();
+        driveItems.set(id, driveItemPromise);
+        return driveItemPromise;
+    }
 }

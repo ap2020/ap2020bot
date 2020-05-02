@@ -216,7 +216,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                 content: (await Promise.all(targets.map(
                     async target => {
                         const item = await fetchDriveItem(drive, getDriveItemId(target));
-                        return `${japaneseTranslations[actionName]}: ${getPath(drive, rootFolderId, item)} (${item.content.webViewLink})`
+                        return `${japaneseTranslations[actionName]}: ${await getPath(drive, rootFolderId, item)} (${item.content.webViewLink})`
                     },
                     ))).join('\n'),
                 text,
