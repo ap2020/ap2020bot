@@ -6,6 +6,7 @@ import {stripIndent} from 'common-tags';
 import moment from 'moment-timezone';
 import {slack} from '../utils/slack';
 import {fetchDriveItem, DriveItem} from './drive-api';
+import {cacheCalls} from '../utils/utils';
 
 // import {promises as fs} from 'fs';
 // import path from 'path';
@@ -15,6 +16,8 @@ const main: AzureFunction = async (context: Context, timer: any, lastDate: {ts: 
 };
 
 export default main;
+
+const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
 
 const fetchAllDriveActivities = async (
     driveActivity: driveactivity_v2.Driveactivity,
@@ -105,45 +108,33 @@ const getDriveItemId = (target: driveactivity_v2.Schema$Target): string => {
  * cache for getPath
  * folderId => path
  */
-const paths = new Map<string, string>();
-const getPath = async (client: drive_v3.Drive, rootFolderId: string, item: DriveItem): Promise<string> => {
-    if (paths.has(item.content.id)) {
-        return paths.get(item.content.id);
-    }
-    if (item.content.id == rootFolderId) {
-        return '/';
-    }
+const paths: Map<string, Promise<{path: string | null, valid: boolean}>> = new Map([[rootFolderId, Promise.resolve({path: '/', valid: true})]]);
+const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<string> => {
     /**
      * path: path to item
      * valid: true if path has rootFolderId in ancestor
      */
-    const rec = async (folder: DriveItem): Promise<{path: string | null; valid: boolean}> => {
-        // I want to use Promise.any...
+    const rec = cacheCalls(async (client: drive_v3.Drive, folderId: string): Promise<{path: string | null; valid: boolean}> => {
+        const folder = await fetchDriveItem(client, folderId);
         if (!folder.content.parents) {
             // folder is root of drive
             return { path: null, valid: false };
         }
-        const parentPaths = (await Promise.all(folder.content.parents.map(async parentId => {
-            if (paths.has(parentId)) {
-                return { path: paths.get(parentId)!, valid: true };
-            }
-            if (parentId == rootFolderId) {
-                return { path: '/', valid: true };
-            }
-            const parent = await fetchDriveItem(client, parentId);
-            return rec(parent)
-        }))).filter(({valid}) => valid);
+        // I want to use Promise.any...
+        const parentPaths = (
+            (await Promise.all(folder.content.parents.map(async parentId => rec(client, parentId))))
+            .filter(({valid}) => valid).map(({path}) => path)
+        );
         if (parentPaths.length > 0) {
             const isFolder = folder.content.mimeType === 'application/vnd.google-apps.folder';
             // folder has one or more parents that is child of rootFolderId
-            const path = `${parentPaths[0].path}${folder.content.name}${isFolder? '/': ''}`;
-            paths.set(folder.content.id, path);
-            return { path, valid: true };
+            return { path: `${parentPaths[0]}${folder.content.name}${isFolder? '/': ''}`, valid: true };
         } else {
+            // rootFolderId is not ancestor of folderId...
             return { path: null, valid: false };
         }
-    };
-    const path = await rec(item);
+    }, (c, id) => id, paths);
+    const path = await rec(client, item.content.id);
     return path.valid? path.path: item.content.name;
 };
 
@@ -161,7 +152,6 @@ const checkUpdate = async (since: Date): Promise<Date> => {
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
     const peopleAPI = google.people({version: 'v1', auth});
-    const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
     const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
 
     const lastChecked = new Date();
@@ -197,7 +187,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
               const item = await fetchDriveItem(drive, getDriveItemId(target));
               return {
                 color: colors[actionName],
-                title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, rootFolderId, item)}`,
+                title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, item)}`,
                 text: '', // TODO: include details
                 title_link: item.content.webViewLink
               };
@@ -216,7 +206,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
                 content: (await Promise.all(targets.map(
                     async target => {
                         const item = await fetchDriveItem(drive, getDriveItemId(target));
-                        return `${japaneseTranslations[actionName]}: ${await getPath(drive, rootFolderId, item)} (${item.content.webViewLink})`
+                        return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
                     },
                     ))).join('\n'),
                 text,
