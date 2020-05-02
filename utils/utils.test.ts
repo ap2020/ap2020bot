@@ -15,7 +15,7 @@ describe('cacheCalls', () => {
     it('uses given initial cache', async () => {
         const slowAsync = jest.fn(slowAsync_); // slow identity function
         // TODO: type of slowAsync is any
-        const cachedFunc = cacheCalls(slowAsync, (k)=>k, [[1, Promise.resolve(123)]]);
+        const cachedFunc = cacheCalls(slowAsync, (k)=>k, new Map([[1, Promise.resolve(123)]]));
         const res = await Promise.all([cachedFunc(1), cachedFunc(1), cachedFunc(2)]);
         expect(slowAsync.mock.calls.length).toBe(1); // not 2 or 3
         expect(res).toEqual([123,123,2]);
