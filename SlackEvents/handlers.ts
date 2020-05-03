@@ -23,10 +23,15 @@ namespace Events {
 // the name of the handler must be the type of the event
 
 export const channel_created = async ({channel}: Events.ChannelCreated, context: Context) => {
-    await slack.bot.chat.postMessage({
-        channel: process.env.SLACK_CHANNEL_NOTIFICATIONS_OTHERS,
-        text: `:new: <@${channel.creator}> が <#${channel.id}> を作成しました :rocket:`,
-    });
+    await Promise.all([
+        slack.bot.chat.postMessage({
+            channel: process.env.SLACK_CHANNEL_NOTIFICATIONS_OTHERS,
+            text: `:new: <@${channel.creator}> が <#${channel.id}> を作成しました :rocket:`,
+        }),
+        slack.bot.conversations.join({
+            channel: channel.id,
+        })
+    ]);
 }
 
 export const channel_unarchive = async ({channel, user}: Events.ChannelUnarchive, context: Context) => {
