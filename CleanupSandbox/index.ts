@@ -22,11 +22,10 @@ const cleanupSandbox = async (lastSavedMessage: LastSavedMessage): Promise<LastS
     const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID;
     const auth = getGoogleClient();
     const drive = google.drive({version: "v3", auth});
-    const deleteAfter = 60 * 1000;//24 * 60 * 60 * 1000;
+    const deleteAfter = 24 * 60 * 60 * 1000;
     const latestOldTS = dateToSlackTS(new Date(Date.now() - deleteAfter)); // latest timestamp that should be cleaned
     const messages = (await listMessages(sandboxId, { oldest: lastSavedMessage.ts, latest: latestOldTS, /* inclusive: false */})).reverse();
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
-    console.log(messages.map(({text}) => text));
     const hooks: ((message: Slack.Message) => unknown)[] = [
         deleteMessages,
     ];
@@ -37,7 +36,7 @@ const cleanupSandbox = async (lastSavedMessage: LastSavedMessage): Promise<LastS
                     hooks.map(async hook => await hook(message))
                 ))
         ),
-        // dumpMessages(drive, messages, dumpFolderId, lastSavedMessage.ts, latestOldTS),
+        dumpMessages(drive, messages, dumpFolderId, lastSavedMessage.ts, latestOldTS),
     ]);
     return {ts: '1234567890.0000000'};
 }
@@ -112,9 +111,9 @@ const dumpMessages = async (drive: drive_v3.Drive, messages: Slack.Message[], du
     });
 }
 
-(async () => {
-    const start = Date.now();
-    await cleanupSandbox({ts: '1588482665.000600'});
-    const end = Date.now();
-    console.log('elapsed time:', end - start);
-})();
+// (async () => {
+//     const start = Date.now();
+//     await cleanupSandbox({ts: '1234567890.000000'});
+//     const end = Date.now();
+//     console.log('elapsed time:', end - start);
+// })();
