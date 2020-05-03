@@ -231,11 +231,11 @@ const notifyActivity = async ({slack, drive, people: peopleAPI}: Clients, activi
 }
 
 const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress) => {
-    for (const target of activity.actions.filter(({detail}) => detail.create).filter(({target}) => target.driveItem?.driveFile).map(({target}) => target)) { // TODO: use Promise.all
+    await Promise.all(activity.actions.filter(({detail}) => detail.create).filter(({target}) => target.driveItem?.driveFile).map(async ({target}) => {
         const item = await fetchDriveItem(drive, getDriveItemId(target));
         if (!item.content.permissions) {
             // the user don't have permission to share this file
-            continue;
+            return;
         }
 
         await drive.permissions.create({
@@ -247,7 +247,7 @@ const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2
                 emailAddress: groupEmailAddress,
             }
         });
-    }
+    }));
 }
 
 const fillEmptyTarget = (context: Context, activity: driveactivity_v2.Schema$DriveActivity): driveactivity_v2.Schema$DriveActivity => {
