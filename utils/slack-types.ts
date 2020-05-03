@@ -11,6 +11,13 @@ export module Slack {
         attachments?: unknown[];
         client_msg_id?: string;
         team?: string;
+        pinned_to: string[];
+        pinned_info: {
+            channel: string;
+            pinned_by: string;
+            pinned_ts: number;
+        };
+        inviter: string;
     }
 
     export module Conversation {
