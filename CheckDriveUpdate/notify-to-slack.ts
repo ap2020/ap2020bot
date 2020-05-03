@@ -41,11 +41,11 @@ const isIgnored = cacheCalls(async (client: drive_v3.Drive, itemId: string): Pro
     // 全ての親がignoredならtrue
     return isParentsIgnored.every((x) => x);
 }, (c, id) => id, new Map([
-    ...(process.env.GOOGLE_DRIVE_IGNORED_IDS.split(',').map(s => [s.trim(), Promise.resolve(true)] as [string, Promise<boolean>])),
+    ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve(true)] as [string, Promise<boolean>])),
     [rootFolderId, Promise.resolve(false)],
 ]));
 
-const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string): boolean => {
+export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string): boolean => {
     // bot activity might be part of activity by ordinary user
     // but I'll think about that after it really occurres.
     // currently this returns true if the activity only contains adding permission by bot
@@ -55,14 +55,14 @@ const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity, groupE
     if (!activity.actors[0].user?.knownUser?.isCurrentUser) {
         return false
     }
-    activity.actions.every((action) => {
-        if (!action.detail.permissionChange?.addedPermissions) {
-            return false;
-        }
-        return action.detail.permissionChange.addedPermissions.every(permission =>
-            permission.role === "COMMENTER" && permission.group?.email === groupEmailAddress
-        )
-    })
+    // use primaryAction, not actions because it somehow contains edit
+    const detail = activity.primaryActionDetail;
+    if (!detail.permissionChange?.addedPermissions) {
+        return false;
+    }
+    return detail.permissionChange.addedPermissions.every(permission =>
+        permission.role === "COMMENTER" && permission.group?.email === groupEmailAddress
+    )
 }
 
 
