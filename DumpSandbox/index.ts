@@ -7,13 +7,13 @@ import { getGoogleClient } from "../utils/google-client";
 import type {LastDumpedMessage} from "./output";
 
 const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<LastDumpedMessage> {
-    const newLastDumpedMessage = await dumpSandbox(lastDumpedMessage);
+    const newLastDumpedMessage = await dumpSandbox(lastDumpedMessage, context);
     return newLastDumpedMessage;
 };
 
 export default main;
 
-const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage): Promise<LastDumpedMessage> => {
+const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage, context: Context): Promise<LastDumpedMessage> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
     const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID;
     const auth = getGoogleClient();
@@ -27,12 +27,12 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage): Promise<LastDu
         return lastDumpedMessage;
     } else {
         const newLastDumpedMessage = messages[messages.length - 1];
-        await dumpMessages(drive, messages, dumpFolderId, lastDumpedMessage.ts, newLastDumpedMessage.ts);
+        await dumpMessages(drive, context, messages, dumpFolderId, lastDumpedMessage.ts, newLastDumpedMessage.ts);
         return {ts: newLastDumpedMessage.ts};
     }
 }
 
-const createFolderIfMissing = async (drive: drive_v3.Drive, parentId: string, name: string): Promise<drive_v3.Schema$File> => {
+const createFolderIfMissing = async (drive: drive_v3.Drive, context: Context, parentId: string, name: string): Promise<drive_v3.Schema$File> => {
     const searchResult: drive_v3.Schema$File[] = (await drive.files.list({
         q: `name = '${name}' and '${parentId}' in parents and mimeType = 'application/vnd.google-apps.folder'`, // TODO: injection!
     })).data.files;
@@ -49,20 +49,20 @@ const createFolderIfMissing = async (drive: drive_v3.Drive, parentId: string, na
         return folder;
     } else {
         if (searchResult.length > 1) {
-            console.error('More than one folder named', name, searchResult.map(({id}) => id));
+            context.log.error('More than one folder named', name, searchResult.map(({id}) => id));
             // まあでも致命的ではないのでとりあえずそのまま実行
         }
         return searchResult[0];
     }
 }
 
-const dumpMessages = async (drive: drive_v3.Drive, messages: Slack.Message[], dumpFolderId: string, oldestTS: string, latestTS: string) => {
+const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: Slack.Message[], dumpFolderId: string, oldestTS: string, latestTS: string) => {
     const oldest = moment(slackTSToDate(oldestTS)).tz('Asia/Tokyo');
     const latest = moment(slackTSToDate(latestTS)).tz('Asia/Tokyo');
     const dump = JSON.stringify(messages);
     
-    const ymfolder = await createFolderIfMissing(drive, dumpFolderId, oldest.format('YYYY-MM'));
-    const dayfolder = await createFolderIfMissing(drive, ymfolder.id, oldest.format('DD'));
+    const ymfolder = await createFolderIfMissing(drive, context, dumpFolderId, oldest.format('YYYY-MM'));
+    const dayfolder = await createFolderIfMissing(drive, context, ymfolder.id, oldest.format('DD'));
     
     await drive.files.create({
         requestBody: {
