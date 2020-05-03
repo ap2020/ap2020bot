@@ -4,7 +4,7 @@ import {slack, listMessages} from "../utils/slack";
 import type {Slack} from "../utils/slack-types";
 import { QueueMessage } from "../DumpSandbox/for-cleaner";
 
-const main: AzureFunction = async function (context: Context, timer: unknown, queueMessage: QueueMessage): Promise<void> {
+const main: AzureFunction = async function (context: Context, queueMessage: QueueMessage): Promise<void> {
     await cleanupSandbox(queueMessage);
 };
 

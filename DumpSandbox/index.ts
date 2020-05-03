@@ -7,9 +7,9 @@ import { getGoogleClient } from "../utils/google-client";
 import type {QueueMessage} from './for-cleaner';
 
 const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<LastDumpedMessage> {
-    const lastDumped = await dumpSandbox(lastDumpedMessage);
-    context.bindings.queue = {lastDumped} as QueueMessage;
-    return lastDumped;
+    const newLastDumpedMessage = await dumpSandbox(lastDumpedMessage);
+    context.bindings.queue = {lastDumped: {ts: newLastDumpedMessage.ts}} as QueueMessage;
+    return newLastDumpedMessage;
 };
 
 export default main;
@@ -25,11 +25,16 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage): Promise<LastDu
     const drive = google.drive({version: "v3", auth});
     const deleteAfter = 24 * 60 * 60 * 1000;
     const latestOldTS = dateToSlackTS(new Date(Date.now() - deleteAfter)); // latest timestamp that should be cleaned
+    // TODO use moment().subtract
     const messages = (await listMessages(sandboxId, { oldest: lastDumpedMessage.ts, latest: latestOldTS, /* inclusive: false */})).reverse();
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
-
-    await dumpMessages(drive, messages, dumpFolderId, lastDumpedMessage.ts, latestOldTS);
-    return {ts: '1234567890.0000000'}; // TODO:
+    if (messages.length === 0) {
+        return lastDumpedMessage;
+    } else {
+        const newLastDumpedMessage = messages[messages.length - 1];
+        await dumpMessages(drive, messages, dumpFolderId, lastDumpedMessage.ts, newLastDumpedMessage.ts);
+        return newLastDumpedMessage;
+    }
 }
 
 const createFolderIfMissing = async (drive: drive_v3.Drive, parentId: string, name: string): Promise<drive_v3.Schema$File> => {
