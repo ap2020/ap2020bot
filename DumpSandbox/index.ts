@@ -4,19 +4,14 @@ import {dateToSlackTS, slackTSToDate, listMessages} from "../utils/slack";
 import type {Slack} from "../utils/slack-types";
 import { drive_v3, google } from "googleapis";
 import { getGoogleClient } from "../utils/google-client";
-import type {QueueMessage} from './for-cleaner';
+import type {LastDumpedMessage} from "./output";
 
 const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<LastDumpedMessage> {
     const newLastDumpedMessage = await dumpSandbox(lastDumpedMessage);
-    context.bindings.queue = {lastDumped: {ts: newLastDumpedMessage.ts}} as QueueMessage;
     return newLastDumpedMessage;
 };
 
 export default main;
-
-interface LastDumpedMessage {
-    ts: string;
-}
 
 const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage): Promise<LastDumpedMessage> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
@@ -33,7 +28,7 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage): Promise<LastDu
     } else {
         const newLastDumpedMessage = messages[messages.length - 1];
         await dumpMessages(drive, messages, dumpFolderId, lastDumpedMessage.ts, newLastDumpedMessage.ts);
-        return newLastDumpedMessage;
+        return {ts: newLastDumpedMessage.ts};
     }
 }
 

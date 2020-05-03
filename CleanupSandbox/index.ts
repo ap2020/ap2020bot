@@ -1,30 +1,25 @@
 import { AzureFunction, Context } from "@azure/functions" 
-import {flatten} from "lodash";
 import {slack, listMessages} from "../utils/slack";
 import type {Slack} from "../utils/slack-types";
-import { QueueMessage } from "../DumpSandbox/for-cleaner";
+import type {LastDumpedMessage} from '../DumpSandbox/output';
 
-const main: AzureFunction = async function (context: Context, queueMessage: QueueMessage): Promise<void> {
-    await cleanupSandbox(queueMessage);
+const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<void> {
+    await cleanupSandbox(lastDumpedMessage);
 };
 
 export default main;
 
-const cleanupSandbox = async ({lastDumped}: QueueMessage): Promise<void> => {
+const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
-    const messages = (await listMessages(sandboxId, { latest: lastDumped.ts, inclusive: true})).reverse();
-    // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
-    const hooks: ((message: Slack.Message) => unknown)[] = [
-        async (message) => await deleteMessage(message, sandboxId),
-    ];
-    await Promise.all([
-        ...flatten(
-            messages
-                .map(message => (
-                    hooks.map(async hook => await hook(message))
-                ))
-        ),
-    ]);
+    const {messages} = await slack.bot.conversations.history({
+        channel: sandboxId,
+        latest: lastDumped.ts,
+        inclusive: true,
+        limit: 40, // to avoid rate limit
+    }) as Slack.Conversation.History;
+    await Promise.all(messages
+        .map(async message => deleteMessage(message, sandboxId))
+    );
 }
 
 const deleteMessage = async (message: Slack.Message, sandboxId: string) => {

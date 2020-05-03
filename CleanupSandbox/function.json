@@ -1,11 +1,18 @@
 {
   "bindings": [
     {
-      "type": "queueTrigger",
+      "name": "timer",
+      "type": "timerTrigger",
       "direction": "in",
-      "name": "queue",
-      "queueName": "DumpSandbox",
-      "connection": "AzureWebJobsStorage"
+      "schedule": "0 */20 * * * *",
+      "runOnStartup": false
+    },
+    {
+      "name": "lastDumpedMessage",
+      "type": "blob",
+      "path": "ap2020bot/DumpSandbox",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
     }
   ],
   "scriptFile": "../dist/CleanupSandbox/index.js"
