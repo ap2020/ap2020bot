@@ -1,0 +1,26 @@
+{
+  "bindings": [
+    {
+      "name": "timer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 */5 * * * *",
+      "runOnStartup": false
+    },
+    {
+      "name": "lastDate",
+      "type": "blob",
+      "path": "ap2020bot/CleanupSandbox",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    },
+    {
+      "name": "$return",
+      "type": "blob",
+      "path": "ap2020bot/CleanupSandbox",
+      "connection": "AzureWebJobsStorage",
+      "direction": "out"
+    }
+  ],
+  "scriptFile": "../dist/CleanupSandbox/index.js"
+}
