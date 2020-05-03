@@ -4,6 +4,7 @@ import {getGoogleClient} from '../utils/google-client';
 import {ignoredActions, japaneseTranslations, colors} from './config';
 import {stripIndent} from 'common-tags';
 import moment from 'moment-timezone';
+import {flatten} from 'lodash';
 import {slack} from '../utils/slack';
 import {fetchDriveItem, DriveItem} from './drive-api';
 import {cacheCalls} from '../utils/utils';
@@ -12,12 +13,19 @@ import {cacheCalls} from '../utils/utils';
 // import path from 'path';
 
 const main: AzureFunction = async (context: Context, timer: any, lastDate: {ts: number},): Promise<{ts: number}> => {
-    return {ts: (await checkUpdate(new Date(lastDate.ts))).getTime()};
+    return {ts: (await checkUpdate(context, new Date(lastDate.ts))).getTime()};
 };
 
 export default main;
 
 const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
+
+interface Clients {
+    slack: typeof slack;
+    drive: drive_v3.Drive;
+    driveActivity: driveactivity_v2.Driveactivity;
+    people: people_v1.People;
+}
 
 const fetchAllDriveActivities = async (
     driveActivity: driveactivity_v2.Driveactivity,
@@ -46,7 +54,9 @@ const fetchAllDriveActivities = async (
                 consolidationStrategy: { legacy: {} }
             }
         })).data;
-        activities = activities.concat(response.activities);
+        if (response.activities !== undefined) {
+            activities = activities.concat(response.activities);
+        }
     } while (response.nextPageToken);
     
     // if (process.env.NODE_ENV === 'development') {
@@ -161,82 +171,142 @@ const getEmoji = (item: DriveItem): string => {
     }
 };
 
-const checkUpdate = async (since: Date): Promise<Date> => {
+const notifyActivity = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, drivelogId: string) => {
+    // not notified in order!
+    // maybe chat.scheduleMessage is useful to imitate notification in order
+    // but I think the inorderness is ignorable if the frequency of execution is high enough
+    const actionName = getActionName(activity.primaryActionDetail);
+    if (ignoredActions.includes(actionName)) {
+        return;
+    }
+    const targets: driveactivity_v2.Schema$Target[] = (
+        (await Promise.all(activity.targets.map(
+            async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
+        )))
+        .filter(({ignored}) => !ignored)
+        .map(({target}) => target)
+    );
+    if (targets.length === 0) {
+        return;
+    }
+    const actorsText = (await Promise.all(
+        activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
+    )).join(', ');
+    const text = stripIndent`
+        ${actorsText}が *${activity.targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
+        発生日時: ${getDate(activity)}
+    `;
+    let fileURL: string | undefined = undefined;
+    if (targets.length <= 20) {
+        // attachments
+        const attachments = await Promise.all(targets.map(async target => {
+            const item = await fetchDriveItem(drive, getDriveItemId(target));
+            return {
+            color: colors[actionName],
+            title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, item)}`,
+            text: '', // TODO: include details
+            title_link: item.content.webViewLink
+            };
+        }));
+        await slack.bot.chat.postMessage({
+            channel: drivelogId,
+            text, 
+            icon_emoji: ':google_drive:',
+            username: 'UpdateNotifier',
+            attachments: attachments,
+        });
+    } else {
+        // post snippet
+        fileURL = ((await slack.bot.files.upload({
+            channels: [drivelogId].join(','),
+            content: (await Promise.all(targets.map(
+                async target => {
+                    const item = await fetchDriveItem(drive, getDriveItemId(target));
+                    return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
+                },
+                ))).join('\n'),
+            initial_comment: text,
+        })) as any).file.permalink;
+    }
+}
+
+const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress) => {
+    await Promise.all(activity.actions.filter(({detail}) => detail.create).filter(({target}) => target.driveItem?.driveFile).map(async ({target}) => {
+        const item = await fetchDriveItem(drive, getDriveItemId(target));
+        if (!item.content.permissions) {
+            // the user don't have permission to share this file
+            return;
+        }
+
+        await drive.permissions.create({
+            fileId: item.content.id,
+            sendNotificationEmail: false,
+            requestBody: {
+                role: 'commenter',
+                type: 'group',
+                emailAddress: groupEmailAddress,
+            }
+        });
+    }));
+}
+
+const fillEmptyTarget = (context: Context, activity: driveactivity_v2.Schema$DriveActivity): driveactivity_v2.Schema$DriveActivity => {
+    if (activity.targets.length > 1) {
+        return activity;
+    }
+    if (activity.targets.length === 0) {
+        context.log.error('empty targets', activity.timestamp ?? activity.timeRange);
+        return activity;
+    }
+    const mainTarget = activity.targets[0];
+    return {
+        ...activity,
+        actions: activity.actions.map(action => {
+            if (action.target) return action;
+            return {
+                ...action,
+                target: mainTarget,
+            }
+        }),
+    }
+} 
+
+const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
     const auth = getGoogleClient();
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
     const peopleAPI = google.people({version: 'v1', auth});
     const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
+    const groupEmailAddress = process.env.GOOGLE_GROUPS_EMAIL_ADDRESS;
+    const clients: Clients = {
+        slack,
+        drive,
+        driveActivity,
+        people: peopleAPI,
+    }
 
     const lastChecked = new Date();
-    const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
-    await Promise.all(activities.reverse().map(async activity => {
-        // not notified in order!
-        // maybe chat.scheduleMessage is useful to imitate notification in order
-        // but I think the inorderness is ignorable if the frequency of execution is high enough
-        if (!activity) {
-            return;
-        };
-        const actionName = getActionName(activity.primaryActionDetail);
-        if (ignoredActions.includes(actionName)) {
-            return;
-        }
-        const targets: driveactivity_v2.Schema$Target[] = (
-            (await Promise.all(activity.targets.map(
-                async target => ({target, ignored: await isIgnored(drive, getDriveItemId(target))})
-            )))
-            .filter(({ignored}) => !ignored)
-            .map(({target}) => target)
-        );
-        if (targets.length === 0) {
-            return;
-        }
-        const actorsText = (await Promise.all(
-            activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
-        )).join(', ');
-        const text = stripIndent`
-            ${actorsText}が *${activity.targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
-            発生日時: ${getDate(activity)}
-        `;
-        let fileURL: string | undefined = undefined;
-        if (targets.length <= 20) {
-            // attachments
-            const attachments = await Promise.all(targets.map(async target => {
-              const item = await fetchDriveItem(drive, getDriveItemId(target));
-              return {
-                color: colors[actionName],
-                title: `${japaneseTranslations[actionName]}: ${getEmoji(item)} ${await getPath(drive, item)}`,
-                text: '', // TODO: include details
-                title_link: item.content.webViewLink
-              };
-            }));
-            await slack.bot.chat.postMessage({
-                channel: drivelogId,
-                text, 
-                icon_emoji: ':google_drive:',
-                username: 'UpdateNotifier',
-                attachments: attachments,
-            });
-        } else {
-            // post snippet
-            fileURL = ((await slack.bot.files.upload({
-                channels: [drivelogId].join(','),
-                content: (await Promise.all(targets.map(
-                    async target => {
-                        const item = await fetchDriveItem(drive, getDriveItemId(target));
-                        return `${japaneseTranslations[actionName]}: ${await getPath(drive, item)} (${item.content.webViewLink})`
-                    },
-                    ))).join('\n'),
-                initial_comment: text,
-            })) as any).file.permalink;
-        }
-    }));
+    const activities = (await fetchAllDriveActivities(driveActivity, rootFolderId, since)).map(activity => fillEmptyTarget(context, activity));
+    const hooks: ((activity: driveactivity_v2.Schema$DriveActivity) =>  unknown)[] = [
+        async (activity) => await notifyActivity(clients, activity, drivelogId),
+        async (activity) => await addCommentPermission(clients, activity, groupEmailAddress),
+    ]
+    await Promise.all(
+        flatten(
+            activities
+                .reverse()
+                .map(activity => (
+                    hooks.map(async hook => await hook(activity))
+                ))
+        )
+    );
     return lastChecked;
 }
 
+// import {context} from '../utils-dev/fake-context';
 // (async () => {
 //     const start = Date.now();
-//     await checkUpdate(new Date(Date.now() - 1000*60*60*24));
+//     await checkUpdate(context, new Date(Date.now() - 1000*60*60*24));
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
 // })();
