@@ -13,7 +13,7 @@ import {cacheCalls} from '../utils/utils';
 // import path from 'path';
 
 const main: AzureFunction = async (context: Context, timer: any, lastDate: {ts: number},): Promise<{ts: number}> => {
-    return {ts: (await checkUpdate(new Date(lastDate.ts))).getTime()};
+    return {ts: (await checkUpdate(context, new Date(lastDate.ts))).getTime()};
 };
 
 export default main;
@@ -230,12 +230,54 @@ const notifyActivity = async ({slack, drive, people: peopleAPI}: Clients, activi
     }
 }
 
-const checkUpdate = async (since: Date): Promise<Date> => {
+const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress) => {
+    for (const target of activity.actions.filter(({detail}) => detail.create).filter(({target}) => target.driveItem?.driveFile).map(({target}) => target)) { // TODO: use Promise.all
+        const item = await fetchDriveItem(drive, getDriveItemId(target));
+        if (!item.content.permissions) {
+            // the user don't have permission to share this file
+            continue;
+        }
+
+        await drive.permissions.create({
+            fileId: item.content.id,
+            sendNotificationEmail: false,
+            requestBody: {
+                role: 'commenter',
+                type: 'group',
+                emailAddress: groupEmailAddress,
+            }
+        });
+    }
+}
+
+const fillEmptyTarget = (context: Context, activity: driveactivity_v2.Schema$DriveActivity): driveactivity_v2.Schema$DriveActivity => {
+    if (activity.targets.length > 1) {
+        return activity;
+    }
+    if (activity.targets.length === 0) {
+        context.log.error('empty targets', activity.timestamp ?? activity.timeRange);
+        return activity;
+    }
+    const mainTarget = activity.targets[0];
+    return {
+        ...activity,
+        actions: activity.actions.map(action => {
+            if (action.target) return action;
+            return {
+                ...action,
+                target: mainTarget,
+            }
+        }),
+    }
+} 
+
+const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
     const auth = getGoogleClient();
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
     const peopleAPI = google.people({version: 'v1', auth});
     const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
+    const groupEmailAddress = process.env.GOOGLE_GROUPS_EMAIL_ADDRESS;
     const clients: Clients = {
         slack,
         drive,
@@ -244,15 +286,16 @@ const checkUpdate = async (since: Date): Promise<Date> => {
     }
 
     const lastChecked = new Date();
-    const activities = await fetchAllDriveActivities(driveActivity, rootFolderId, since);
+    const activities = (await fetchAllDriveActivities(driveActivity, rootFolderId, since)).map(activity => fillEmptyTarget(context, activity));
     const hooks: ((activity: driveactivity_v2.Schema$DriveActivity) =>  unknown)[] = [
         async (activity) => await notifyActivity(clients, activity, drivelogId),
+        async (activity) => await addCommentPermission(clients, activity, groupEmailAddress),
     ]
     await Promise.all(
         flatten(
             activities
                 .reverse()
-                .map(async activity => (
+                .map(activity => (
                     hooks.map(async hook => await hook(activity))
                 ))
         )
@@ -260,9 +303,10 @@ const checkUpdate = async (since: Date): Promise<Date> => {
     return lastChecked;
 }
 
+// import {context} from '../utils-dev/fake-context';
 // (async () => {
 //     const start = Date.now();
-//     await checkUpdate(new Date(Date.now() - 1000*60*60*24));
+//     await checkUpdate(context, new Date(Date.now() - 1000*60*60*24));
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
 // })();
