@@ -107,7 +107,7 @@ export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, 
         activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
     )).join(', ');
     const text = stripIndent`
-        ${actorsText}が *${activity.targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
+        ${actorsText}が *${targets.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
         発生日時: ${getDate(activity)}
     `;
     let fileURL: string | undefined = undefined;
