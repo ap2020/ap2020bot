@@ -1,0 +1,33 @@
+{
+  "bindings": [
+    {
+      "name": "myTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 0 * * * *",
+      "runOnStartup": false
+    },
+    {
+      "name": "lastDumpedTS",
+      "type": "blob",
+      "path": "ap2020bot/DumpSandbox",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    },
+    {
+      "name": "$return",
+      "type": "blob",
+      "path": "ap2020bot/DumpSandbox",
+      "connection": "AzureWebJobsStorage",
+      "direction": "out"
+    },
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "queue",
+      "queueName": "DumpSandbox",
+      "connection": "AzureWebJobsStorage"
+    }
+  ],
+  "scriptFile": "../dist/DumpSandbox/index.js"
+}
