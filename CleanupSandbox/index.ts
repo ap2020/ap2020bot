@@ -17,7 +17,8 @@ export default main;
 const cleanupSandbox = async (lastSavedMessage: LastSavedMessage): Promise<LastSavedMessage> => {
     const deleteAfter = 60 * 1000;//24 * 60 * 60 * 1000;
     const latestOldTS = dateToSlackTS(new Date(Date.now() - deleteAfter)); // latest timestamp that should be cleaned
-    const messages = (await listMessages(sandboxId, { oldest: lastSavedMessage.ts, latest: latestOldTS, inclusive: false})).reverse();
+    const messages = (await listMessages(sandboxId, { oldest: lastSavedMessage.ts, latest: latestOldTS, /* inclusive: false */})).reverse();
+    // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
 
     return {ts: '1234567890.0000000'};
 }
@@ -34,7 +35,7 @@ const listMessages = async (
 
     return messages;
 };
-
+ 
 // (async () => {
 //     const start = Date.now();
 //     await cleanupSandbox({ts: '1234567890.0000000'});
