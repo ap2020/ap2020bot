@@ -76,3 +76,10 @@ const dumpMessages = async (drive: drive_v3.Drive, messages: Slack.Message[], du
         },
     });
 }
+
+// (async () => {
+//     const start = Date.now();
+//     await dumpSandbox({ts: '1234567890.000000'});
+//     const end = Date.now();
+//     console.log('elapsed time:', end - start);
+// })();
