@@ -16,9 +16,9 @@ export class DriveItem {
     }
 }
 
-export const fetchDriveItem = cacheCalls(async (client: drive_v3.Drive, id: string): Promise<DriveItem> => { // TODO: use cacheCalls
-    return new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions'})).data)
-}, (c, id) => id);
+export const fetchDriveItem = cacheCalls(async (client: drive_v3.Drive, id: string): Promise<DriveItem> =>
+    new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions'})).data)
+, (c, id) => id);
 
 /**
  * cache for getPath
