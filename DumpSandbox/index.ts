@@ -82,4 +82,4 @@ const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: S
 //     await dumpSandbox({ts: '1234567890.000000'});
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
-// })();
+// })().catch(console.error);

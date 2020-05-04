@@ -39,4 +39,4 @@ const deleteMessage = async (message: Slack.Message, sandboxId: string) => {
 //     await cleanupSandbox({lastDumped: {ts: '1234567890.000000'}});
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
-// })();
+// })().catch(console.error);

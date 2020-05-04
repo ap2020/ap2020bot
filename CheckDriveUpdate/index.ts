@@ -142,4 +142,4 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
 //     await checkUpdate(context, new Date(Date.now() - 1000*60*60*24));
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
-// })();
+// })().catch(console.error);

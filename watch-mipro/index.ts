@@ -46,4 +46,4 @@ export default check;
 // for development
 
 // import {context} from "../utils-dev/fake-context";
-// check(context, undefined, ['20pro02','20pro032','20pro100']);
+// check(context, undefined, ['20pro02','20pro032','20pro100']).catch(console.error);
