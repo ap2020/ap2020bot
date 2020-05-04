@@ -4,6 +4,10 @@ import {rootFolderId} from './lib';
 
 const driveItems = new Map<string, Promise<DriveItem>>()
 
+// TODO: drive-activity-apiと名前が衝突している
+// DriveItemはDrive Activityの概念なので↓を改名すべきか？
+// それともnamespaceで分けてあげるか
+// そもそもcontentでアクセスするの面倒なので適切にラップしたい (#30)
 export class DriveItem {
     client: drive_v3.Drive;
     content: drive_v3.Schema$File;

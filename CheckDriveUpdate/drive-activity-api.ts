@@ -26,6 +26,7 @@ class FoundItem implements DriveItem {
         if (!item.content.mimeType) {
             // いや起きないだろと思っている
             // 起きたらtargetの情報を使う (つまりNotFoundItem) けどちゃんとしたエラー処理が面倒
+            // TODO: さすがにエグいので， requiredField = ["mimetype", ...] とかしてまとめて適切にチェックしたい
             throw Error(`Missing mimeType: ${item.content.id}`);
         }
         if (!item.content.name) {
