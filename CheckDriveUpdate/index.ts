@@ -66,6 +66,10 @@ const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2
             // the user don't have permission to share this file
             return;
         }
+        if(item.content.mimeType === 'application/vnd.google-apps.folder') {
+            // item is a folder so adding comment permission does nothing
+            return;
+        }
 
         await drive.permissions.create({
             fileId: item.content.id,
