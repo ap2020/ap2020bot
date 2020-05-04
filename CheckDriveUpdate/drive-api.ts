@@ -16,17 +16,9 @@ export class DriveItem {
     }
 }
 
-export const fetchDriveItem = async (client: drive_v3.Drive, id: string) => { // TODO: use cacheCalls
-    if (driveItems.has(id)) {
-        return driveItems.get(id);
-    } else {
-        const driveItemPromise = (async () =>
-            new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions'})).data)
-        )();
-        driveItems.set(id, driveItemPromise);
-        return driveItemPromise;
-    }
-}
+export const fetchDriveItem = cacheCalls(async (client: drive_v3.Drive, id: string): Promise<DriveItem> => { // TODO: use cacheCalls
+    return new DriveItem(client, (await client.files.get({fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions'})).data)
+}, (c, id) => id);
 
 /**
  * cache for getPath
@@ -61,3 +53,17 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
     const path = await rec(client, item.content.id);
     return path.valid? path.path: item.content.name;
 };
+
+export const isIgnored = cacheCalls(async (client: drive_v3.Drive, itemId: string): Promise<boolean> => {
+    const item = await fetchDriveItem(client, itemId);
+    if (item.content.parents.length === 0) {
+        // we don't need to ignore this
+        return false;
+    }
+    const isParentsIgnored = await Promise.all(item.content.parents.map(async parentId => isIgnored(client, parentId)));
+    // 全ての親がignoredならtrue
+    return isParentsIgnored.every((x) => x);
+}, (c, id) => id, new Map([
+    ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve(true)] as [string, Promise<boolean>])),
+    [rootFolderId, Promise.resolve(false)],
+]));
