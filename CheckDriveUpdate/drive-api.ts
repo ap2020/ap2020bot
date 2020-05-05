@@ -60,6 +60,10 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
 
 export const isIgnored = cacheCalls(async (client: drive_v3.Drive, itemId: string): Promise<boolean> => {
     const item = await fetchDriveItem(client, itemId);
+    if(!item.content.parents) {
+        // root of drive
+        return false;
+    }
     if (item.content.parents.length === 0) {
         // we don't need to ignore this
         return false;
