@@ -20,12 +20,10 @@ export const dateToSlackTS = (date: Date): string =>
 export const slackTSToDate = (ts: string): Date =>
     new Date(Number(ts) * 1000)
 
-// TODO: inclusiveで演算子を変えるより，最後にoldest・latestと等号成立するものをfilter-outした方が綺麗だと思うよ
 export const listMessages = async (
     channel: string,
     option: { latest?: string; oldest?: string, inclusive?: boolean, limit?: number, thread_policy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { thread_policy: 'just-in-range'}
 ): Promise<Slack.Message[]> => {
-    // TODO: handle inclusive
     const oldestDate = option.oldest === undefined? new Date(0) : slackTSToDate(option.oldest);
     const latestDate = option.latest === undefined? new Date(Date.now() + 24*60*60*1000) : slackTSToDate(option.latest);
     let messages: Slack.Message[];
