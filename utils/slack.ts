@@ -26,6 +26,8 @@ export const listMessages = async (
     option: { latest?: string; oldest?: string, inclusive?: boolean, limit?: number, thread_policy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { thread_policy: 'just-in-range'}
 ): Promise<Slack.Message[]> => {
     // TODO: handle inclusive
+    const oldestDate = option.oldest === undefined? new Date(0) : slackTSToDate(option.oldest);
+    const latestDate = option.latest === undefined? new Date(Date.now() + 24*60*60*1000) : slackTSToDate(option.latest);
     switch (option.thread_policy) {
         case 'all-or-nothing': {
             let {messages} = (await slack.bot.conversations.history({
@@ -38,11 +40,10 @@ export const listMessages = async (
                 messages
                     .filter(isThreadParent)
                     .filter(({latest_reply}) => // if latest reply is before latest
-                        option.latest === undefined? true : (
-                            option.inclusive?
-                                (slackTSToDate(latest_reply) <= slackTSToDate(option.latest)) :
-                                (slackTSToDate(latest_reply) < slackTSToDate(option.latest))
-                        )
+                        option.inclusive?
+                            (slackTSToDate(latest_reply) <= slackTSToDate(option.latest)) :
+                            (slackTSToDate(latest_reply) < slackTSToDate(option.latest))
+                    
                     )
                     .map(async message => {
                         const thread_rest = (await slack.user.conversations.replies({
@@ -71,11 +72,11 @@ export const listMessages = async (
                             .filter(isThreadParent)
                             .filter(({ts: oldest_reply, latest_reply}) => // filter threads that may have replies in range
                                 option.inclusive? (
-                                    (option.oldest === undefined? true : slackTSToDate(option.oldest) <= slackTSToDate(latest_reply)) &&
-                                    (option.latest === undefined? true : slackTSToDate(oldest_reply) <= slackTSToDate(option.latest))
+                                    slackTSToDate(option.oldest) <= slackTSToDate(latest_reply) &&
+                                    slackTSToDate(oldest_reply) <= slackTSToDate(option.latest)
                                 ) : (
-                                    (option.oldest === undefined? true : slackTSToDate(option.oldest) < slackTSToDate(latest_reply)) &&
-                                    (option.latest === undefined? true : slackTSToDate(oldest_reply) < slackTSToDate(option.latest))
+                                    slackTSToDate(option.oldest) < slackTSToDate(latest_reply) &&
+                                    slackTSToDate(oldest_reply) < slackTSToDate(option.latest)
                                 )
                             )
                             .map(async message =>
@@ -89,14 +90,10 @@ export const listMessages = async (
                             )
                     )
                 ).filter(({ts}) => // whether message's ts is in range
-                    (option.latest === undefined?
-                        true :
-                        option.inclusive?
+                    (option.inclusive?
                             slackTSToDate(ts) <= slackTSToDate(option.latest) :
                             slackTSToDate(ts) < slackTSToDate(option.latest)) &&
-                    (option.oldest === undefined?
-                        true :
-                        option.inclusive?
+                    (option.inclusive?
                             slackTSToDate(ts) >= slackTSToDate(option.oldest) :
                             slackTSToDate(ts) > slackTSToDate(option.oldest))
                 )
