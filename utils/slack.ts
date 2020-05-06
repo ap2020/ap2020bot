@@ -22,11 +22,11 @@ export const slackTSToDate = (ts: string): Date =>
 
 export const listMessages = async (
     channel: string,
-    option: { latest?: string; oldest?: string, inclusive?: boolean, thread_policy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { thread_policy: 'just-in-range'}
+    option: { latest?: string; oldest?: string, inclusive?: boolean, limit?: number, thread_policy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { thread_policy: 'just-in-range'}
 ): Promise<Slack.Message[]> => {
     let {messages} = (await slack.bot.conversations.history({
         channel, 
-        count: 1000, // TODO: handle has_more
+        count: option.limit ?? 1000, // TODO: handle has_more
         ...option,
     })) as Slack.Conversation.History;
     switch (option.thread_policy) {
