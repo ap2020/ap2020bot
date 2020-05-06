@@ -11,12 +11,15 @@ export default main;
 
 const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
-    const {messages} = await slack.bot.conversations.history({
-        channel: sandboxId,
-        latest: lastDumped.ts,
-        inclusive: true,
-        limit: 40, // to avoid rate limit
-    }) as Slack.Conversation.History;
+    const messages = (await listMessages(
+        sandboxId,
+        {
+            latest: lastDumped.ts,
+            inclusive: true,
+            limit: 40, // to avoid rate limit
+            thread_policy: 'all-or-nothing',
+        })
+    );
     await Promise.all(messages
         .map(async message => deleteMessage(message, sandboxId))
     );
