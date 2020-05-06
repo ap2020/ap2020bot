@@ -20,23 +20,29 @@ export const dateToSlackTS = (date: Date): string =>
 export const slackTSToDate = (ts: string): Date =>
     new Date(Number(ts) * 1000)
 
+// TODO: inclusiveで演算子を変えるより，最後にoldest・latestと等号成立するものをfilter-outした方が綺麗だと思うよ
 export const listMessages = async (
     channel: string,
     option: { latest?: string; oldest?: string, inclusive?: boolean, limit?: number, thread_policy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { thread_policy: 'just-in-range'}
 ): Promise<Slack.Message[]> => {
-    let {messages} = (await slack.bot.conversations.history({
-        channel, 
-        count: option.limit ?? 1000, // TODO: handle has_more
-        ...option,
-    })) as Slack.Conversation.History;
+    // TODO: handle inclusive
     switch (option.thread_policy) {
-        case 'all-or-nothing':
+        case 'all-or-nothing': {
+            let {messages} = (await slack.bot.conversations.history({
+                channel, 
+                ...option,
+                count: option.limit ?? 1000, // TODO: handle has_more
+            })) as Slack.Conversation.History;
             // add thread messages
             await Promise.all(
                 messages
                     .filter(isThreadParent)
                     .filter(({latest_reply}) => // if latest reply is before latest
-                        option.latest === undefined? true : slackTSToDate(latest_reply) < slackTSToDate(option.latest) 
+                        option.latest === undefined? true : (
+                            option.inclusive?
+                                (slackTSToDate(latest_reply) <= slackTSToDate(option.latest)) :
+                                (slackTSToDate(latest_reply) < slackTSToDate(option.latest))
+                        )
                     )
                     .map(async message => {
                         const thread_rest = (await slack.user.conversations.replies({
@@ -47,27 +53,63 @@ export const listMessages = async (
                         messages = messages.concat(thread_rest);
                     })
             );
-            break;
-        case 'just-in-range':
+            return messages;
+        }
+        case 'just-in-range': {
+            let {messages} = (await slack.bot.conversations.history({
+                channel, 
+                count: option.limit ?? 1000, // TODO: handle has_more
+                inclusive: option.inclusive,
+                latest: option.latest,
+                // no oldest because child of outdated parent can be new
+            })) as Slack.Conversation.History;
             // get all hidden thread messages
             messages = messages.concat(
                 flatten(
                     await Promise.all(
                         messages
                             .filter(isThreadParent)
-                            .map(async message => 
+                            .filter(({ts: oldest_reply, latest_reply}) => // filter threads that may have replies in range
+                                option.inclusive? (
+                                    (option.oldest === undefined? true : slackTSToDate(option.oldest) <= slackTSToDate(latest_reply)) &&
+                                    (option.latest === undefined? true : slackTSToDate(oldest_reply) <= slackTSToDate(option.latest))
+                                ) : (
+                                    (option.oldest === undefined? true : slackTSToDate(option.oldest) < slackTSToDate(latest_reply)) &&
+                                    (option.latest === undefined? true : slackTSToDate(oldest_reply) < slackTSToDate(option.latest))
+                                )
+                            )
+                            .map(async message =>
                                 (await slack.user.conversations.replies({
                                     channel,
                                     ts: message.ts,
-                                    limit: 1000,  // TODO: handle has_more
-                                }) as Slack.Conversation.Replies).messages.filter(isThreadChildHidden)
+                                    ...option,
+                                    limit: option.limit ?? 1000,  // TODO: handle has_more
+                                }) as Slack.Conversation.Replies).messages
+                                    .filter(isThreadChildHidden)
                             )
                     )
-                ).filter(({ts}) => option.latest === undefined? true : slackTSToDate(ts) < slackTSToDate(option.latest)) // whether message's ts is in range
+                ).filter(({ts}) => // whether message's ts is in range
+                    (option.latest === undefined?
+                        true :
+                        option.inclusive?
+                            slackTSToDate(ts) <= slackTSToDate(option.latest) :
+                            slackTSToDate(ts) < slackTSToDate(option.latest)) &&
+                    (option.oldest === undefined?
+                        true :
+                        option.inclusive?
+                            slackTSToDate(ts) >= slackTSToDate(option.oldest) :
+                            slackTSToDate(ts) > slackTSToDate(option.oldest))
+                )
             );
-            break;
-        case 'nothing':
-            break;
+            return messages;
+        }
+        case 'nothing': {
+            const {messages} = (await slack.bot.conversations.history({
+                channel, 
+                count: option.limit ?? 1000, // TODO: handle has_more
+                ...option,
+            })) as Slack.Conversation.History;
+            return messages;
+        }
     }
-    return messages;
 };
