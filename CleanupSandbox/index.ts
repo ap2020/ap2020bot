@@ -19,7 +19,7 @@ const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
             limit: 40, // to avoid rate limit
             thread_policy: 'all-or-nothing',
         })
-    );
+    ).filter(({subtype}) => subtype !== 'tombstone');
     await Promise.all(messages
         .map(async message => deleteMessage(message, sandboxId))
     );
