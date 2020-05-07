@@ -39,7 +39,7 @@ export const listMessages = async (
                 messages
                     .filter(isThreadParent)
                     .filter(({latest_reply}) => // if latest reply is before latest
-                        slackTSToDate(latest_reply) <= slackTSToDate(option.latest)
+                        slackTSToDate(latest_reply) <= latestDate
                     )
                     .map(async message => {
                         const thread_rest = (await slack.user.conversations.replies({
@@ -67,8 +67,8 @@ export const listMessages = async (
                         messages
                             .filter(isThreadParent)
                             .filter(({ts: oldest_reply, latest_reply}) => // filter threads that may have replies in range
-                                slackTSToDate(option.oldest) <= slackTSToDate(latest_reply) &&
-                                slackTSToDate(oldest_reply) <= slackTSToDate(option.latest)
+                                oldestDate <= slackTSToDate(latest_reply) &&
+                                slackTSToDate(oldest_reply) <= latestDate
                             )
                             .map(async message =>
                                 (await slack.user.conversations.replies({
@@ -81,8 +81,8 @@ export const listMessages = async (
                             )
                     )
                 ).filter(({ts}) => // whether message's ts is in range
-                    slackTSToDate(option.oldest) <= slackTSToDate(ts) &&
-                    slackTSToDate(ts) <= slackTSToDate(option.latest)
+                    oldestDate <= slackTSToDate(ts) &&
+                    slackTSToDate(ts) <= latestDate
                 )
             );
             break;
