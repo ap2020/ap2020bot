@@ -20,6 +20,7 @@ export const dateToSlackTS = (date: Date): string =>
 export const slackTSToDate = (ts: string): Date =>
     new Date(Number(ts) * 1000);
 
+// TODO: どうにか共通化できないか，あるいはswitchを関数に切り出しちゃうか
 export const listMessages = async (
     channel: string,
     option: { latest?: string; oldest?: string; inclusive?: boolean; limit?: number; threadPolicy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { threadPolicy: 'just-in-range' },
@@ -107,6 +108,6 @@ export const listMessages = async (
     return messages.filter(({ ts }) => ( // if exclusive, remove exact match
         option.inclusive ?
             true :
-            ts === option.latest || ts === option.oldest
+            ts !== option.latest && ts !== option.oldest
     ));
 };
