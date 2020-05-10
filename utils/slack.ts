@@ -109,5 +109,5 @@ export const listMessages = async (
         option.inclusive ?
             true :
             ts !== option.latest && ts !== option.oldest
-    ));
+    )).sort(({ ts }) => Number(ts)); // TODO: in-place sortなのでin-placeっぽく書きたいね
 };
