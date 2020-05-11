@@ -1,6 +1,30 @@
-import type {WebAPICallResult} from '@slack/web-api';
+/* eslint @typescript-eslint/naming-convention: [
+    "warn",
+    {
+        "selector": "default",
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow",
+    },
+    {
+        "selector": "property",
+        "format": ["camelCase", "snake_case"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow",
+    },
+    {
+        "selector": "typeLike",
+        "format": ["PascalCase"],
+    },
+]
+*/
+/* eslint @typescript-eslint/no-namespace: "off"
+*/
+// TODO: enable this rule above
 
-export module Slack {
+import type { WebAPICallResult } from '@slack/web-api';
+
+export declare namespace Slack {
     interface MessageBase {
         type: string;
         subtype?: string;
@@ -41,16 +65,16 @@ export module Slack {
     }
 
     export interface ThreadChildInChannel extends ThreadChild {
-        subtype: "thread_broadcast";
+        subtype: 'thread_broadcast';
         root: ThreadParent;
     }
 
     export type Message = MessageBase | ThreadParent | ThreadChild | ThreadChildInChannel;
 
-    export module Conversation {
+    export namespace Conversation {
         export interface History extends WebAPICallResult {
             ok: boolean;
-            response_metadata?:  {
+            response_metadata?: {
                 next_cursor: string;
             };
             messages: (MessageBase | ThreadParent | ThreadChildInChannel)[];
@@ -65,8 +89,8 @@ export module Slack {
         export interface Replies extends WebAPICallResult {
             ok: boolean;
             response_metadata?: {
-                next_cursor: string
-            }
+                next_cursor: string;
+            };
             messages: [
                 ThreadParent,
                 ...(ThreadChild | ThreadChildInChannel)[],
