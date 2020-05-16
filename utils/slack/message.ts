@@ -29,34 +29,37 @@ type ListMessagesSubArgs = [
     }
 ]
 
-const _listRedundantMessages: {[key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Slack.Message[]> } = {
+const _listRedundantMessages: {
+    [key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Slack.Message[]>
+} = {
     'all-or-nothing': async (args, moments) => {
-        let { messages } = (await slack.bot.conversations.history({
+        const { messages } = (await slack.bot.conversations.history({
             ...args,
             count: args.limit ?? 1000, // TODO: handle has_more
         })) as Slack.Conversation.History;
-        // add thread messages
-        await Promise.all(
-            messages
-                .filter(isThreadParent)
-                .filter(
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    ({ latest_reply }) => // if latest reply is before latest
-                        slackTSToMoment(latest_reply) <= moments.latest,
-                )
-                .map(async message => {
-                    const threadRest = (await slack.user.conversations.replies({
-                        channel: args.channel,
-                        ts: message.ts,
-                        limit: 1000, // TODO: handle has_more
-                    }) as Slack.Conversation.Replies).messages.filter(isThreadChildHidden);
-                    messages = messages.concat(threadRest);
-                }),
-        );
-        return messages;
+        const threadMessages: Slack.ThreadChild[][] =
+            await Promise.all(
+                messages
+                    .filter(isThreadParent)
+                    .filter(
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
+                        ({ latest_reply }) => // if latest reply is before latest
+                            slackTSToMoment(latest_reply) <= moments.latest,
+                    )
+                    .map(
+                        async message =>
+                            (await slack.user.conversations.replies({
+                                channel: args.channel,
+                                ts: message.ts,
+                                limit: 1000, // TODO: handle has_more
+                            }) as Slack.Conversation.Replies).messages
+                                .filter(isThreadChildHidden),
+                    ),
+            );
+        return messages.concat(flatten(threadMessages));
     },
     'just-in-range': async (args, moments) => {
-        let { messages } = (await slack.bot.conversations.history({
+        const { messages } = (await slack.bot.conversations.history({
             channel: args.channel,
             count: args.limit ?? 1000, // TODO: handle has_more
             inclusive: args.inclusive,
@@ -64,32 +67,34 @@ const _listRedundantMessages: {[key in ThreadPolicy]: (...a: ListMessagesSubArgs
         // no oldest because child of outdated parent can be new
         })) as Slack.Conversation.History;
         // get all hidden thread messages
-        messages = messages.concat(
-            flatten(
-                await Promise.all(
-                    messages
-                        .filter(isThreadParent)
-                        .filter(
-                            // eslint-disable-next-line @typescript-eslint/naming-convention
-                            ({ ts: oldest_reply, latest_reply }) => // filter threads that may have replies in range
-                                moments.oldest <= slackTSToMoment(latest_reply) && slackTSToMoment(oldest_reply) <= moments.latest,
-                        )
-                        .map(
-                            async message =>
-                                (await slack.user.conversations.replies({
-                                    ...args,
-                                    ts: message.ts,
-                                    limit: args.limit ?? 1000, // TODO: handle has_more
-                                }) as Slack.Conversation.Replies).messages
-                                    .filter(isThreadChildHidden),
-                        ),
+        const threadMessages: Slack.ThreadChild[][] = await Promise.all(
+            messages
+                // search for thread parents
+                .filter(isThreadParent)
+                // filter threads that may have replies in range
+                .filter(
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    ({ ts: oldest_reply, latest_reply }) =>
+                        moments.oldest <= slackTSToMoment(latest_reply) && slackTSToMoment(oldest_reply) <= moments.latest,
+                )
+                .map(
+                    async message =>
+                        // fetch children
+                        (await slack.user.conversations.replies({
+                            ...args,
+                            ts: message.ts,
+                            limit: args.limit ?? 1000, // TODO: handle has_more
+                        }) as Slack.Conversation.Replies).messages
+                            // filter out messages posted in channel
+                            .filter(isThreadChildHidden)
+                            // filter message whose ts is in range
+                            .filter(
+                                ({ ts }) =>
+                                    moments.oldest <= slackTSToMoment(ts) && slackTSToMoment(ts) <= moments.latest,
+                            ),
                 ),
-            ).filter(
-                ({ ts }) => // whether message's ts is in range
-                    moments.oldest <= slackTSToMoment(ts) && slackTSToMoment(ts) <= moments.latest,
-            ),
         );
-        return messages;
+        return messages.concat(flatten(threadMessages));
     },
     nothing: async (args) =>
         (await slack.bot.conversations.history({
