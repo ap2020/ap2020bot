@@ -19,15 +19,15 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage, context: Contex
     const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID;
     const auth = getGoogleClient();
     const drive = google.drive({version: "v3", auth});
-    const deleteAfter = [1, 'days'];
-    const latestOldTS = momentToSlackTS(moment().subtract(...deleteAfter)); // latest timestamp that should be cleaned
+    const deleteAfter = moment.duration(1, 'days');
+    const latestOldTS = momentToSlackTS(moment().subtract(deleteAfter)); // latest timestamp that should be cleaned
     const messages = (await listMessages({
         channel: sandboxId,
         oldest: lastDumpedMessage.ts,
         latest: latestOldTS,
         threadPolicy: 'just-in-range',
         /* inclusive: false */
-    })).reverse();
+    }));
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
     if (messages.length === 0) {
         return lastDumpedMessage;
@@ -83,9 +83,10 @@ const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: S
     });
 }
 
+// import { context } from '../utils-dev/fake-context';
 // (async () => {
 //     const start = Date.now();
-//     await dumpSandbox({ts: '1234567890.000000'});
+//     await dumpSandbox({ts: '1234567890.000000'}, context);
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
 // })().catch(console.error);
