@@ -16,7 +16,7 @@ export module Slack {
             users: string[];
             count: number;
         }[];
-        pinned_to: string[];
+        pinned_to?: string[];
         pinned_info: {
             channel: string;
             pinned_by: string;
