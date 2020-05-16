@@ -13,8 +13,8 @@ export default main;
 const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
     const messages = (await listMessages(
-        sandboxId,
         {
+            channel: sandboxId,
             latest: lastDumped.ts,
             inclusive: true,
             limit: 40, // to avoid rate limit

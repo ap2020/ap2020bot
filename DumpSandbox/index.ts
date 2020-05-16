@@ -21,7 +21,13 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage, context: Contex
     const drive = google.drive({version: "v3", auth});
     const deleteAfter = [1, 'days'];
     const latestOldTS = momentToSlackTS(moment().subtract(...deleteAfter)); // latest timestamp that should be cleaned
-    const messages = (await listMessages(sandboxId, { oldest: lastDumpedMessage.ts, latest: latestOldTS, threadPolicy: 'just-in-range', /* inclusive: false */})).reverse();
+    const messages = (await listMessages({
+        channel: sandboxId,
+        oldest: lastDumpedMessage.ts,
+        latest: latestOldTS,
+        threadPolicy: 'just-in-range',
+        /* inclusive: false */
+    })).reverse();
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
     if (messages.length === 0) {
         return lastDumpedMessage;
