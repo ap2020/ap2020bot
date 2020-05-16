@@ -9,6 +9,8 @@ const main: AzureFunction = async function (context: Context, timer: unknown, la
 
 export default main;
 
+// TODO: Queueでよくないか
+
 const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
     const messages = (await listMessages(
