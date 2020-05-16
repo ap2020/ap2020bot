@@ -86,15 +86,15 @@ const _listRedundantMessages: {
                             limit: args.limit ?? 1000, // TODO: handle has_more
                         }) as Slack.Conversation.Replies).messages
                             // filter out messages posted in channel
-                            .filter(isThreadChildHidden)
-                            // filter message whose ts is in range
-                            .filter(
-                                ({ ts }) =>
-                                    moments.oldest <= slackTSToMoment(ts) && slackTSToMoment(ts) <= moments.latest,
-                            ),
+                            .filter(isThreadChildHidden),
                 ),
         );
-        return messages.concat(flatten(threadMessages));
+        return messages.concat(flatten(threadMessages))
+            // filter message whose ts is in range
+            .filter(
+                ({ ts }) =>
+                    moments.oldest <= slackTSToMoment(ts) && slackTSToMoment(ts) <= moments.latest,
+            );
     },
     nothing: async (args) =>
         (await slack.bot.conversations.history({
@@ -113,6 +113,6 @@ export const listMessages = async (args: ListMessagesArgs): Promise<Slack.Messag
                     true :
                     ts !== args.latest && ts !== args.oldest
             ));
-    messages.sort(({ ts }) => Number(ts));
+    messages.sort(({ ts: ts1 }, { ts: ts2 }) => Number(ts1) - Number(ts2));
     return messages;
 };
