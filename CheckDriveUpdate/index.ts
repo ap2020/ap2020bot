@@ -2,7 +2,7 @@ import {AzureFunction, Context} from "@azure/functions"
 import {google, driveactivity_v2, people_v1, drive_v3} from 'googleapis';
 import {getGoogleClient} from '../utils/google-client';
 import {flatten} from 'lodash';
-import {slack} from '../utils/slack';
+import {slack} from '../utils/slack/clients';
 import {fetchDriveItem} from './drive-api';
 import {Clients, rootFolderId, getDriveItemId} from './lib';
 import {notifyToSlack} from './notify-to-slack';
