@@ -1,7 +1,8 @@
 import { AzureFunction, Context } from "@azure/functions" 
 import moment from 'moment-timezone';
-import {dateToSlackTS, slackTSToDate, listMessages} from "../utils/slack";
-import type {Slack} from "../utils/slack-types";
+import {listMessages} from "../utils/slack/message";
+import {dateToSlackTS, slackTSToDate} from "../utils/slack/timestamp";
+import type {Slack} from "../utils/slack/types";
 import { drive_v3, google } from "googleapis";
 import { getGoogleClient } from "../utils/google-client";
 import type {LastDumpedMessage} from "./output";

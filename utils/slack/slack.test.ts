@@ -1,4 +1,4 @@
-import {dateToSlackTS, slackTSToDate} from './slack';
+import {dateToSlackTS, slackTSToDate} from './timestamp';
 
 describe('dateToSlackTS', () => {
     it('converts Date object to timestamp', () => {

@@ -1,5 +1,5 @@
 import type {driveactivity_v2, people_v1, drive_v3} from 'googleapis';
-import type {slack} from '../utils/slack';
+import type {slack} from '../utils/slack/clients';
 
 export const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID;
 

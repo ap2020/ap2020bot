@@ -1,24 +1,13 @@
-import { WebClient } from '@slack/web-api';
 import { flatten } from 'lodash';
-import type { Slack } from './slack-types';
+import { slack } from './clients';
+import { slackTSToDate } from './timestamp';
+import type { Slack } from './types';
 
 export const isThreadParent = (message: Slack.Message): message is Slack.ThreadParent =>
     'thread_ts' in message && typeof message.thread_ts === 'string' && message.thread_ts === message.ts;
 
 export const isThreadChildHidden = (message: Slack.Conversation.Replies['messages'][number]): message is Slack.ThreadChild => // ThreadChildInChannelも除外するけど，TSの型システムでは無理
     message.thread_ts !== message.ts && message.subtype !== 'thread_broadcast';
-
-export const slack = {
-    bot: new WebClient(process.env.SLACK_TOKEN_BOT),
-    user: new WebClient(process.env.SLACK_TOKEN_USER),
-    admin: new WebClient(process.env.SLACK_TOKEN_ADMIN),
-};
-
-export const dateToSlackTS = (date: Date): string =>
-    (date.getTime() / 1000).toFixed(3);
-
-export const slackTSToDate = (ts: string): Date =>
-    new Date(Number(ts) * 1000);
 
 // TODO: どうにか共通化できないか，あるいはswitchを関数に切り出しちゃうか
 export const listMessages = async (

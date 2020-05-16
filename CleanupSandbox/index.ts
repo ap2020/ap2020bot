@@ -1,6 +1,7 @@
 import { AzureFunction, Context } from "@azure/functions" 
-import {slack, listMessages} from "../utils/slack";
-import type {Slack} from "../utils/slack-types";
+import {slack} from "../utils/slack/clients";
+import {listMessages} from "../utils/slack/message";
+import type {Slack} from "../utils/slack/types";
 import type {LastDumpedMessage} from '../DumpSandbox/output';
 
 const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<void> {

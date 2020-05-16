@@ -1,6 +1,6 @@
 import { AzureFunction, Context } from "@azure/functions"
 import scrapeIt from "scrape-it";
-import { slack } from "../utils/slack";
+import { slack } from "../utils/slack/clients";
 
 /**
  * return A \ B
