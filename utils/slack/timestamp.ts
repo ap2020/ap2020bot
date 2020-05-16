@@ -1,5 +1,7 @@
-export const dateToSlackTS = (date: Date): string =>
-    (date.getTime() / 1000).toFixed(3);
+import moment, { Moment } from 'moment-timezone';
 
-export const slackTSToDate = (ts: string): Date =>
-    new Date(Number(ts) * 1000);
+export const momentToSlackTS = (date: Moment): string =>
+    (date.valueOf() / 1000).toFixed(3);
+
+export const slackTSToMoment = (ts: string): Moment =>
+    moment(Number(ts) * 1000).tz('Asia/Tokyo');

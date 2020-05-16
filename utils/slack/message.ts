@@ -1,6 +1,7 @@
 import { flatten } from 'lodash';
+import moment from 'moment-timezone';
 import { slack } from './clients';
-import { slackTSToDate } from './timestamp';
+import { slackTSToMoment } from './timestamp';
 import type { Slack } from './types';
 
 export const isThreadParent = (message: Slack.Message): message is Slack.ThreadParent =>
@@ -14,8 +15,8 @@ export const listMessages = async (
     channel: string,
     option: { latest?: string; oldest?: string; inclusive?: boolean; limit?: number; threadPolicy: 'nothing' | 'all-or-nothing' | 'just-in-range' } = { threadPolicy: 'just-in-range' },
 ): Promise<Slack.Message[]> => {
-    const oldestDate = option.oldest === undefined ? new Date(0) : slackTSToDate(option.oldest);
-    const latestDate = option.latest === undefined ? new Date(Date.now() + 24 * 60 * 60 * 1000) : slackTSToDate(option.latest);
+    const oldestDate = option.oldest === undefined ? moment(0).tz('Asia/Tokyo') : slackTSToMoment(option.oldest);
+    const latestDate = option.latest === undefined ? moment().add(1, 'days') : slackTSToMoment(option.latest); //十分大きい時刻
     let messages: Slack.Message[];
     switch (option.threadPolicy) {
         case 'all-or-nothing': {
@@ -31,7 +32,7 @@ export const listMessages = async (
                     .filter(
                         // eslint-disable-next-line @typescript-eslint/naming-convention
                         ({ latest_reply }) => // if latest reply is before latest
-                            slackTSToDate(latest_reply) <= latestDate,
+                            slackTSToMoment(latest_reply) <= latestDate,
                     )
                     .map(async message => {
                         const threadRest = (await slack.user.conversations.replies({
@@ -61,7 +62,7 @@ export const listMessages = async (
                             .filter(
                                 // eslint-disable-next-line @typescript-eslint/naming-convention
                                 ({ ts: oldest_reply, latest_reply }) => // filter threads that may have replies in range
-                                    oldestDate <= slackTSToDate(latest_reply) && slackTSToDate(oldest_reply) <= latestDate,
+                                    oldestDate <= slackTSToMoment(latest_reply) && slackTSToMoment(oldest_reply) <= latestDate,
                             )
                             .map(
                                 async message =>
@@ -76,7 +77,7 @@ export const listMessages = async (
                     ),
                 ).filter(
                     ({ ts }) => // whether message's ts is in range
-                        oldestDate <= slackTSToDate(ts) && slackTSToDate(ts) <= latestDate,
+                        oldestDate <= slackTSToMoment(ts) && slackTSToMoment(ts) <= latestDate,
                 ),
             );
             break;

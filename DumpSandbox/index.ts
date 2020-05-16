@@ -1,7 +1,7 @@
 import { AzureFunction, Context } from "@azure/functions" 
 import moment from 'moment-timezone';
 import {listMessages} from "../utils/slack/message";
-import {dateToSlackTS, slackTSToDate} from "../utils/slack/timestamp";
+import {momentToSlackTS, slackTSToMoment} from "../utils/slack/timestamp";
 import type {Slack} from "../utils/slack/types";
 import { drive_v3, google } from "googleapis";
 import { getGoogleClient } from "../utils/google-client";
@@ -19,9 +19,8 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage, context: Contex
     const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID;
     const auth = getGoogleClient();
     const drive = google.drive({version: "v3", auth});
-    const deleteAfter = 24 * 60 * 60 * 1000;
-    const latestOldTS = dateToSlackTS(new Date(Date.now() - deleteAfter)); // latest timestamp that should be cleaned
-    // TODO use moment().subtract
+    const deleteAfter = [1, 'days'];
+    const latestOldTS = momentToSlackTS(moment().subtract(...deleteAfter)); // latest timestamp that should be cleaned
     const messages = (await listMessages(sandboxId, { oldest: lastDumpedMessage.ts, latest: latestOldTS, threadPolicy: 'just-in-range', /* inclusive: false */})).reverse();
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
     if (messages.length === 0) {
@@ -58,8 +57,8 @@ const createFolderIfMissing = async (drive: drive_v3.Drive, context: Context, pa
 }
 
 const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: Slack.Message[], dumpFolderId: string, oldestTS: string, latestTS: string) => {
-    const oldest = moment(slackTSToDate(oldestTS)).tz('Asia/Tokyo');
-    const latest = moment(slackTSToDate(latestTS)).tz('Asia/Tokyo');
+    const oldest = slackTSToMoment(oldestTS);
+    const latest = slackTSToMoment(latestTS);
     const dump = JSON.stringify(messages);
     
     const ymfolder = await createFolderIfMissing(drive, context, dumpFolderId, oldest.format('YYYY-MM'));
