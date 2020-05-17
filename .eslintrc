@@ -4,5 +4,7 @@
         "project": "./tsconfig.json"
     },
     "rules": {
+      // You should use context for logging
+      "no-console": "error"
     }
 }
