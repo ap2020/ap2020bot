@@ -28,6 +28,7 @@ const fetchAllDriveActivities = async (
     let response: driveactivity_v2.Schema$QueryDriveActivityResponse | null = null;
 
     do {
+        // disable because you can't fetch the next page without the nextPageToken
         // eslint-disable-next-line no-await-in-loop
         response = (await driveActivity.activity.query({
             requestBody: {
@@ -133,6 +134,7 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
 const main: AzureFunction = async (context: Context, timer: unknown, lastDate: {ts: number}): Promise<{ts: number}> =>
     ({ ts: (await checkUpdate(context, new Date(lastDate.ts))).getTime() });
 
+// disable because Azure Functions requires this
 // eslint-disable-next-line import/no-default-export
 export default main;
 
