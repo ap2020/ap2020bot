@@ -1,12 +1,12 @@
-import {stripIndent} from 'common-tags';
-import type {driveactivity_v2, people_v1, drive_v3} from 'googleapis';
+import { stripIndent } from 'common-tags';
+import type { driveactivity_v2, people_v1 } from 'googleapis';
 import moment from 'moment-timezone';
-import {ignoredActions, japaneseTranslations, colors} from './config';
-import {Clients} from './lib';
-import {getDriveItem, DriveItem} from './drive-activity-api';
+import { ignoredActions, japaneseTranslations, colors } from './config';
+import { Clients } from './lib';
+import { getDriveItem, DriveItem } from './drive-activity-api';
 
 const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): string =>
-Object.keys(actionDetail)[0];
+    Object.keys(actionDetail)[0];
 
 const formatDate = (timestamp: string): string =>
     moment(timestamp).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss');
@@ -15,7 +15,7 @@ const getDate = (activity: driveactivity_v2.Schema$DriveActivity): string => {
     if (activity.timestamp) {
         return formatDate(activity.timestamp);
     } else if (activity.timeRange) {
-        return `${formatDate(activity.timeRange.startTime)} - ${formatDate(activity.timeRange.endTime)}`
+        return `${formatDate(activity.timeRange.startTime)} - ${formatDate(activity.timeRange.endTime)}`;
     }
 };
 
@@ -27,22 +27,24 @@ export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity,
         return false;
     }
     if (!activity.actors[0].user?.knownUser?.isCurrentUser) {
-        return false
+        return false;
     }
     // use primaryAction, not actions because it somehow contains edit
     const detail = activity.primaryActionDetail;
     if (!detail.permissionChange?.addedPermissions) {
         return false;
     }
-    return detail.permissionChange.addedPermissions.every(permission =>
-        permission.role === "COMMENTER" && permission.group?.email === groupEmailAddress
-    )
-}
+    return detail.permissionChange.addedPermissions.every(
+        permission =>
+            permission.role === 'COMMENTER' && permission.group?.email === groupEmailAddress,
+    );
+};
 
 
 // TODO: use batchGet https://developers.google.com/people/api/rest/v1/people/getBatchGet
 const getPersonName = async (client: people_v1.People, resourceName: string): Promise<string> => {
-    const person: people_v1.Schema$Person = (await client.people.get({resourceName, personFields: 'names' })).data;
+    const person: people_v1.Schema$Person =
+        (await client.people.get({ resourceName, personFields: 'names' })).data;
     const name = person.names?.[0]?.displayName;
     return name ?? resourceName; // TODO: a better approach?
 };
@@ -56,61 +58,67 @@ const getEmoji = (mimeType: string): string => {
     }
 };
 
-export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, drivelogId: string, groupEmailAddress: string) => {
-    // not notified in order!
-    // maybe chat.scheduleMessage is useful to imitate notification in order
-    // but I think the inorderness is ignorable if the frequency of execution is high enough
-    const actionName = getActionName(activity.primaryActionDetail);
-    if (ignoredActions.includes(actionName)) {
-        return;
-    }
-    if (isActivityByBot(activity, groupEmailAddress)) {
-        return;
-    }
-    const items: DriveItem[] = (
-        (await Promise.all(activity.targets.map(
-            async target => await getDriveItem(drive, target))
-        ))
-        .filter(({ignored}) => !ignored)
-    );
-    if (items.length === 0) {
-        return;
-    }
-    const actorsText = (await Promise.all(
-        activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
-    )).join(', ');
-    const text = stripIndent`
-        ${actorsText}が *${items.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
-        発生日時: ${getDate(activity)}
-    `;
-    let fileURL: string | undefined = undefined;
-    if (items.length <= 20) {
-        // attachments
-        const attachments = await Promise.all(items.map(async item => {
-            return {
-                color: colors[actionName],
-                title: `${japaneseTranslations[actionName]}: ${getEmoji(item.mimeType)} ${await item.getPath(drive)}`,
-                text: '', // TODO: include details
-                title_link: item.link,
-            };
-        }));
-        await slack.bot.chat.postMessage({
-            channel: drivelogId,
-            text, 
-            icon_emoji: ':google_drive:',
-            username: 'UpdateNotifier',
-            attachments: attachments,
-        });
-    } else {
-        // post snippet
-        fileURL = ((await slack.bot.files.upload({
-            channels: [drivelogId].join(','),
-            content: (await Promise.all(items.map(
-                async item => {
-                    return `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`
-                },
+export const notifyToSlack =
+    async (
+        { slack, drive, people: peopleAPI }: Clients,
+        activity: driveactivity_v2.Schema$DriveActivity,
+        drivelogId: string,
+        groupEmailAddress: string,
+    ) => {
+        // not notified in order!
+        // maybe chat.scheduleMessage is useful to imitate notification in order
+        // but I think the inorderness is ignorable if the frequency of execution is high enough
+        const actionName = getActionName(activity.primaryActionDetail);
+        if (ignoredActions.includes(actionName)) {
+            return;
+        }
+        if (isActivityByBot(activity, groupEmailAddress)) {
+            return;
+        }
+        const items: DriveItem[] = (
+            (await Promise.all(activity.targets.map(
+                async target => await getDriveItem(drive, target),
+            )))
+                .filter(({ ignored }) => !ignored)
+        );
+        if (items.length === 0) {
+            return;
+        }
+        const actorsText = (await Promise.all(
+            activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`),
+        )).join(', ');
+        const text = stripIndent`
+            ${actorsText}が *${items.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
+            発生日時: ${getDate(activity)}
+        `;
+        let fileURL: string | undefined = undefined;
+        if (items.length <= 20) {
+            // attachments
+            const attachments = await Promise.all(items.map(
+                async item =>
+                    ({
+                        color: colors[actionName],
+                        title: `${japaneseTranslations[actionName]}: ${getEmoji(item.mimeType)} ${await item.getPath(drive)}`,
+                        text: '', // TODO: include details
+                        title_link: item.link,
+                    }),
+            ));
+            await slack.bot.chat.postMessage({
+                channel: drivelogId,
+                text,
+                icon_emoji: ':google_drive:',
+                username: 'UpdateNotifier',
+                attachments,
+            });
+        } else {
+            // post snippet
+            fileURL = ((await slack.bot.files.upload({
+                channels: [drivelogId].join(','),
+                content: (await Promise.all(items.map(
+                    async item =>
+                        `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`,
                 ))).join('\n'),
-            initial_comment: text,
-        })) as any).file.permalink;
-    }
-}
+                initial_comment: text,
+            })) as any).file.permalink;
+        }
+    };
