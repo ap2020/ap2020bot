@@ -1,6 +1,6 @@
-import type {drive_v3, driveactivity_v2} from 'googleapis';
-import {getDriveItemId} from './lib';
-import {fetchDriveItem, getPath, DriveItem as DriveItem_, isIgnored} from './drive-api'; // TODO: 名前衝突なんとかしろ
+import type { drive_v3, driveactivity_v2 } from 'googleapis';
+import { getDriveItemId } from './lib';
+import { fetchDriveItem, getPath, DriveItem as DriveItem_, isIgnored } from './drive-api'; // TODO: 名前衝突なんとかしろ
 
 export interface DriveItem {
     mimeType: string;
@@ -33,7 +33,7 @@ class FoundItem implements DriveItem {
             throw Error(`Missing name: ${item.content.id}`);
         }
         if (!item.content.id) {
-            throw Error(`Missing id`); // これはどうログすりゃいいんだ
+            throw Error('Missing id'); // これはどうログすりゃいいんだ
         }
         this.mimeType = item.content.mimeType;
         this.name = item.content.name;
@@ -49,9 +49,9 @@ class NotFoundItem implements DriveItem {
     link: string | null;
     ignored = false;
 
-    getPath(drive: drive_v3.Drive): Promise<string> {
+    getPath(): Promise<string> {
         return Promise.resolve(`???/${this.name}`);
-    };
+    }
 
     constructor(target: driveactivity_v2.Schema$DriveItem) {
         if (!target.mimeType) {
@@ -64,29 +64,30 @@ class NotFoundItem implements DriveItem {
         this.mimeType = target.mimeType;
         this.name = target.title;
         this.link = null;
-    };
+    }
 }
 
-export const getDriveItem = async (drive: drive_v3.Drive, target: driveactivity_v2.Schema$Target): Promise<DriveItem> => {
-    if (!target.driveItem) {
-        throw Error(`Not driveItem: ${target}`);
-    }
-    try {
-        const driveItem = await fetchDriveItem(drive, getDriveItemId(target));
-        const ignored = await isIgnored(drive, driveItem.content.id);
-        return new FoundItem(driveItem, ignored);
-    } catch (err) {
-        const errors: {reason: string;}[] = err?.response?.data?.error?.errors;
-        if (!errors) {
-            throw err;
+export const getDriveItem =
+    async (drive: drive_v3.Drive, target: driveactivity_v2.Schema$Target): Promise<DriveItem> => {
+        if (!target.driveItem) {
+            throw Error(`Not driveItem: ${JSON.stringify(target)}`);
         }
-        if (errors.length != 1) {
-            throw err;
+        try {
+            const driveItem = await fetchDriveItem(drive, getDriveItemId(target));
+            const ignored = await isIgnored(drive, driveItem.content.id);
+            return new FoundItem(driveItem, ignored);
+        } catch (err) {
+            const errors: {reason: string}[] = err?.response?.data?.error?.errors;
+            if (!errors) {
+                throw err;
+            }
+            if (errors.length !== 1) {
+                throw err;
+            }
+            if (errors[0].reason !== 'notFound') {
+                throw err;
+            }
+            // not found so use NotFoundItem
+            return new NotFoundItem(target.driveItem);
         }
-        if (errors[0].reason !== 'notFound') {
-            throw err;
-        }
-        // not found so use NotFoundItem
-        return new NotFoundItem(target.driveItem);
-    }
-}
+    };
