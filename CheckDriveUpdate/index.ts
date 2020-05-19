@@ -70,6 +70,21 @@ const addCommentPermission = async ({drive}: Clients, activity: driveactivity_v2
             // item is a folder so adding comment permission does nothing
             return;
         }
+        const commentables = ["owner", "writer", "commenter"];
+        const groupPermission = item.content.permissions.find(
+            ({type, emailAddress}) => type === 'group' && emailAddress === groupEmailAddress
+        );
+        const anyonePermission = item.content.permissions.find(
+            ({type}) => type === 'anyone'
+        );
+        if (commentables.includes(groupPermission?.role)) {
+            // group already has permission
+            return;
+        }
+        if (commentables.includes(anyonePermission?.role)) {
+            // anyone already has permission
+            return;
+        }
 
         await drive.permissions.create({
             fileId: item.content.id,
