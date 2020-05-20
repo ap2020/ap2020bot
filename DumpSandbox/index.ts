@@ -1,7 +1,8 @@
 import { AzureFunction, Context } from "@azure/functions" 
 import moment from 'moment-timezone';
-import {dateToSlackTS, slackTSToDate, listMessages} from "../utils/slack";
-import type {Slack} from "../utils/slack-types";
+import {listMessages} from "../utils/slack/message";
+import {momentToSlackTS, slackTSToMoment} from "../utils/slack/timestamp";
+import type {Slack} from "../utils/slack/types";
 import { drive_v3, google } from "googleapis";
 import { getGoogleClient } from "../utils/google-client";
 import type {LastDumpedMessage} from "./output";
@@ -18,10 +19,15 @@ const dumpSandbox = async (lastDumpedMessage: LastDumpedMessage, context: Contex
     const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID;
     const auth = getGoogleClient();
     const drive = google.drive({version: "v3", auth});
-    const deleteAfter = 24 * 60 * 60 * 1000;
-    const latestOldTS = dateToSlackTS(new Date(Date.now() - deleteAfter)); // latest timestamp that should be cleaned
-    // TODO use moment().subtract
-    const messages = (await listMessages(sandboxId, { oldest: lastDumpedMessage.ts, latest: latestOldTS, threadPolicy: 'just-in-range', /* inclusive: false */})).reverse();
+    const deleteAfter = moment.duration(1, 'days');
+    const latestOldTS = momentToSlackTS(moment().subtract(deleteAfter)); // latest timestamp that should be cleaned
+    const messages = (await listMessages({
+        channel: sandboxId,
+        oldest: lastDumpedMessage.ts,
+        latest: latestOldTS,
+        threadPolicy: 'just-in-range',
+        /* inclusive: false */
+    }));
     // inclusive: false doesn't work (because of Slack?) but default is false so just leave it empty
     if (messages.length === 0) {
         return lastDumpedMessage;
@@ -57,8 +63,8 @@ const createFolderIfMissing = async (drive: drive_v3.Drive, context: Context, pa
 }
 
 const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: Slack.Message[], dumpFolderId: string, oldestTS: string, latestTS: string) => {
-    const oldest = moment(slackTSToDate(oldestTS)).tz('Asia/Tokyo');
-    const latest = moment(slackTSToDate(latestTS)).tz('Asia/Tokyo');
+    const oldest = slackTSToMoment(oldestTS);
+    const latest = slackTSToMoment(latestTS);
     const dump = JSON.stringify(messages);
     
     const ymfolder = await createFolderIfMissing(drive, context, dumpFolderId, oldest.format('YYYY-MM'));
@@ -77,9 +83,10 @@ const dumpMessages = async (drive: drive_v3.Drive, context: Context, messages: S
     });
 }
 
+// import { context } from '../utils-dev/fake-context';
 // (async () => {
 //     const start = Date.now();
-//     await dumpSandbox({ts: '1234567890.000000'});
+//     await dumpSandbox({ts: '1234567890.000000'}, context);
 //     const end = Date.now();
 //     console.log('elapsed time:', end - start);
 // })().catch(console.error);

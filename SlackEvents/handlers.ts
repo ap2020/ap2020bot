@@ -1,5 +1,5 @@
 import { Context } from "@azure/functions"
-import { slack } from "../utils/slack";
+import { slack } from "../utils/slack/clients";
 
 namespace Events {
     export interface ChannelCreated {

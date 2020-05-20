@@ -1,6 +1,6 @@
 import { AzureFunction, Context } from "@azure/functions" 
-import {slack, listMessages} from "../utils/slack";
-import type {Slack} from "../utils/slack-types";
+import {slack} from "../utils/slack/clients";
+import {listMessages} from "../utils/slack/message";
 import type {LastDumpedMessage} from '../DumpSandbox/output';
 
 const main: AzureFunction = async function (context: Context, timer: unknown, lastDumpedMessage: LastDumpedMessage): Promise<void> {
@@ -9,11 +9,13 @@ const main: AzureFunction = async function (context: Context, timer: unknown, la
 
 export default main;
 
+// TODO: Queueでよくないか
+
 const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
     const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
     const messages = (await listMessages(
-        sandboxId,
         {
+            channel: sandboxId,
             latest: lastDumped.ts,
             inclusive: true,
             limit: 40, // to avoid rate limit
@@ -21,20 +23,13 @@ const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
         })
     ).filter(({subtype}) => subtype !== 'tombstone');
     await Promise.all(messages
-        .map(async message => deleteMessage(message, sandboxId))
+        .filter(({pinned_to}) => !pinned_to?.includes(sandboxId))
+        .map(async message => await slack.admin.chat.delete({
+            channel: sandboxId,
+            ts: message.ts,
+            as_user: true,
+        }))
     );
-}
-
-const deleteMessage = async (message: Slack.Message, sandboxId: string) => {
-    if (message.pinned_to?.includes(sandboxId)) {
-        // pinned so don't delete
-        return;
-    }
-    await slack.admin.chat.delete({
-        channel: sandboxId,
-        ts: message.ts,
-        as_user: true,
-    });
 }
 
 // (async () => {
