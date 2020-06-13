@@ -1,16 +1,6 @@
 import { AzureFunction, Context } from "@azure/functions"
 import scrapeIt from "scrape-it";
-import moment from "moment-timezone";
 import { slack } from "../utils/slack/clients";
-
-
-const checkTime = (): boolean => {
-    const now = moment().tz('Asia/Tokyo');
-    if (2 /* Tuesday */ <= now.day() && now.day() <= 4 /* Thursday */) {
-        return 0 <= now.minute() && now.minute() < 5; // once in an hour
-    }
-    return true;
-}
 
 /**
  * return A \ B
