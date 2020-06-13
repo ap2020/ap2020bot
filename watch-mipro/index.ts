@@ -1,6 +1,15 @@
 import { AzureFunction, Context } from "@azure/functions"
 import scrapeIt from "scrape-it";
+import moment from "moment-timezone";
 import { slack } from "../utils/slack/clients";
+
+const checkTime = (): boolean => {
+    const now = moment().tz('Asia/Tokyo');
+    if (2 /* Tuesday */ <= now.day() && now.day() <= 4 /* Thursday */) {
+        return 0 <= now.minute() && now.minute() < 5; // once in an hour
+    }
+    return true;
+}
 
 /**
  * return A \ B
@@ -9,6 +18,9 @@ const disjoint = <T>(A: Set<T>, B: Set<T>): Set<T> =>
     new Set([...A].filter(x => !B.has(x)));
 
 const check: AzureFunction = async function (context: Context, timer: any, oldData: string[]): Promise<string[]> {
+    if (!checkTime()) {
+        return oldData;
+    }
     context.log('last data:', oldData);
     const oldProblems = new Set(oldData === undefined? [] : oldData);
     const {problems} = (await scrapeIt<{ problems: string[] }>("http://133.11.136.29/public/", {
