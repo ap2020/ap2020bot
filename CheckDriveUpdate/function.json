@@ -10,14 +10,14 @@
   {
     "name": "lastDate",
     "type": "blob",
-    "path": "ap2020bot/CheckDriveUpdate",
+    "path": "ap2020bot/CheckDriveUpdate.json",
     "connection": "AzureWebJobsStorage",
     "direction": "in"
   },
   {
     "name": "$return",
     "type": "blob",
-    "path": "ap2020bot/CheckDriveUpdate",
+    "path": "ap2020bot/CheckDriveUpdate.json",
     "connection": "AzureWebJobsStorage",
     "direction": "out"
   }
