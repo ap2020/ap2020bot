@@ -31,7 +31,7 @@
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
-    "@azure/functions": "^1.0.2-beta2",
+    "@azure/functions": "^1.2.2",
     "@pizzacat83/eslint-config": "github:pizzacat83/eslint-config",
     "@types/common-tags": "^1.8.0",
     "@types/jest": "^26.0.13",
