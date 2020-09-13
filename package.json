@@ -41,6 +41,6 @@
     "jest": "^26.2.2",
     "ts-jest": "^26.1.4",
     "ts-node": "^9.0.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.9.7"
   }
 }
