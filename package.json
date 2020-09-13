@@ -21,7 +21,7 @@
     "test-dev": "jest --verbose"
   },
   "dependencies": {
-    "@slack/web-api": "^5.8.0",
+    "@slack/web-api": "^5.11.0",
     "common-tags": "^1.8.0",
     "googleapis": "^59.0.0",
     "lodash": "^4.17.19",
