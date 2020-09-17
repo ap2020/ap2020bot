@@ -8,11 +8,4 @@ updates:
     schedule:
       interval: "daily"
     allow:
-      - dependency-type: "development"
-      - dependency-name: "@slack/web-api"
-      - dependency-name: "common-tags"
-      - dependency-name: "lodash"
-      - dependency-name: "moment"
-      - dependency-name: "moment-timezone"
-      - dependency-name: "scrape-it"
-      - dependency-name: "tsscmp"
+      - dependency-type: "direct"
