@@ -38,8 +38,8 @@ provider:
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.WATCH_PORTAL_DYNAMODB_TABLE}"
 
 functions:
-  hello:
-    handler: handler.hello
+  watch-portal:
+    handler: watch-portal/index.handler
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'

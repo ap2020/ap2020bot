@@ -79,7 +79,7 @@ const notifyItem = async (item: Parser.Item) => {
     console.log(item);
 };
 
-export const hello: ScheduledHandler = async () => {
+export const handler: ScheduledHandler = async () => {
     const oldURLs = await fetchOldURLs();
     const data = await fetchRSS();
     const items = await extractItems(data);
