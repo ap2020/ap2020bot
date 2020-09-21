@@ -56,16 +56,13 @@ const fetchOldURLs = async (): Promise<string[]> => {
 };
 
 const setNewURLs = async (urls: string[]): Promise<void> => {
-    await db.update({
+    await db.put({
         // eslint-disable-next-line @typescript-eslint/naming-convention
         TableName: process.env.WATCH_PORTAL_DYNAMODB_TABLE,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        Key: {
+        Item: {
             key: 'oldURLs',
-        },
-        UpdateExpression: 'set urls = :urls',
-        ExpressionAttributeValues: {
-            ':urls': urls,
+            urls,
         },
     }).promise();
 };
