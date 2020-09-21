@@ -1,0 +1,62 @@
+service: ap2020bot
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local # orders matter
+  # - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  # config for dynamodb-local
+  # dynamodb:
+  #   stages:
+  #     - dev
+  #   start:
+  #     port: 8000
+  #     inMemory: true
+  #     migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  environment: '${file(.env.js)}'
+    # DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  # iamRoleStatements:
+  #   - Effect: Allow
+  #     Action:
+  #       - dynamodb:Query
+  #       - dynamodb:Scan
+  #       - dynamodb:GetItem
+  #       - dynamodb:PutItem
+  #       - dynamodb:UpdateItem
+  #       - dynamodb:DeleteItem
+  #     Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - schedule:
+          rate: 'cron(5 * * * ? *)'
+          
+# resources:
+#   Resources:
+#     TodosDynamoDbTable:
+#       Type: 'AWS::DynamoDB::Table'
+#       DeletionPolicy: Retain
+#       Properties:
+#         AttributeDefinitions:
+#           -
+#             AttributeName: id
+#             AttributeType: S
+#         KeySchema:
+#           -
+#             AttributeName: id
+#             KeyType: HASH
+#         BillingMode: PAY_PER_REQUEST
+#         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
