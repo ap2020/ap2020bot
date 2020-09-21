@@ -37,7 +37,7 @@ const extractItems = async (data: string): Promise<Item[]> => {
     return rss.items.map(({ title, link }) => ({ title, url: link }));
 };
 
-const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
+export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
     const oldURLSet = new Set(oldURLs);
     return newItems.filter(({ url }) => !oldURLSet.has(url));
 };
