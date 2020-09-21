@@ -12,29 +12,30 @@ custom:
     webpackConfig: ./webpack.config.js
     includeModules: true
   # config for dynamodb-local
-  # dynamodb:
-  #   stages:
-  #     - dev
-  #   start:
-  #     port: 8000
-  #     inMemory: true
-  #     migrate: true
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
 
 provider:
   name: aws
   runtime: nodejs12.x
+  #region:
   environment: '${file(.env.js)}'
     # DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
-  # iamRoleStatements:
-  #   - Effect: Allow
-  #     Action:
-  #       - dynamodb:Query
-  #       - dynamodb:Scan
-  #       - dynamodb:GetItem
-  #       - dynamodb:PutItem
-  #       - dynamodb:UpdateItem
-  #       - dynamodb:DeleteItem
-  #     Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.WATCH_PORTAL_DYNAMODB_TABLE}"
 
 functions:
   hello:
@@ -43,20 +44,20 @@ functions:
       - schedule:
           rate: 'cron(5 * * * ? *)'
           
-# resources:
-#   Resources:
-#     TodosDynamoDbTable:
-#       Type: 'AWS::DynamoDB::Table'
-#       DeletionPolicy: Retain
-#       Properties:
-#         AttributeDefinitions:
-#           -
-#             AttributeName: id
-#             AttributeType: S
-#         KeySchema:
-#           -
-#             AttributeName: id
-#             KeyType: HASH
-#         BillingMode: PAY_PER_REQUEST
-#         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+resources:
+  Resources:
+    WatchPortalDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      # DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.WATCH_PORTAL_DYNAMODB_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          -
+            AttributeName: key
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: key
+            KeyType: HASH
 
