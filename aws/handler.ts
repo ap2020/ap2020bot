@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { ScheduledHandler } from 'aws-lambda';
 import axios from 'axios';
 import Parser from 'rss-parser';
@@ -58,9 +59,31 @@ const fetchOldURLs = async (): Promise<string[]> => {
     return res?.Item?.urls ?? [];
 };
 
+const setNewURLs = async (urls: string[]): Promise<void> => {
+    await db.update({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        TableName: process.env.WATCH_PORTAL_DYNAMODB_TABLE,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Key: {
+            key: 'oldURLs',
+        },
+        UpdateExpression: 'set urls = :urls',
+        ExpressionAttributeValues: {
+            ':urls': urls,
+        },
+    }).promise();
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+const notifyItem = async (item: Parser.Item) => {
+    console.log(item);
+};
+
 export const hello: ScheduledHandler = async () => {
-    // const data = await fetchRSS();
-    // const items = await extractItems(data);
-    const urls = await fetchOldURLs();
-    console.log(urls);
+    const oldURLs = await fetchOldURLs();
+    const data = await fetchRSS();
+    const items = await extractItems(data);
+    const newItems = filterNewItems(oldURLs, items);
+    await Promise.all(newItems.map(item => notifyItem(item)));
+    await setNewURLs(items.map(({ link }) => link));
 };
