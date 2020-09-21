@@ -2,8 +2,8 @@
 import { ScheduledHandler } from 'aws-lambda';
 import axios from 'axios';
 import Parser from 'rss-parser';
-import AWS from 'aws-sdk';
 import 'source-map-support/register';
+import { db } from '../lib/dynamodb';
 
 const fetchRSS = async (): Promise<string> => {
     const { data } = await axios.get(
@@ -36,15 +36,6 @@ const filterNewItems = (oldURLs: string[], newItems: Parser.Item[]): Parser.Item
     const oldURLSet = new Set(oldURLs);
     return newItems.filter(({ link }) => !oldURLSet.has(link));
 };
-
-const db = new AWS.DynamoDB.DocumentClient(
-    process.env.IS_OFFLINE || process.env.IS_LOCAL ?
-        {
-            region: 'localhost',
-            endpoint: 'http://localhost:8000',
-        } :
-        {},
-);
 
 const fetchOldURLs = async (): Promise<string[]> => {
     const res = await db.get({
@@ -79,11 +70,15 @@ const notifyItem = async (item: Parser.Item) => {
     console.log(item);
 };
 
-export const handler: ScheduledHandler = async () => {
+const main = async () => {
     const oldURLs = await fetchOldURLs();
     const data = await fetchRSS();
     const items = await extractItems(data);
     const newItems = filterNewItems(oldURLs, items);
     await Promise.all(newItems.map(item => notifyItem(item)));
     await setNewURLs(items.map(({ link }) => link));
+};
+
+export const handler: ScheduledHandler = async () => {
+    await main();
 };
