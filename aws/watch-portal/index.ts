@@ -5,6 +5,11 @@ import Parser from 'rss-parser';
 import 'source-map-support/register';
 import { db } from '../lib/dynamodb';
 
+type Item = {
+    url: string;
+    title: string;
+};
+
 const fetchRSS = async (): Promise<string> => {
     const { data } = await axios.get(
         'https://info.t.u-tokyo.ac.jp/rss/index.xml',
@@ -26,15 +31,15 @@ const fetchRSS = async (): Promise<string> => {
     return data;
 };
 
-const extractItems = async (data: string): Promise<Parser.Item[]> => {
+const extractItems = async (data: string): Promise<Item[]> => {
     const parser = new Parser();
     const rss = await parser.parseString(data);
-    return rss.items;
+    return rss.items.map(({ title, link }) => ({ title, url: link }));
 };
 
-const filterNewItems = (oldURLs: string[], newItems: Parser.Item[]): Parser.Item[] => {
+const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
     const oldURLSet = new Set(oldURLs);
-    return newItems.filter(({ link }) => !oldURLSet.has(link));
+    return newItems.filter(({ url }) => !oldURLSet.has(url));
 };
 
 const fetchOldURLs = async (): Promise<string[]> => {
@@ -66,7 +71,7 @@ const setNewURLs = async (urls: string[]): Promise<void> => {
 };
 
 // eslint-disable-next-line @typescript-eslint/require-await
-const notifyItem = async (item: Parser.Item) => {
+const notifyItem = async (item: Item) => {
     console.log(item);
 };
 
@@ -76,7 +81,7 @@ const main = async () => {
     const items = await extractItems(data);
     const newItems = filterNewItems(oldURLs, items);
     await Promise.all(newItems.map(item => notifyItem(item)));
-    await setNewURLs(items.map(({ link }) => link));
+    await setNewURLs(items.map(({ url }) => url));
 };
 
 export const handler: ScheduledHandler = async () => {
