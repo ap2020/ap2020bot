@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* eslint indent: ["warn", 2] */
 import type { Serverless } from 'serverless/aws';
 
@@ -26,6 +27,7 @@ const serverlessConfiguration: Serverless = {
     environment: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      ...require('./.env.json'),
     },
   },
   functions: {
@@ -33,9 +35,8 @@ const serverlessConfiguration: Serverless = {
       handler: 'handler.hello',
       events: [
         {
-          http: {
-            method: 'get',
-            path: 'hello',
+          schedule: {
+            rate: 'cron(5 * * * ? *)',
           },
         },
       ],

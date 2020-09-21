@@ -7,12 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "axios": "^0.20.0",
+    "rss-parser": "^3.9.0",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
+    "@pizzacat83/eslint-config": "github:pizzacat83/eslint-config",
     "@types/aws-lambda": "^8.10.17",
     "@types/node": "^10.12.18",
     "@types/serverless": "^1.72.5",
+    "eslint": "^6.8.0",
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "serverless": "^2.1.1",
     "serverless-dynamodb-local": "^0.2.39",
