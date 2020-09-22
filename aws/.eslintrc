@@ -1,24 +1,11 @@
 {
-    "extends": ["@pizzacat83/eslint-config/typescript"],
-    "parserOptions": {
-        "project": "./tsconfig.json"
-    },
-    "settings": {
-        "import/resolver": {
-          "node": {
-            "extensions": [
-              ".js",
-              ".jsx",
-              ".json",
-              ".ts",
-              ".tsx"
-            ]
-          }
-        }
-      },
-    "env": {
-        "jest": true
-    },
-    "rules": {
-    }
+  "extends": ["@pizzacat83/eslint-config/typescript"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "jest": true
+  },
+  "rules": {
+  }
 }
