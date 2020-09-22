@@ -9,4 +9,4 @@ jspm_packages
 .webpack
 
 # dotenv
-.env.js
+.env.local.json
