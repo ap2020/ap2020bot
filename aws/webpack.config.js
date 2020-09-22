@@ -46,18 +46,18 @@ module.exports = (async () => ({
     ],
   },
   plugins: [
-    new CopyPlugin({
-      patterns: (() => {
-        switch (process.env.STAGE) {
-          case 'local': {
-            return [{ from: '.env.local.json', to: '../.env.local.json' }];
-          }
-          default: {
-            return [];
-          }
+    ...(() => {
+      switch (process.env.STAGE) {
+        case 'local': {
+          return new CopyPlugin({
+            patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
+          });
         }
+        default: {
+          return [];
+        }
+      }
       })(),
-    }),
     // new ForkTsCheckerWebpackPlugin({
     //   eslint: true,
     //   eslintOptions: {
