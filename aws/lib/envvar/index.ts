@@ -1,15 +1,18 @@
-import { IEnvVar } from './base';
+import { EnvVar } from './base';
 import { EnvVarProd } from './prod';
 import { EnvVarLocal } from './local';
+import { EnvVarTest } from './test';
 
-export const EnvVar: new () => IEnvVar = (() => {
+export const envvar: EnvVar = (() => {
     switch (process.env.STAGE) {
         case 'prod': {
-            return EnvVarProd;
+            return new EnvVarProd();
         }
-        // TODO: case 'test'
+        case 'test': {
+            return new EnvVarTest();
+        }
         default: {
-            return EnvVarLocal;
+            return new EnvVarLocal();
         }
     }
 })();

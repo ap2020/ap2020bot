@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { IEnvVar } from './base';
+import { EnvVar } from './base';
 
-export class EnvVarLocal implements IEnvVar {
+export class EnvVarLocal implements EnvVar {
     envvars: Map<string, string> | null
 
     private async loadEnv() {

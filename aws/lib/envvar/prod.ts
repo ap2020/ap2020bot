@@ -1,8 +1,8 @@
 import AWS from 'aws-sdk';
 import 'source-map-support/register';
-import { IEnvVar } from './base';
+import { EnvVar } from './base';
 
-export class EnvVarProd implements IEnvVar {
+export class EnvVarProd implements EnvVar {
     ssm = new AWS.SSM();
     cache: Map<string, Promise<string>>;
 
