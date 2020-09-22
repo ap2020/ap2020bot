@@ -4,38 +4,52 @@ frameworkVersion: '2'
 
 plugins:
   - serverless-webpack
-  - serverless-dynamodb-local # orders matter
+  - serverless-dynamodb-local
   # - serverless-offline
 
 custom:
+  stage: '${opt:stage, "local"}'
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+  dynamodbTableName:
+    watch-portal:
+      prod: ${ssm:/ap2020bot/dynamodb/tablename/watch-portal}
+      local: watch-portal
   # config for dynamodb-local
   dynamodb:
     stages:
-      - dev
+      - local
     start:
       port: 8000
       inMemory: true
       migrate: true
-
+      
 provider:
   name: aws
   runtime: nodejs12.x
-  #region:
-  environment: '${file(.env.js)}'
-    # DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  stage: ${self:custom.stage}
+  region: us-east-1
+  environment:
+    # ! DO NOT WRITE CREDENTIALS HERE!
+    # TODO: write docs about storign credentials
+    STAGE: ${self:custom.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
       Action:
-        # - dynamodb:Query
-        # - dynamodb:Scan
+       - "ssm:GetParameter"
+      Resource: "arn:aws:ssm:${self:provider.region}:*:parameter/ap2020bot/*"
+    - Effect: "Allow"
+      Action:
+        - "kms:Decrypt"
+      Resource: "arn:aws:kms:${self:provider.region}:*:alias/ap2020bot"
+    - Effect: Allow
+      Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.WATCH_PORTAL_DYNAMODB_TABLE}"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbTableName.watch-portal.${self:custom.stage}}"
 
 functions:
   watch-portal:
@@ -43,14 +57,14 @@ functions:
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
-          
+    memorySize: 512
+
 resources:
   Resources:
     WatchPortalDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
-      # DeletionPolicy: Retain
       Properties:
-        TableName: ${self:provider.environment.WATCH_PORTAL_DYNAMODB_TABLE}
+        TableName: ${self:custom.dynamodbTableName.watch-portal.${self:custom.stage}}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           -
@@ -60,4 +74,3 @@ resources:
           -
             AttributeName: key
             KeyType: HASH
-
