@@ -7,12 +7,15 @@
     "test": "jest --verbose"
   },
   "dependencies": {
+    "@slack/web-api": "^5.12.0",
+    "@types/common-tags": "^1.8.0",
     "axios": "^0.20.0",
+    "common-tags": "^1.8.0",
     "rss-parser": "^3.9.0",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
-    "@pizzacat83/eslint-config": "github:pizzacat83/eslint-config",
+    "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
     "@types/aws-lambda": "^8.10.17",
     "@types/jest": "^26.0.14",
     "@types/node": "^10.12.18",
