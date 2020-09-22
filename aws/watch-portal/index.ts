@@ -1,3 +1,4 @@
+import { envvar } from '@/lib/envvar';
 /* eslint-disable @typescript-eslint/naming-convention */
 import { ScheduledHandler } from 'aws-lambda';
 import axios from 'axios';
@@ -15,16 +16,16 @@ const fetchRSS = async (): Promise<string> => {
         'https://info.t.u-tokyo.ac.jp/rss/index.xml',
         {
             proxy: {
-                host: process.env.UTOKYO_PROXY_HOST,
-                port: Number(process.env.UTOKYO_PROXY_PORT),
+                host: await envvar.get('utokyo-proxy/host'),
+                port: Number(await envvar.get('utokyo-proxy/port')),
                 auth: {
-                    username: process.env.UTOKYO_PROXY_USERNAME,
-                    password: process.env.UTOKYO_PROXY_PASSWORD,
+                    username: await envvar.get('utokyo-proxy/username'),
+                    password: await envvar.get('utokyo-proxy/password'),
                 },
             },
             headers: {
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                'User-Agent': process.env.USER_AGENT,
+                'User-Agent': await envvar.get('user-agent'),
             },
         },
     );
@@ -45,7 +46,7 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
 const fetchOldURLs = async (): Promise<string[]> => {
     const res = await db.get({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        TableName: process.env.WATCH_PORTAL_DYNAMODB_TABLE,
+        TableName: await envvar.get('dynamodb/tablename/watch-portal'),
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Key: {
             key: 'oldURLs',
@@ -58,7 +59,7 @@ const fetchOldURLs = async (): Promise<string[]> => {
 const setNewURLs = async (urls: string[]): Promise<void> => {
     await db.put({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        TableName: process.env.WATCH_PORTAL_DYNAMODB_TABLE,
+        TableName: await envvar.get('dynamodb/tablename/watch-portal'),
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Item: {
             key: 'oldURLs',
