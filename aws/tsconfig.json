@@ -12,7 +12,11 @@
     "types": [
       "node",
       "jest",
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "include": ["./**/*.ts"],
   "exclude": [
