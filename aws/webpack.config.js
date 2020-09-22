@@ -1,9 +1,11 @@
 const path = require('path');
 const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
+const CopyPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const {promises: fs} = require('fs')
 
-module.exports = {
+module.exports = (async () => ({
   context: __dirname,
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   entry: slsw.lib.entries,
@@ -44,6 +46,18 @@ module.exports = {
     ],
   },
   plugins: [
+    new CopyPlugin({
+      patterns: (() => {
+        switch (process.env.STAGE) {
+          case 'local': {
+            return [{ from: '.env.local.json', to: '../.env.local.json' }];
+          }
+          default: {
+            return [];
+          }
+        }
+      })(),
+    }),
     // new ForkTsCheckerWebpackPlugin({
     //   eslint: true,
     //   eslintOptions: {
@@ -51,4 +65,4 @@ module.exports = {
     //   }
     // })
   ],
-};
+}))();
