@@ -1,10 +1,12 @@
-import { envvar } from '@/lib/envvar';
 /* eslint-disable @typescript-eslint/naming-convention */
 import { ScheduledHandler } from 'aws-lambda';
 import axios from 'axios';
+import { source } from 'common-tags';
 import Parser from 'rss-parser';
 import 'source-map-support/register';
-import { db } from '../lib/dynamodb';
+import { envvar } from '@/lib/envvar';
+import { slack } from '@/lib/slack/client';
+import { db } from '@/lib/dynamodb';
 
 type Item = {
     url: string;
@@ -68,9 +70,15 @@ const setNewURLs = async (urls: string[]): Promise<void> => {
     }).promise();
 };
 
-// eslint-disable-next-line @typescript-eslint/require-await
 const notifyItem = async (item: Item) => {
-    console.log(item);
+    await (await slack.bot).chat.postMessage({
+        channel: await envvar.get('slack/channel/notify-temp'),
+        username: '工学部ポータルサイト',
+        icon_emoji: ':faculty-of-engineering:',
+        text: source`
+            <${item.url}|${item.title}>
+        `,
+    });
 };
 
 const main = async () => {
