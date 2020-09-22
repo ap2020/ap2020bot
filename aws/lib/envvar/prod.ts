@@ -4,7 +4,7 @@ import { EnvVar } from './base';
 
 export class EnvVarProd implements EnvVar {
     ssm = new AWS.SSM();
-    cache: Map<string, Promise<string>>;
+    cache = new Map<string, Promise<string>>();
 
     async get(key: string): Promise<string> {
         if (this.cache.has(key)) {

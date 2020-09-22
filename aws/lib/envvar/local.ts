@@ -3,7 +3,7 @@ import path from 'path';
 import { EnvVar } from './base';
 
 export class EnvVarLocal implements EnvVar {
-    envvars: Map<string, string> | null
+    envvars: Map<string, string> | null = null;
 
     private async loadEnv() {
         const text = await fs.readFile(path.join(__dirname, '..', '..', '.env.local.json'), { encoding: 'utf8' });
