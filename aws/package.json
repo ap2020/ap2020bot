@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "bot for ap2020",
   "scripts": {
-    "build": "npx serverless webpack",
+    "build": "serverless webpack",
     "test": "jest --verbose",
     "test:ci": "jest --verbose --coverage"
   },
