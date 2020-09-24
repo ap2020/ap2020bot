@@ -11,7 +11,9 @@ custom:
   stage: '${opt:stage, "local"}'
   webpack:
     webpackConfig: ./webpack.config.js
-    includeModules: true
+    includeModules:
+      forceExclude:
+        - aws-sdk
   dynamodbTableName:
     watch-portal:
       prod: ${ssm:/ap2020bot/dynamodb/tablename/watch-portal}
