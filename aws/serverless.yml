@@ -52,7 +52,7 @@ provider:
         - dynamodb:PutItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbTableName.watch-portal.${self:custom.stage}}"
   roleBoundary:
-    rolePermissionsBoundary: arn:aws:iam::${AWS::AccountId}:policy/ap2020botLambdaBoundary
+    rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
 
 functions:
   watch-portal:
