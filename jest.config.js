@@ -3,6 +3,7 @@ const ignorePatterns = [
     '<rootDir>/dist/',
     '<rootDir>/tmp/',
     '/coverage/',
+    '<rootDir>/aws/',
   ];
 
 module.exports = {
