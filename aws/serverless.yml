@@ -30,7 +30,7 @@ provider:
   runtime: nodejs12.x
   stage: ${self:custom.stage}
   region: us-east-1
-  profile: ${opt:profile}
+  profile: ${opt:profile, 'default'}
   environment:
     # ! DO NOT WRITE CREDENTIALS HERE!
     # TODO: write docs about storign credentials
