@@ -25,7 +25,7 @@ jobs:
       working-directory: aws/
 
     - name: Run tests
-      run: npm test:ci
+      run: npm run test:ci
       working-directory: aws/
     
     - uses: codecov/codecov-action@v1
