@@ -5,7 +5,7 @@
   "scripts": {
     "build": "serverless webpack",
     "test": "jest --verbose",
-    "test:ci": "jest --verbose --coverage"
+    "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
   "dependencies": {
     "@slack/web-api": "^5.12.0",
