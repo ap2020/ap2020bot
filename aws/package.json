@@ -2,15 +2,15 @@
   "name": "ap2020bot",
   "version": "1.0.0",
   "description": "bot for ap2020",
-  "main": "handler.js",
   "scripts": {
+    "build": "npx serverless webpack",
     "test": "jest --verbose",
     "test:ci": "jest --verbose --coverage"
   },
   "dependencies": {
     "@slack/web-api": "^5.12.0",
     "@types/common-tags": "^1.8.0",
-    "axios": "^0.20.0",
+    "axios": "~0.19.2",
     "common-tags": "^1.8.0",
     "rss-parser": "^3.9.0",
     "source-map-support": "^0.5.10"
