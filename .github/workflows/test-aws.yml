@@ -12,14 +12,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Read .nvmrc
-      run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      run: echo ::set-output name=NVMRC::$(cat aws/.nvmrc)
       id: nvm
 
     - name: Use Node.js ${{ steps.nvm.outputs.NVMRC }}
       uses: actions/setup-node@v1
       with:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      working-directory: aws/
 
     - name: Install dependencies
       run: npm ci
