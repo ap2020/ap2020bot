@@ -3,7 +3,6 @@ name: Test (AWS)
 on:
   push:
   pull_request:
-    branches: [ master, aws/master ]
 
 jobs:
   test:
