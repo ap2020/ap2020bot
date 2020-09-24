@@ -24,12 +24,8 @@ jobs:
       run: npm ci
       working-directory: aws/
 
-    - name: Build
-      run: npm run build
-      working-directory: aws/
-
     - name: Run tests
-      run: npm test
+      run: npm test:ci
       working-directory: aws/
     
     - uses: codecov/codecov-action@v1
