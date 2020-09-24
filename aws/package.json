@@ -4,7 +4,8 @@
   "description": "bot for ap2020",
   "main": "handler.js",
   "scripts": {
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "test:ci": "jest --verbose --coverage"
   },
   "dependencies": {
     "@slack/web-api": "^5.12.0",
