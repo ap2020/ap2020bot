@@ -14,10 +14,10 @@ custom:
     includeModules:
       forceExclude:
         - aws-sdk
-  dynamodbTableName:
-    watch-portal:
-      prod: ${ssm:/ap2020bot/dynamodb/tablename/watch-portal}
-      local: watch-portal
+  dynamodbConfig:
+    tableNamePrefix: ap2020bot-${self:custom.stage}-
+    tableName:
+      watch-portal: ${self:custom.dynamodbConfig.tableNamePrefix}watch-portal
   # config for dynamodb-local
   dynamodb:
     stages:
@@ -38,6 +38,7 @@ provider:
     # TODO: write docs about storign credentials
     STAGE: ${self:custom.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DYNAMODB_TABLENAME_PREFIX: ${self:custom.dynamodbConfig.tableNamePrefix}
   versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
@@ -52,7 +53,7 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbTableName.watch-portal.${self:custom.stage}}"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
   roleBoundary:
     rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
 
@@ -69,7 +70,7 @@ resources:
     WatchPortalDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
-        TableName: ${self:custom.dynamodbTableName.watch-portal.${self:custom.stage}}
+        TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           -
