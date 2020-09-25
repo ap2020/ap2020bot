@@ -49,9 +49,11 @@ module.exports = (async () => ({
     ...(() => {
       switch (process.env.STAGE) {
         case 'local': {
-          return new CopyPlugin({
-            patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
-          });
+          return [
+            new CopyPlugin({
+              patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
+            })
+          ];
         }
         default: {
           return [];
