@@ -4,6 +4,8 @@
   "description": "bot for ap2020",
   "scripts": {
     "build": "serverless webpack",
+    "emulator:dynamodb": "serverless dynamodb start",
+    "emulator:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
     "test": "jest --verbose",
     "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
