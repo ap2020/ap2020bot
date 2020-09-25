@@ -80,3 +80,4 @@ resources:
           -
             AttributeName: key
             KeyType: HASH
+      DeletionPolicy: 'Retain' # may need to backup before deletion
