@@ -48,7 +48,7 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
 const fetchOldURLs = async (): Promise<string[]> => {
     const res = await db.get({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        TableName: await envvar.get('dynamodb/tablename/watch-portal'),
+        TableName: `${process.env.DYNAMODB_TABLENAME_PREFIX}watch-portal`,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Key: {
             key: 'oldURLs',
@@ -61,7 +61,7 @@ const fetchOldURLs = async (): Promise<string[]> => {
 const setNewURLs = async (urls: string[]): Promise<void> => {
     await db.put({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        TableName: await envvar.get('dynamodb/tablename/watch-portal'),
+        TableName: `${process.env.DYNAMODB_TABLENAME_PREFIX}watch-portal`,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Item: {
             key: 'oldURLs',
