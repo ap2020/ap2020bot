@@ -73,17 +73,17 @@ resources:
         Properties:
           TopicName: ap2020bot-${self:custom.stage}-error
           DisplayName: ap2020bot errors
-    WatchPortalDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          -
-            AttributeName: key
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: key
-            KeyType: HASH
-      DeletionPolicy: 'Retain' # may need to backup before deletion
+      WatchPortalDynamoDbTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+            -
+              AttributeName: key
+              AttributeType: S
+          KeySchema:
+            -
+              AttributeName: key
+              KeyType: HASH
+        DeletionPolicy: 'Retain' # may need to backup before deletion
