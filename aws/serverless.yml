@@ -9,15 +9,15 @@ plugins:
 
 custom:
   stage: '${opt:stage, "local"}'
+  resourcePrefix: ap2020bot-${self:custom.stage}-
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules:
       forceExclude:
         - aws-sdk
   dynamodbConfig:
-    tableNamePrefix: ap2020bot-${self:custom.stage}-
     tableName:
-      watch-portal: ${self:custom.dynamodbConfig.tableNamePrefix}watch-portal
+      watch-portal: ${self:custom.resourcePrefix}watch-portal
   # config for dynamodb-local
   dynamodb:
     stages:
@@ -38,7 +38,7 @@ provider:
     # TODO: write docs about storign credentials
     STAGE: ${self:custom.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    DYNAMODB_TABLENAME_PREFIX: ${self:custom.dynamodbConfig.tableNamePrefix}
+    DYNAMODB_TABLENAME_PREFIX: ${self:custom.resourcePrefix}
   versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
