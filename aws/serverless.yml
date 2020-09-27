@@ -66,7 +66,13 @@ functions:
     memorySize: 512
 
 resources:
-  Resources:
+  - '${file(serverless/error-alarms.js):${self:custom.stage}}'
+  - Resources:
+      ErrorTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+          TopicName: ap2020bot-${self:custom.stage}-error
+          DisplayName: ap2020bot errors
     WatchPortalDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       Properties:
