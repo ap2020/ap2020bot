@@ -4,7 +4,7 @@ const ignorePatterns = [
     '<rootDir>/.dynamodb/',
     '<rootDir>/.vscode/',
     '/coverage/',
-    '<rootDir>/lib/envvar/test.ts',
+    '<rootDir>/src/lib/envvar/test.ts',
 ];
 
 module.exports = {
@@ -27,6 +27,6 @@ module.exports = {
         './test-utils/setup.ts',
     ],
     moduleNameMapper: {
-        "^@/(.+)": "<rootDir>/$1"
+        "^@/(.+)": "<rootDir>/src/$1"
     },
 };
