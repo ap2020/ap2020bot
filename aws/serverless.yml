@@ -9,15 +9,15 @@ plugins:
 
 custom:
   stage: '${opt:stage, "local"}'
+  resourcePrefix: ap2020bot-${self:custom.stage}-
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules:
       forceExclude:
         - aws-sdk
   dynamodbConfig:
-    tableNamePrefix: ap2020bot-${self:custom.stage}-
     tableName:
-      watch-portal: ${self:custom.dynamodbConfig.tableNamePrefix}watch-portal
+      watch-portal: ${self:custom.resourcePrefix}watch-portal
   # config for dynamodb-local
   dynamodb:
     stages:
@@ -38,7 +38,7 @@ provider:
     # TODO: write docs about storign credentials
     STAGE: ${self:custom.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    DYNAMODB_TABLENAME_PREFIX: ${self:custom.dynamodbConfig.tableNamePrefix}
+    DYNAMODB_TABLENAME_PREFIX: ${self:custom.resourcePrefix}
   versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
@@ -59,25 +59,31 @@ provider:
 
 functions:
   watch-portal:
-    handler: watch-portal/index.handler
+    handler: src/watch-portal/index.handler
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
     memorySize: 512
 
 resources:
-  Resources:
-    WatchPortalDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          -
-            AttributeName: key
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: key
-            KeyType: HASH
-      DeletionPolicy: 'Retain' # may need to backup before deletion
+  - '${file(serverless/error-alarms.js):${self:custom.stage}}'
+  - Resources:
+      ErrorTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+          TopicName: ap2020bot-${self:custom.stage}-error
+          DisplayName: ap2020bot errors
+      WatchPortalDynamoDbTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+            -
+              AttributeName: key
+              AttributeType: S
+          KeySchema:
+            -
+              AttributeName: key
+              KeyType: HASH
+        DeletionPolicy: 'Retain' # may need to backup before deletion
