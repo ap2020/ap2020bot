@@ -2,6 +2,7 @@ const path = require('path');
 const {readFileSync} = require('fs');
 const stages = require('./stages.js');
 const yaml = require('js-yaml');
+const {pascalCase} = require('change-case');
 
 const configText = readFileSync(path.join(__dirname, '..', 'serverless.yml'), {encoding: 'utf8'});
 const config = yaml.safeLoad(configText);
@@ -9,7 +10,7 @@ const config = yaml.safeLoad(configText);
 const functions = Object.keys(config.functions);
 
 const createAlarm = ({func, stage}) => ([
-    `${func}ErrorAlarm`,
+    `${pascalCase(func)}ErrorAlarm`,
     {
         "Type": "AWS::CloudWatch::Alarm",
         "Properties": {
