@@ -1,9 +1,12 @@
+const path = require('path');
+const {readFileSync} = require('fs');
 const stages = require('./stages.js');
+const yaml = require('js-yaml');
 
-// TODO: extract from serverless.yml
-const functions = [
-    'watch-portal',
-];
+const configText = readFileSync(path.join(__dirname, '..', 'serverless.yml'), {encoding: 'utf8'});
+const config = yaml.safeLoad(configText);
+
+const functions = Object.keys(config.functions);
 
 const createAlarm = ({func, stage}) => ([
     `${func}ErrorAlarm`,
