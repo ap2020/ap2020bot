@@ -63,7 +63,7 @@ functions:
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
-    memorySize: 512
+    memorySize: 128
 
 resources:
   - '${file(serverless/error-alarms.js):${self:custom.stage}}'
