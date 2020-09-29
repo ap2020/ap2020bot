@@ -40,3 +40,22 @@ jobs:
         _AWS_DEPLOY_USER_NAME: ${{ secrets.AWS_DEPLOY_USER_NAME }}
         _AWS_DYNAMODB_WATCH_PORTAL: ${{ secrets.AWS_DYNAMODB_WATCH_PORTAL }}
         _AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: ":rocket: *ap2020bot (AWS)* Deploy: *Failed* :x:"
+        fields: message,commit,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: failure()
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: ":rocket: *ap2020bot (AWS)* Deploy: *Success* :white_check_mark:"
+        fields: message,commit,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: success()
