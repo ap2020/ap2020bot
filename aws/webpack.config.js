@@ -30,7 +30,15 @@ module.exports = (async () => ({
       // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
       {
         test: /\.(tsx?)$/,
-        loader: 'ts-loader',
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              experimentalWatchApi: true,
+            },
+          },
+        ],
         exclude: [
           [
             path.resolve(__dirname, 'node_modules'),
@@ -38,16 +46,30 @@ module.exports = (async () => ({
             path.resolve(__dirname, '.webpack'),
           ],
         ],
-        options: {
-          transpileOnly: true,
-          experimentalWatchApi: true,
-        },
+      },
+      {
+        test: /\.([jt]sx?)$/,
+        use: [
+          {
+            loader: 'ifdef-loader',
+            options: {
+              STAGE: slsw.lib.serverless.service.custom.stage,
+            }
+          },
+        ],
+        exclude: [
+          [
+            path.resolve(__dirname, 'node_modules'),
+            path.resolve(__dirname, '.serverless'),
+            path.resolve(__dirname, '.webpack'),
+          ],
+        ],
       },
     ],
   },
   plugins: [
     ...(() => {
-      switch (process.env.STAGE) {
+      switch (slsw.lib.options.stage) {
         case 'local': {
           return [
             new CopyPlugin({
