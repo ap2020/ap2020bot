@@ -1,6 +1,6 @@
 import { EnvVar } from './base';
 import { EnvVarProd } from './prod';
-/// #if STAGE !== 'prod'
+/// #if STAGE !== 'local'
 import { EnvVarTest } from './test';
 import { EnvVarLocal } from './local';
 /// #endif
@@ -11,7 +11,7 @@ export const envvar: EnvVar = (() => {
         case 'prod': {
             return new EnvVarProd();
         }
-        /// #if STAGE !== 'prod'
+        /// #if STAGE === 'local'
         case 'test': {
             return new EnvVarTest();
         }
