@@ -36,4 +36,3 @@ jobs:
       with:
         flags: unittests
         fail_ci_if_error: true
-        working-directory: aws/
