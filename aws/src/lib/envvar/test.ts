@@ -1,6 +1,6 @@
 import { EnvVar } from './base';
 
-export class EnvVarTest implements EnvVar {
+class EnvVarTest implements EnvVar {
     envvars = new Map<string, string>();
 
     init() {
@@ -15,3 +15,5 @@ export class EnvVarTest implements EnvVar {
         return Promise.resolve(this.envvars.get(key));
     }
 }
+
+export const envvarTest = new EnvVarTest();

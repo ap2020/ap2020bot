@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import 'source-map-support/register';
 import { EnvVar } from './base';
 
-export class EnvVarProd implements EnvVar {
+class EnvVarProd implements EnvVar {
     ssm = new AWS.SSM();
     cache = new Map<string, Promise<string>>();
 
@@ -24,3 +24,5 @@ export class EnvVarProd implements EnvVar {
         return promise;
     }
 }
+
+export const envvarProd = new EnvVarProd();

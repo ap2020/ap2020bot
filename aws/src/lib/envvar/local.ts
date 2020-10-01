@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { EnvVar } from './base';
 
-export class EnvVarLocal implements EnvVar {
+class EnvVarLocal implements EnvVar {
     envvars: Map<string, string> | null = null;
 
     private async loadEnv() {
@@ -26,3 +26,5 @@ export class EnvVarLocal implements EnvVar {
         return this.envvars.get(key);
     }
 }
+
+export const envvarLocal = new EnvVarLocal();
