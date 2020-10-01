@@ -27,7 +27,10 @@ const main = async (params: SlashParams) => {
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     if (!(await verify(event))) {
-        return 'invalid request';
+        return {
+            statusCode: 400,
+            body: 'invalid request',
+        };
     }
 
     // TODO: use SQS to avoid timeout
