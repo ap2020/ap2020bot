@@ -38,6 +38,18 @@ module.exports = (async () => ({
               experimentalWatchApi: true,
             },
           },
+        ],
+        exclude: [
+          [
+            path.resolve(__dirname, 'node_modules'),
+            path.resolve(__dirname, '.serverless'),
+            path.resolve(__dirname, '.webpack'),
+          ],
+        ],
+      },
+      {
+        test: /\.([jt]sx?)$/,
+        use: [
           {
             loader: 'ifdef-loader',
             options: {
