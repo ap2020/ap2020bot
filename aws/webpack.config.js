@@ -47,7 +47,7 @@ module.exports = (async () => ({
   },
   plugins: [
     ...(() => {
-      switch (process.env.STAGE) {
+      switch (slsw.lib.options.stage) {
         case 'local': {
           return [
             new CopyPlugin({
