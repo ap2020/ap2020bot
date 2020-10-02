@@ -1,12 +1,12 @@
 import type {drive_v3, driveactivity_v2} from 'googleapis';
 import {getDriveItemId} from './lib';
-import {fetchDriveItem, getPath, DriveItem as DriveItem_, isIgnored} from './drive-api'; // TODO: 名前衝突なんとかしろ
+import {fetchDriveItem, getPath, DriveItem as DriveItem_, getSentChannel, SentChannel} from './drive-api'; // TODO: 名前衝突なんとかしろ
 
 export interface DriveItem {
     mimeType: string;
     name: string;
     link: string | null;
-    ignored: boolean;
+    sentChannel: SentChannel;
     getPath(drive: drive_v3.Drive): Promise<string>;
 }
 
@@ -14,7 +14,7 @@ class FoundItem implements DriveItem {
     mimeType: string;
     name: string;
     link: string | null;
-    ignored: boolean;
+    sentChannel: SentChannel;
 
     driveItem: DriveItem_;
 
@@ -22,7 +22,7 @@ class FoundItem implements DriveItem {
         return getPath(drive, this.driveItem);
     }
 
-    constructor(item: DriveItem_, ignored: boolean) {
+    constructor(item: DriveItem_, sentChannel: SentChannel) {
         if (!item.content.mimeType) {
             // いや起きないだろと思っている
             // 起きたらtargetの情報を使う (つまりNotFoundItem) けどちゃんとしたエラー処理が面倒
@@ -38,7 +38,7 @@ class FoundItem implements DriveItem {
         this.mimeType = item.content.mimeType;
         this.name = item.content.name;
         this.link = item.content.webViewLink ?? null;
-        this.ignored = ignored;
+        this.sentChannel = sentChannel;
         this.driveItem = item;
     }
 }
@@ -47,7 +47,7 @@ class NotFoundItem implements DriveItem {
     mimeType: string;
     name: string;
     link: string | null;
-    ignored = false;
+    sentChannel = 'main' as const;
 
     getPath(drive: drive_v3.Drive): Promise<string> {
         return Promise.resolve(`???/${this.name}`);
@@ -73,8 +73,8 @@ export const getDriveItem = async (drive: drive_v3.Drive, target: driveactivity_
     }
     try {
         const driveItem = await fetchDriveItem(drive, getDriveItemId(target));
-        const ignored = await isIgnored(drive, driveItem.content.id);
-        return new FoundItem(driveItem, ignored);
+        const sentChannel = await getSentChannel(drive, driveItem.content.id);
+        return new FoundItem(driveItem, sentChannel);
     } catch (err) {
         const errors: {reason: string;}[] = err?.response?.data?.error?.errors;
         if (!errors) {

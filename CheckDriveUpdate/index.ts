@@ -124,7 +124,6 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
     const drive = google.drive({version: 'v3', auth});
     const driveActivity = google.driveactivity({version: "v2", auth});
     const peopleAPI = google.people({version: 'v1', auth});
-    const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
     const groupEmailAddress = process.env.GOOGLE_GROUPS_EMAIL_ADDRESS;
     const clients: Clients = {
         slack,
@@ -136,7 +135,7 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
     const lastChecked = new Date();
     const activities = (await fetchAllDriveActivities(driveActivity, rootFolderId, since)).map(activity => fillEmptyTarget(context, activity));
     const hooks: ((activity: driveactivity_v2.Schema$DriveActivity) =>  unknown)[] = [
-        async (activity) => await notifyToSlack(clients, activity, drivelogId, groupEmailAddress),
+        async (activity) => await notifyToSlack(clients, activity, groupEmailAddress),
         async (activity) => await addCommentPermission(clients, activity, groupEmailAddress),
     ]
     await Promise.all(

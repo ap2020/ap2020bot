@@ -58,20 +58,24 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
     return path.valid? path.path: item.content.name;
 };
 
-export const isIgnored = cacheCalls(async (client: drive_v3.Drive, itemId: string): Promise<boolean> => {
+export type SentChannel = 'main' | 'lms' | 'none';
+
+export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, string>(async (client: drive_v3.Drive, itemId: string): Promise<SentChannel> => {
     const item = await fetchDriveItem(client, itemId);
     if(!item.content.parents) {
         // root of drive
-        return false;
+        return 'none';
     }
     if (item.content.parents.length === 0) {
         // we don't need to ignore this
-        return false;
+        return 'none';
     }
-    const isParentsIgnored = await Promise.all(item.content.parents.map(async parentId => isIgnored(client, parentId)));
-    // 全ての親がignoredならtrue
-    return isParentsIgnored.every((x) => x);
+    const parentSentChannels = new Set(await Promise.all(item.content.parents.map(async parentId => getSentChannel(client, parentId))));
+    if (parentSentChannels.has('main')) return 'main';
+    if (parentSentChannels.has('lms')) return 'lms';
+    return 'none';
 }, (c, id) => id, new Map([
-    ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve(true)] as [string, Promise<boolean>])),
-    [rootFolderId, Promise.resolve(false)],
+    ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
+    [rootFolderId, Promise.resolve('main')],
+    [process.env.GOOGLE_DRIVE_LMS_FOLDER_ID, Promise.resolve('lms')],
 ]));
