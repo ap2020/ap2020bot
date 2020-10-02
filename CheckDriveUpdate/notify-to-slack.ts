@@ -86,6 +86,9 @@ export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, 
     )).join(', ');
     const send = async ([sentChannel, channelId]: [SentChannel, string]) => {
         const sentItems = items.filter(({sentChannel: c}) => c === sentChannel);
+        if (sentItems.length === 0) {
+            return;
+        }
         const text = stripIndent`
             ${actorsText}が *${sentItems.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
             発生日時: ${getDate(activity)}
