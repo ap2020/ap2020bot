@@ -1,6 +1,7 @@
+import {promisify} from 'util';
 import {cacheCalls} from './utils';
 
-const slowAsync_ = async <T>(result: T) => new Promise<T>(resolve => setTimeout(resolve, 100, result)); // slow identity function
+const slowAsync_ = async <T>(result: T) => {await promisify(process.nextTick)(); return result}; // async identity function
 
 describe('cacheCalls', () => {
     it('caches calls', async () => {
