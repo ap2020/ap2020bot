@@ -4,6 +4,9 @@ const ignorePatterns = [
     '<rootDir>/.dynamodb/',
     '<rootDir>/.vscode/',
     '/coverage/',
+];
+
+const notTestPatterns = [
     '<rootDir>/src/lib/envvar/test.ts',
 ];
 
@@ -13,6 +16,7 @@ module.exports = {
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
     testPathIgnorePatterns: [
         ...ignorePatterns,
+        ...notTestPatterns,
     ],
     collectCoverageFrom: [
         '**/*.{js,ts}',
