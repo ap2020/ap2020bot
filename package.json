@@ -35,7 +35,7 @@
     "@pizzacat83/eslint-config": "github:pizzacat83/eslint-config",
     "@types/common-tags": "^1.8.0",
     "@types/jest": "^26.0.14",
-    "@types/lodash": "^4.14.161",
+    "@types/lodash": "^4.14.162",
     "@types/moment-timezone": "^0.5.30",
     "eslint": "^6.8.0",
     "jest": "^26.5.2",
