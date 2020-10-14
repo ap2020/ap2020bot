@@ -4,7 +4,7 @@ name: Deploy (AWS)
 # events but only for the master branch
 on:
   push:
-    branches: [ aws/master ]
+    branches: [ master ]
 
 defaults:
   run:
