@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 import {ignoredActions, japaneseTranslations, colors} from './config';
 import {Clients} from './lib';
 import {getDriveItem, DriveItem} from './drive-activity-api';
+import { SentChannel } from './drive-api';
 
 const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): string =>
 Object.keys(actionDetail)[0];
@@ -56,7 +57,10 @@ const getEmoji = (mimeType: string): string => {
     }
 };
 
-export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, drivelogId: string, groupEmailAddress: string) => {
+const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
+const drivelogLMSId = process.env.SLACK_CHANNEL_DRIVE_LMS;
+
+export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string) => {
     // not notified in order!
     // maybe chat.scheduleMessage is useful to imitate notification in order
     // but I think the inorderness is ignorable if the frequency of execution is high enough
@@ -68,49 +72,56 @@ export const notifyToSlack = async ({slack, drive, people: peopleAPI}: Clients, 
         return;
     }
     const items: DriveItem[] = (
-        (await Promise.all(activity.targets.map(
-            async target => await getDriveItem(drive, target))
-        ))
-        .filter(({ignored}) => !ignored)
-    );
+        await Promise.all(
+            activity.targets
+                .map(async target => await getDriveItem(drive, target))
+                
+        )
+    ).filter(({sentChannel}) => sentChannel !== 'none');
     if (items.length === 0) {
         return;
     }
     const actorsText = (await Promise.all(
         activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`)
     )).join(', ');
-    const text = stripIndent`
-        ${actorsText}が *${items.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
-        発生日時: ${getDate(activity)}
-    `;
-    let fileURL: string | undefined = undefined;
-    if (items.length <= 20) {
-        // attachments
-        const attachments = await Promise.all(items.map(async item => {
-            return {
-                color: colors[actionName],
-                title: `${japaneseTranslations[actionName]}: ${getEmoji(item.mimeType)} ${await item.getPath(drive)}`,
-                text: '', // TODO: include details
-                title_link: item.link,
-            };
-        }));
-        await slack.bot.chat.postMessage({
-            channel: drivelogId,
-            text, 
-            icon_emoji: ':google_drive:',
-            username: 'UpdateNotifier',
-            attachments: attachments,
-        });
-    } else {
-        // post snippet
-        fileURL = ((await slack.bot.files.upload({
-            channels: [drivelogId].join(','),
-            content: (await Promise.all(items.map(
-                async item => {
-                    return `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`
-                },
-                ))).join('\n'),
-            initial_comment: text,
-        })) as any).file.permalink;
-    }
+    const send = async ([sentChannel, channelId]: [SentChannel, string]) => {
+        const sentItems = items.filter(({sentChannel: c}) => c === sentChannel);
+        if (sentItems.length === 0) {
+            return;
+        }
+        const text = stripIndent`
+            ${actorsText}が *${sentItems.length}* 件のアイテムを *${japaneseTranslations[actionName]}* しました。
+            発生日時: ${getDate(activity)}
+        `;
+        if (sentItems.length <= 20) {
+            // attachments
+            const attachments = await Promise.all(sentItems.map(async item => {
+                return {
+                    color: colors[actionName],
+                    title: `${japaneseTranslations[actionName]}: ${getEmoji(item.mimeType)} ${await item.getPath(drive)}`,
+                    text: '', // TODO: include details
+                    title_link: item.link,
+                };
+            }));
+            await slack.bot.chat.postMessage({
+                channel: channelId,
+                text, 
+                icon_emoji: ':google_drive:',
+                username: 'UpdateNotifier',
+                attachments: attachments,
+            });
+        } else {
+            // post snippet
+            await slack.bot.files.upload({
+                channels: [drivelogId].join(','),
+                content: (await Promise.all(sentItems.map(
+                    async item => {
+                        return `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`
+                    },
+                    ))).join('\n'),
+                initial_comment: text,
+            });
+        }
+    };
+    await Promise.all([['main', drivelogId], ['lms', drivelogLMSId]].map(send));
 }
