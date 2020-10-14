@@ -6,6 +6,11 @@
     "bot",
     "slack"
   ],
+  "workspaces": {
+    "nohoist": [
+      "**"
+    ]
+  },
   "author": "ap2020",
   "repository": "https://github.com/ap2020/ap2020bot.git",
   "homepage": "https://github.com/ap2020/ap2020bot",
