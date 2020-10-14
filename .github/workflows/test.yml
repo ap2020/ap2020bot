@@ -8,6 +8,10 @@ on:
   pull_request:
     branches: [ master ]
 
+defaults:
+  run:
+    working-directory: azure/
+
 jobs:
   test:
     runs-on: ubuntu-latest
