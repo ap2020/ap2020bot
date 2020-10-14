@@ -1,5 +1,5 @@
 {
-  "name": "ap2020bot",
+  "name": "@ap2020/bot-aws",
   "version": "1.0.0",
   "description": "bot for ap2020",
   "keywords": [
@@ -42,5 +42,6 @@
     "ts-jest": "^26.4.1",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
-  }
+  },
+  "private": true
 }

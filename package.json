@@ -1,0 +1,16 @@
+{
+  "name": "@ap2020/bot",
+  "version": "1.0.0",
+  "workspaces": [
+    "aws",
+    "azure"
+  ],
+  "resolutions": {
+    "@types/cheerio": "0.22.15"
+  },
+  "main": "index.js",
+  "repository": "https://github.com/ap2020/ap2020bot.git",
+  "author": "ap2020",
+  "license": "MIT",
+  "private": true
+}
