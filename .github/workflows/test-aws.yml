@@ -27,8 +27,8 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile
 
-    - name: Add empty .env.local.json
-      run: echo '{}' > .env.local.json
+    - name: Setup test
+      run: bash ci/test-setup.sh
 
     - name: Run tests
       run: yarn run test:ci
