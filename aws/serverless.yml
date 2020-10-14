@@ -12,6 +12,7 @@ custom:
   resourcePrefix: ap2020bot-${self:custom.stage}-
   webpack:
     webpackConfig: ./webpack.config.js
+    packager: yarn
     includeModules:
       forceExclude:
         - aws-sdk
