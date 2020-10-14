@@ -6,7 +6,9 @@ on:
   push:
     branches: [ master ]
     paths-ignore: # don't trigger if all changes matches these paths
-      - 'azure/**' 
+      - 'azure/**'
+      - '**.md'
+
 defaults:
   run:
     working-directory: aws/
