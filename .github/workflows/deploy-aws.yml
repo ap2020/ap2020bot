@@ -31,7 +31,9 @@ jobs:
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
-      working-directory: aws/
+    
+    - name: Test
+      run: yarn run test:ci
 
     - name: Deploy
       run: yarn run serverless deploy --stage prod
