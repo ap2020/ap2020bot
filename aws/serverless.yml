@@ -1,0 +1,95 @@
+service: ap2020bot
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  stage: '${opt:stage, "local"}'
+  resourcePrefix: ap2020bot-${self:custom.stage}-
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules:
+      forceExclude:
+        - aws-sdk
+  dynamodbConfig:
+    tableName:
+      watch-portal: ${self:custom.resourcePrefix}watch-portal
+  # config for dynamodb-local
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${self:custom.stage}
+  region: us-east-1
+  profile: ${opt:profile, ''}
+  environment:
+    # ! DO NOT WRITE CREDENTIALS HERE!
+    # TODO: write docs about storign credentials
+    STAGE: ${self:custom.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DYNAMODB_TABLENAME_PREFIX: ${self:custom.resourcePrefix}
+  versionFunctions: false
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+       - "ssm:GetParameter"
+      Resource: "arn:aws:ssm:${self:provider.region}:*:parameter/ap2020bot/*"
+    - Effect: "Allow"
+      Action:
+        - "kms:Decrypt"
+      Resource: "arn:aws:kms:${self:provider.region}:*:alias/ap2020bot"
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
+  roleBoundary:
+    rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
+
+functions:
+  watch-portal:
+    handler: src/watch-portal/index.handler
+    events:
+      - schedule:
+          rate: 'cron(5 * * * ? *)'
+    memorySize: 128
+  slash-invite-all:
+    handler: src/slash/invite-all/index.handler
+    events:
+      - http:
+          path: slack/slash/invite-all
+          method: post
+
+resources:
+  - '${file(serverless/error-alarms.js):${self:custom.stage}}'
+  - Resources:
+      ErrorTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+          TopicName: ap2020bot-${self:custom.stage}-error
+          DisplayName: ap2020bot errors
+      WatchPortalDynamoDbTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+            -
+              AttributeName: key
+              AttributeType: S
+          KeySchema:
+            -
+              AttributeName: key
+              KeyType: HASH
+        DeletionPolicy: 'Retain' # may need to backup before deletion

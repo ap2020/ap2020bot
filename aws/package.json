@@ -1,0 +1,51 @@
+{
+  "name": "@ap2020/bot-azure",
+  "version": "1.0.0",
+  "description": "bot for ap2020",
+  "scripts": {
+    "build": "serverless webpack",
+    "emulator:dynamodb": "serverless dynamodb start",
+    "emulator:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
+    "test": "jest --verbose",
+    "test:ci": "tsc --noEmit && jest --verbose --coverage"
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.12.0",
+    "@types/common-tags": "^1.8.0",
+    "axios": "~0.19.2",
+    "common-tags": "^1.8.0",
+    "rss-parser": "^3.9.0",
+    "source-map-support": "^0.5.10",
+    "tsscmp": "^1.0.6"
+  },
+  "devDependencies": {
+    "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
+    "@types/aws-lambda": "^8.10.17",
+    "@types/jest": "^26.0.14",
+    "@types/js-yaml": "^3.12.5",
+    "@types/node": "^10.12.18",
+    "@types/serverless": "^1.72.5",
+    "@types/tsscmp": "^1.0.0",
+    "aws-sdk": "^2.759.0",
+    "change-case": "^4.1.1",
+    "copy-webpack-plugin": "^6.1.1",
+    "dynamodb-admin": "^4.0.0",
+    "eslint": "^6.8.0",
+    "fork-ts-checker-webpack-plugin": "^3.0.1",
+    "ifdef-loader": "^2.1.5",
+    "jest": "^26.4.2",
+    "js-yaml": "^3.14.0",
+    "serverless": "^2.1.1",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.8.0",
+    "serverless-webpack": "^5.2.0",
+    "ts-jest": "^26.4.0",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.2.4",
+    "webpack": "^4.29.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "ap2020",
+  "license": "MIT"
+}

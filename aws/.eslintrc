@@ -1,0 +1,11 @@
+{
+  "extends": ["@pizzacat83/eslint-config/typescript"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "jest": true
+  },
+  "rules": {
+  }
+}

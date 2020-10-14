@@ -1,0 +1,71 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deploy (Azure)
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: # don't trigger if all changes matches these paths
+      - 'aws/**' 
+
+defaults:
+  run:
+    working-directory: azure/
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Read .nvmrc
+      run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      id: nvm
+
+    - name: Use Node.js ${{ steps.nvm.outputs.NVMRC }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run tests
+      shell: bash
+      run: yarn test
+
+    - name: 'Deploy'
+      uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
+        publish-profile: ${{ secrets.SCM_CREDENTIALS }}
+        package: azure/
+
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: ":rocket: *ap2020bot (Azure)* Deploy: *Failed* :x:"
+        fields: message,commit,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: failure()
+
+    - uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: ":rocket: *ap2020bot (Azure)* Deploy: *Success* :white_check_mark:"
+        fields: message,commit,ref,workflow
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: success()
