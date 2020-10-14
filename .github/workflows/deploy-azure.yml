@@ -58,7 +58,7 @@ jobs:
         text: ":rocket: *ap2020bot (Azure)* Deploy: *Failed* :x:"
         fields: message,commit,ref,workflow
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AZURE }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: failure()
 
@@ -68,6 +68,6 @@ jobs:
         text: ":rocket: *ap2020bot (Azure)* Deploy: *Success* :white_check_mark:"
         fields: message,commit,ref,workflow
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AWS }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_AZURE }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: success()
