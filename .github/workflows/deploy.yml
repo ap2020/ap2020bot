@@ -8,6 +8,10 @@ on:
   push:
     branches: [ master ]
 
+defaults:
+  run:
+    working-directory: azure/
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -25,16 +29,12 @@ jobs:
       with:
         node-version: '10.x'
 
-    - name: 'Run npm'
+    - name: 'Run yarn'
       shell: bash
       run: |
-        # If your function app project is not located in your repository's root
-        # Please change your directory for npm in pushd
-        pushd .
-        npm install
-        npm run build --if-present
-        npm run test --if-present
-        popd
+        yarn install --frozen-lockfile
+        yarn run build --if-present
+        yarn run test --if-present
 
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
@@ -42,3 +42,4 @@ jobs:
       with:
         app-name: ${{ secrets.FUNCTIONS_APP_NAME }}
         publish-profile: ${{ secrets.SCM_CREDENTIALS }}
+        package: azure/

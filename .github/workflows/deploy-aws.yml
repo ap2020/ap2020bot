@@ -29,11 +29,11 @@ jobs:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
     - name: Install dependencies
-      run: npm ci
+      run: yarn install --frozen-lockfile
       working-directory: aws/
 
     - name: Deploy
-      run: npx serverless deploy --stage prod
+      run: yarn run serverless deploy --stage prod
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
