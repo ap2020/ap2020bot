@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+defaults:
+  run:
+    working-directory: azure/
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,15 +26,12 @@ jobs:
 
     - name: Install dependencies
       run: yarn install --frozen-lockfile
-      working-directory: yarn/
 
     - name: Add empty .env.local.json
       run: echo '{}' > .env.local.json
-      working-directory: aws/
 
     - name: Run tests
       run: yarn run test:ci
-      working-directory: aws/
     
     - uses: codecov/codecov-action@v1
       with:
