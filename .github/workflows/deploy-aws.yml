@@ -5,7 +5,8 @@ name: Deploy (AWS)
 on:
   push:
     branches: [ master ]
-
+    paths-ignore: # don't trigger if all changes matches these paths
+      - 'azure/**' 
 defaults:
   run:
     working-directory: aws/
