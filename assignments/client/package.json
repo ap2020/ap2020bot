@@ -1,0 +1,13 @@
+{
+  "name": "@ap2020/assignments-client",
+  "version": "0.0.1",
+  "description": "Client of ap2020 assignments management sysytem",
+  "main": "index.js",
+  "repository": "https://github.com/ap2020/ap2020bot.git",
+  "author": "ap2020",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@ap2020/assignments-core": "0.0.1"
+  }
+}

@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "workspaces": [
     "aws",
-    "azure"
+    "azure",
+    "assignments/core",
+    "assignments/client"
   ],
   "resolutions": {
     "@types/cheerio": "0.22.15"
