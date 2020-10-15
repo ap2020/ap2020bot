@@ -19,7 +19,6 @@ export const dayNameToNumber: {[key in DayName]: DayNumber} = {
     '日': 6
 };
 
-
 export class Day {
     constructor(
         public readonly dayNumber: DayNumber,
