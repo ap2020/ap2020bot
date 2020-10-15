@@ -1,0 +1,10 @@
+{
+  "name": "@ap2020/courses-core",
+  "version": "0.0.1",
+  "description": "Core library of ap2020 courses API",
+  "main": "index.js",
+  "repository": "https://github.com/ap2020/ap2020bot.git",
+  "author": "ap2020",
+  "license": "MIT",
+  "private": false
+}

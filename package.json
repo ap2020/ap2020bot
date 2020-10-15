@@ -6,7 +6,10 @@
     "azure",
     "assignments/core",
     "assignments/client/http",
-    "assignments/client/aws"
+    "assignments/client/aws",
+    "courses/core",
+    "courses/client/http",
+    "courses/client/aws"
   ],
   "resolutions": {
     "@types/cheerio": "0.22.15"
