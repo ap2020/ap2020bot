@@ -5,7 +5,8 @@
     "aws",
     "azure",
     "assignments/core",
-    "assignments/client"
+    "assignments/client/http",
+    "assignments/client/aws"
   ],
   "resolutions": {
     "@types/cheerio": "0.22.15"
