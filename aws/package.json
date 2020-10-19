@@ -24,7 +24,7 @@
     "@types/jest": "^26.0.14",
     "@types/js-yaml": "^3.12.5",
     "@types/node": "^10.12.18",
-    "@types/serverless": "^1.72.5",
+    "@types/serverless": "^1.78.6",
     "@types/tsscmp": "^1.0.0",
     "aws-sdk": "^2.759.0",
     "change-case": "^4.1.1",
