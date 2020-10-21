@@ -39,7 +39,7 @@
     "@azure/functions": "^1.2.2",
     "@pizzacat83/eslint-config": "github:pizzacat83/eslint-config",
     "@types/common-tags": "^1.8.0",
-    "@types/jest": "^26.0.14",
+    "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.162",
     "@types/moment-timezone": "^0.5.30",
     "azure-functions-core-tools": "^2.7.2936",
