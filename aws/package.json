@@ -26,7 +26,7 @@
     "@types/node": "^10.12.18",
     "@types/serverless": "^1.78.6",
     "@types/tsscmp": "^1.0.0",
-    "aws-sdk": "^2.759.0",
+    "aws-sdk": "^2.775.0",
     "change-case": "^4.1.1",
     "copy-webpack-plugin": "^6.1.1",
     "dynamodb-admin": "^4.0.0",
