@@ -2,21 +2,6 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    # Check the npm registry for updates every day (weekdays)
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-  - package-ecosystem: "npm"
-    directory: "/aws/"
-    # Check the npm registry for updates every day (weekdays)
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-  - package-ecosystem: "npm"
-    directory: "/azure/"
-    # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
     allow:
