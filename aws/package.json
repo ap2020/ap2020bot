@@ -23,7 +23,7 @@
     "@types/aws-lambda": "^8.10.17",
     "@types/jest": "^26.0.15",
     "@types/js-yaml": "^3.12.5",
-    "@types/node": "^12.12.69",
+    "@types/node": "^12.19.2",
     "@types/serverless": "^1.78.6",
     "@types/tsscmp": "^1.0.0",
     "aws-sdk": "^2.779.0",
