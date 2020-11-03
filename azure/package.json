@@ -28,7 +28,7 @@
   "dependencies": {
     "@slack/web-api": "^5.13.0",
     "common-tags": "^1.8.0",
-    "googleapis": "^61.0.0",
+    "googleapis": "^63.0.0",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
