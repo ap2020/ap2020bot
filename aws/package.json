@@ -39,7 +39,7 @@
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
     "serverless-webpack": "^5.2.0",
-    "ts-jest": "^26.4.3",
+    "ts-jest": "^26.4.4",
     "ts-loader": "^5.3.3",
     "ts-node": "^9.0.0",
     "typescript": "^3.2.4",
