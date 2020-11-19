@@ -25,8 +25,11 @@ export module Slack {
         inviter: string;
     }
 
-    export interface ThreadParent extends MessageBase {
+    export interface ThreadMessageBase extends MessageBase {
         thread_ts: string;
+    }
+
+    export interface ThreadParent extends ThreadMessageBase {
         reply_count: number;
         reply_users_count: number;
         latest_reply: string;
@@ -35,17 +38,18 @@ export module Slack {
         last_read?: string;
     }
 
-    export interface ThreadChild extends MessageBase {
-        thread_ts: string;
+    export interface ThreadChild extends ThreadMessageBase {
         parent_user_id: string;
     }
-
+    
     export interface ThreadChildInChannel extends ThreadChild {
         subtype: "thread_broadcast";
         root: ThreadParent;
     }
 
-    export type Message = MessageBase | ThreadParent | ThreadChild | ThreadChildInChannel;
+    export type ThreadMessage = ThreadParent | ThreadChild | ThreadChildInChannel;
+
+    export type Message = MessageBase | ThreadMessage;
 
     export module Conversation {
         export interface History extends WebAPICallResult {
