@@ -55,8 +55,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
-  roleBoundary:
-    rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
+  rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
   deploymentBucket:
     blockPublicAccess: true
 
