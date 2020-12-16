@@ -7,15 +7,19 @@ export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {
     const version = 'v0';
     const actual = req.headers['X-Slack-Signature'];
     if (actual === undefined) {
+        // TODO: logging
         return false;
     }
     const timestamp = req.headers['X-Slack-Request-Timestamp'];
     if (timestamp === undefined) {
+        // TODO: logging
         return false;
     }
+    // TODO: time check
     const hmac = crypto.createHmac('sha256', await envvar.get('slack/signing-secret'));
     hmac.update(`${version}:${timestamp}:${req.body}`);
     const expected = `${version}=${hmac.digest('hex')}`;
 
+    // TODO: logging
     return timingSafeCompare(expected, actual);
 };
