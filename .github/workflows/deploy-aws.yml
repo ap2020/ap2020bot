@@ -22,6 +22,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Mask variables
+      run: |
+        echo "::add-mask::${{ secrets.AWS_ACCOUNT_ID }}"
+        echo "::add-mask::${{ secrets.AWS_API_GATEWAY_ID }}"
+        echo "::add-mask::${{ secrets.AWS_DEPLOY_USER_NAME }}"
+
     - name: Read .nvmrc
       run: echo ::set-output name=NVMRC::$(cat .nvmrc)
       id: nvm
@@ -45,9 +51,6 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        _AWS_DEPLOY_USER_NAME: ${{ secrets.AWS_DEPLOY_USER_NAME }}
-        _AWS_DYNAMODB_WATCH_PORTAL: ${{ secrets.AWS_DYNAMODB_WATCH_PORTAL }}
-        _AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
     - uses: 8398a7/action-slack@v3
       with:

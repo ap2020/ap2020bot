@@ -4,8 +4,11 @@ import { slack } from './clients';
 import { slackTSToMoment } from './timestamp';
 import type { Slack } from './types';
 
+export const isThreadMessage = (message: Slack.Message): message is Slack.ThreadMessage =>
+    'thread_ts' in message && typeof message.thread_ts === 'string'
+    
 export const isThreadParent = (message: Slack.Message): message is Slack.ThreadParent =>
-    'thread_ts' in message && typeof message.thread_ts === 'string' && message.thread_ts === message.ts;
+    isThreadMessage(message) && message.thread_ts === message.ts;
 
 export const isThreadChildHidden = (message: Slack.Conversation.Replies['messages'][number]): message is Slack.ThreadChild => // ThreadChildInChannelも除外するけど，TSの型システムでは無理
     message.thread_ts !== message.ts && message.subtype !== 'thread_broadcast';
@@ -37,7 +40,7 @@ const _listRedundantMessages: {
             ...args,
             count: args.limit ?? 1000, // TODO: handle has_more
         })) as Slack.Conversation.History;
-        const threadMessages: Slack.ThreadChild[][] =
+        const threadMessages: Slack.ThreadMessage[][] =
             await Promise.all(
                 messages
                     .filter(isThreadParent)
@@ -53,10 +56,12 @@ const _listRedundantMessages: {
                                 ts: message.ts,
                                 limit: 1000, // TODO: handle has_more
                             }) as Slack.Conversation.Replies).messages
-                                .filter(isThreadChildHidden),
                     ),
             );
-        return messages.concat(flatten(threadMessages));
+        return [
+            ...messages.filter(message => !isThreadMessage(message)),
+            ...flatten(threadMessages),
+        ];
     },
     'just-in-range': async (args, moments) => {
         const { messages } = (await slack.bot.conversations.history({

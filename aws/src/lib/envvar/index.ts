@@ -1,6 +1,6 @@
 import { EnvVar } from './base';
 import { envvarProd } from './prod';
-/// #if STAGE !== 'local'
+/// #if STAGE === 'local'
 import { envvarTest } from './test';
 import { envvarLocal } from './local';
 /// #endif
