@@ -1,7 +1,6 @@
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { verify } from '@/lib/slack/verify';
-import { SNS } from 'aws-sdk';
-import { EventPayload } from './slack-types';
+import { EventPayload } from '../../lib/slack/events/types';
 import { extractAttribute } from './attribute';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 

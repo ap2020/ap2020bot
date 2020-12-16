@@ -1,6 +1,6 @@
-import { SlackEvent } from "./slack-types";
+import { SlackEvent } from "../../lib/slack/events/types";
 import { MessageAttributeMap, MessageAttributeValue } from "aws-sdk/clients/sns";
-import { EventPayload } from "./slack-types";
+import { EventPayload } from "../../lib/slack/events/types";
 
 const toAttr = (str: string): MessageAttributeValue => {
   return {
