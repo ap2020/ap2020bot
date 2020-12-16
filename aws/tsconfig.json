@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "lib": ["es2017"],
+    "lib": ["es2019"],
     "removeComments": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "target": "es2017",
+    "target": "es2019",
     "outDir": ".build",
     "esModuleInterop": true,
     "types": [
