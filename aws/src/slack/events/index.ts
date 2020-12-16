@@ -21,8 +21,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
             console.log('Challenge from Slack');
             return payload.challenge;
         case "event_callback":
-            console.log(JSON.stringify(payload, undefined, 2));
-            // await main(payload);
+            await main(payload);
             break;
         default:
             console.error('not recognized top-level event: ', payload.type);
