@@ -1,12 +1,12 @@
 export type SlackEvent =
-  | ChannelCreated
-  | ChannelUnarchive
+  | ChannelCreatedEvent
+  | ChannelUnarchiveEvent
 
-export type EventPayload = {
+export type EventPayload<Event extends SlackEvent = SlackEvent> = {
   // token: string; // deprecated
   team_id: string;
   api_app_id: string;
-  event: SlackEvent;
+  event: Event;
   type: 'event_callback';
   event_id: string;
   event_time: number;
@@ -20,7 +20,9 @@ export type EventPayload = {
   }[];
 }
 
-export type ChannelCreated = {
+export type SlackSNSMessage<Event extends SlackEvent> = EventPayload<Event>;
+
+export type ChannelCreatedEvent = {
   type: "channel_created";
   channel: {
       id: string;
@@ -30,7 +32,7 @@ export type ChannelCreated = {
   }
 }
 
-export type ChannelUnarchive = {
+export type ChannelUnarchiveEvent = {
   type: "channel_unarchive";
   channel: string;
   user: string;
