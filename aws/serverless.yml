@@ -81,14 +81,22 @@ functions:
       - http:
           path: slack/events
           method: post
-  channel-notifier:
-    handler: src/slack/channel-notifier/index.handler
+  channel-create-notifier:
+    handler: src/slack/channel-notifier/index.channelCreatedHandler
     events:
       - sns:
           topicName: slack-events
           filterPolicy:
             event_name:
               - channel_created
+  channel-unarchive-notifier:
+    handler: src/slack/channel-notifier/index.channelUnarchiveHandler
+    events:
+      - sns:
+          topicName: slack-events
+          filterPolicy:
+            event_name:
+              - channel_unarchive
 
 resources:
   - '${file(serverless/error-alarms.js):${self:custom.stage}}'

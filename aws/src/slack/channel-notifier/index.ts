@@ -1,21 +1,28 @@
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { ChannelCreatedEvent, SlackSNSMessage } from '@/lib/slack/events/types';
+import { createHandler } from '@/lib/slack/events';
+import { ChannelCreatedEvent, ChannelUnarchiveEvent, SlackSNSMessage } from '@/lib/slack/events/types';
 import { SNSHandler } from 'aws-lambda';
 
-export const handler: SNSHandler = async (snsEvent) => {
-  const event = JSON.parse(snsEvent.Records[0].Sns.Message);
-  await main(event);
-}
-
-const main = async ({event: {channel}}: SlackSNSMessage<ChannelCreatedEvent>) => {
+const channelCreatedMain = async ({event: {channel}}: SlackSNSMessage<ChannelCreatedEvent>) => {
   await Promise.all([
     (await slack.bot).chat.postMessage({
-        channel: await envvar.get('slack/channel/notify-others'),
-        text: `:new: <@${channel.creator}> が <#${channel.id}> を作成しました :rocket:`,
+      channel: await envvar.get('slack/channel/notify-others'),
+      text: `:new: <@${channel.creator}> が <#${channel.id}> を作成しました :rocket:`,
     }),
     (await slack.bot).conversations.join({
-        channel: channel.id,
+      channel: channel.id,
     })
-]);
+  ]);
 }
+
+const channelUnarchiveMain = async ({event: {user, channel}}: SlackSNSMessage<ChannelUnarchiveEvent>) => {
+  await (await slack.bot).chat.postMessage({
+    channel: await envvar.get('slack/channel/notify-others'),
+    text: `:recycle: <@${user}> が <#${channel}> をアーカイブから復元しました :rocket:`,
+  });
+}
+
+export const channelCreatedHandler: SNSHandler = createHandler<ChannelCreatedEvent>(channelCreatedMain);
+
+export const channelUnarchiveHandler: SNSHandler = createHandler<ChannelUnarchiveEvent>(channelUnarchiveMain);
