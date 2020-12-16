@@ -3,6 +3,7 @@ import { verify } from '@/lib/slack/verify';
 import { EventPayload } from '../../lib/slack/events/types';
 import { extractAttribute } from './attribute';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
+import { sns } from '@/lib/sns';
 
 export const handler: APIGatewayProxyHandlerV2 = async (request) => {
     if (!(await verify(request))) {
@@ -34,7 +35,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
 };
 
 const main = async (payload: EventPayload) => {
-    const sns = new SNS();
     const message = payload;
     const messageAttributes = extractAttribute(payload);
     await sns.publish({
