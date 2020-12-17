@@ -26,7 +26,6 @@ export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {
         return false;
     }
     const timestampDate = DateTime.fromSeconds(Number(timestamp));
-    console.log(timestampDate.toFormat('yyyy-MM-dd HH:mm:ss'))
     if (DateTime.local().diff(timestampDate) > Duration.fromObject({ minutes: 5 })) {
         logInvalidRequest(req, 'X-Slack-Request-Timestamp is older than 5 minutes.');
         return false;
