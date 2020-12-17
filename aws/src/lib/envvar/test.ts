@@ -1,17 +1,17 @@
-import { EnvVar } from './base';
+import { EnvVar, EnvVarKey } from './base';
 
 class EnvVarTest implements EnvVar {
-    envvars = new Map<string, string>();
+    envvars = new Map<EnvVarKey, string>();
 
     init() {
         this.envvars.clear();
     }
 
-    set(key: string, value: string) {
+    set(key: EnvVarKey, value: string) {
         this.envvars.set(key, value);
     }
 
-    get(key: string) {
+    get(key: EnvVarKey) {
         return Promise.resolve(this.envvars.get(key));
     }
 }
