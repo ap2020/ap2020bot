@@ -5,6 +5,7 @@ import { extractAttribute } from './attribute';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
 
+// TODO: preload envvars
 export const handler: APIGatewayProxyHandlerV2 = async (request) => {
     if (!(await verify(request))) {
         console.error('Slack verification failed.', request)
@@ -37,6 +38,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
 const main = async (payload: EventPayload) => {
     const message = payload;
     const messageAttributes = extractAttribute(payload);
+    // TODO: exclude events by bots
     await sns.publish({
         TopicArn: await getSlackEventTopicARN(),
         Message: JSON.stringify(message),
