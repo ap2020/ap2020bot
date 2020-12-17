@@ -5,6 +5,7 @@ frameworkVersion: '2'
 plugins:
   - serverless-webpack
   - serverless-dynamodb-local
+  - serverless-offline-sns
   - serverless-offline
 
 custom:
@@ -28,6 +29,9 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
+  serverless-offline-sns:
+    port: 3001 # a free port for the sns server to run on
+    accountId: ${ssm:/ap2020bot/aws/account-id} # TODO: use fake accountId
       
 provider:
   name: aws
@@ -73,6 +77,28 @@ functions:
       - http:
           path: slack/slash/invite-all
           method: post
+  slack-events:
+    handler: src/slack/events/index.handler
+    events:
+      - http:
+          path: slack/events
+          method: post
+  channel-create-notifier:
+    handler: src/slack/channel-notifier/index.channelCreatedHandler
+    events:
+      - sns:
+          topicName: slack-events
+          filterPolicy:
+            event_name:
+              - channel_created
+  channel-unarchive-notifier:
+    handler: src/slack/channel-notifier/index.channelUnarchiveHandler
+    events:
+      - sns:
+          topicName: slack-events
+          filterPolicy:
+            event_name:
+              - channel_unarchive
 
 resources:
   - '${file(serverless/error-alarms.js):${self:custom.stage}}'
