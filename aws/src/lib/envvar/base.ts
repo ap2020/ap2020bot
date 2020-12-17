@@ -1,6 +1,7 @@
 // TODO: type keys
 
 export const envVarKeys = [
+    "aws/account-id",
     "user-agent",
     "utokyo-proxy/host",
     "utokyo-proxy/port",
@@ -8,6 +9,7 @@ export const envVarKeys = [
     "utokyo-proxy/password",
     "slack/signing-secret",
     "slack/token/bot",
+    "slack/channel/notify-others",
     "slack/channel/notify-temp",
     "slack/user_id/bot",
 ] as const;
