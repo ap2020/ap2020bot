@@ -1,0 +1,19 @@
+{
+  "name": "@ap2020/assignments-core",
+  "version": "0.0.1",
+  "description": "Core library of ap2020 assignments management system",
+  "main": "index.js",
+  "repository": "https://github.com/ap2020/ap2020bot.git",
+  "author": "ap2020",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@types/lodash": "^4.14.162",
+    "@types/luxon": "^1.25.0",
+    "lodash": "^4.17.20",
+    "luxon": "^1.25.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.3"
+  }
+}
