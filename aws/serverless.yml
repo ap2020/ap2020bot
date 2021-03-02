@@ -63,6 +63,8 @@ provider:
   rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
   deploymentBucket:
     blockPublicAccess: true
+  httpApi:
+    payload: '2.0'
 
 functions:
   watch-portal:
@@ -74,15 +76,15 @@ functions:
   slash-invite-all:
     handler: src/slash/invite-all/index.handler
     events:
-      - http:
-          path: slack/slash/invite-all
-          method: post
+      - httpApi:
+          path: /slack/slash/invite-all
+          method: POST
   slack-events:
     handler: src/slack/events/index.handler
     events:
-      - http:
-          path: slack/events
-          method: post
+      - httpApi:
+          path: /slack/events
+          method: POST
   channel-create-notifier:
     handler: src/slack/channel-notifier/index.channelCreatedHandler
     events:
