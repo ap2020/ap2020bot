@@ -26,6 +26,7 @@ jobs:
       run: |
         echo "::add-mask::${{ secrets.AWS_ACCOUNT_ID }}"
         echo "::add-mask::${{ secrets.AWS_API_GATEWAY_ID }}"
+        echo "::add-mask::${{ secrets.AWS_API_GATEWAY_ID2 }}"
         echo "::add-mask::${{ secrets.AWS_DEPLOY_USER_NAME }}"
 
     - name: Read .nvmrc
