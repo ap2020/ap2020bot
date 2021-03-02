@@ -87,7 +87,7 @@ functions:
     handler: src/slack/channel-notifier/index.channelCreatedHandler
     events:
       - sns:
-          topicName: slack-events
+          topicName: ap2020bot-prod-slack-events
           filterPolicy:
             event_name:
               - channel_created
@@ -95,7 +95,7 @@ functions:
     handler: src/slack/channel-notifier/index.channelUnarchiveHandler
     events:
       - sns:
-          topicName: slack-events
+          topicName: ap2020bot-prod-slack-events
           filterPolicy:
             event_name:
               - channel_unarchive

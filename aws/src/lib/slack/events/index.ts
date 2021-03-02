@@ -3,7 +3,7 @@ import { SNSHandler } from "aws-lambda"
 import { SlackEvent, SlackSNSMessage } from "./types"
 
 export const getSlackEventTopicARN = async () => {
-  return `arn:aws:sns:us-east-1:${await envvar.get('aws/account-id')}:slack-events`
+  return `arn:aws:sns:us-east-1:${await envvar.get('aws/account-id')}:ap2020bot-prod-slack-events` // TODO: use env.STAGE
 }
 
 export const createHandler = <Event extends SlackEvent>(callback: ((message: SlackSNSMessage<Event>) => Promise<void>)): SNSHandler => {
