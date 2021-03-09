@@ -21,6 +21,9 @@ custom:
   dynamodbConfig:
     tableName:
       watch-portal: ${self:custom.resourcePrefix}watch-portal
+  sns:
+    topicName:
+      slack-events: ${self:custom.resourcePrefix}slack-events
   # config for dynamodb-local
   dynamodb:
     stages:
@@ -60,6 +63,10 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
+    - Effect: Allow
+      Action:
+        - "sns:Publish"
+      Resource: "arn:aws:sns:${self:provider.region}:*:${self:custom.sns.topicName.slack-events}"
   rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
   deploymentBucket:
     blockPublicAccess: true
@@ -89,7 +96,7 @@ functions:
     handler: src/slack/channel-notifier/index.channelCreatedHandler
     events:
       - sns:
-          topicName: ap2020bot-prod-slack-events
+          topicName: ${self:custom.sns.topicName.slack-events}
           filterPolicy:
             event_name:
               - channel_created
@@ -97,7 +104,7 @@ functions:
     handler: src/slack/channel-notifier/index.channelUnarchiveHandler
     events:
       - sns:
-          topicName: ap2020bot-prod-slack-events
+          topicName: ${self:custom.sns.topicName.slack-events}
           filterPolicy:
             event_name:
               - channel_unarchive
