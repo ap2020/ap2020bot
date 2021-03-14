@@ -12,7 +12,8 @@ import { envvarLocal } from './local';
 
 export const envvar: EnvVar = (() => {
     switch (process.env.STAGE) {
-        case 'prod': {
+        case 'prod':
+        case 'dev': {
             return envvarProd;
         }
         /// #if STAGE === 'local'
