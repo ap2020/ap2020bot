@@ -8,7 +8,7 @@ class EnvVarProd implements EnvVar {
 
     private async fetch(key: EnvVarKey): Promise<string> {
         const res = await this.ssm.getParameter({
-            Name: `/ap2020bot/${key}`,
+            Name: `/ap2020bot/${process.env.STAGE}/${key}`,
             WithDecryption: true,
         }).promise();
         const value = res.Parameter.Value;
