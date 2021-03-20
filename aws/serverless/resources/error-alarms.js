@@ -1,10 +1,10 @@
 const path = require('path');
 const {readFileSync} = require('fs');
-const stages = require('./stages.js');
+const stages = require('../lib/stages.js');
 const yaml = require('js-yaml');
 const {pascalCase} = require('change-case');
 
-const configText = readFileSync(path.join(__dirname, '..', 'serverless.yml'), {encoding: 'utf8'});
+const configText = readFileSync(path.join(__dirname, '..', '..', 'serverless.yml'), {encoding: 'utf8'});
 const config = yaml.safeLoad(configText);
 
 const functions = Object.keys(config.functions);

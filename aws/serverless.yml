@@ -110,7 +110,7 @@ functions:
               - channel_unarchive
 
 resources:
-  - '${file(serverless/error-alarms.js):${self:custom.stage}}'
+  - '${file(serverless/resources/error-alarms.js):${self:custom.stage}}'
   - Resources:
       ErrorTopic:
         Type: AWS::SNS::Topic
