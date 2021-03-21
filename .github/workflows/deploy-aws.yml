@@ -4,7 +4,7 @@ name: Deploy (AWS)
 # events but only for the master branch
 on:
   push:
-    branches: [ master, feature/cannot-merge-until-deploy-succeeds ] # TODO: remove
+    branches: [ master ]
     paths-ignore: # don't trigger if all changes matches these paths
       - 'azure/**'
       - '**.md'
