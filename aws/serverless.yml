@@ -11,7 +11,7 @@ plugins:
 
 custom:
   stage: '${opt:stage, "local"}'
-  accountId: ${ssm:/ap2020bot/aws/account-id}
+  accountId: ${file(serverless/lib/sts.js):accountId}
   resourcePrefix: ap2020bot-${self:custom.stage}-
   iam:
     lambdaRole: ap2020bot-${self:custom.stage}-${self:provider.region}-lambdaRole
