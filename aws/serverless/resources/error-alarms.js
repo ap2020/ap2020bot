@@ -1,25 +1,20 @@
-const path = require('path');
-const {readFileSync} = require('fs');
-const stages = require('../lib/stages.js');
-const yaml = require('js-yaml');
 const {pascalCase} = require('change-case');
 
-const configText = readFileSync(path.join(__dirname, '..', '..', 'serverless.yml'), {encoding: 'utf8'});
-const config = yaml.safeLoad(configText);
+const { shortnames: getFuncShortnames, calcFullname } = require('../lib/functions');
 
-const functions = Object.keys(config.functions);
+const calcAlarmName = (funcShortname) => `ap2020bot-\${self:custom.stage}-error-${funcShortname}`;
 
-const createAlarm = ({func, stage}) => ([
+const createAlarm = (func) => ([
     `${pascalCase(func)}ErrorAlarm`,
     {
         "Type": "AWS::CloudWatch::Alarm",
         "Properties": {
-            "AlarmName": `ap2020bot-${stage}-error-${func}`,
+            "AlarmName": calcAlarmName(func),
             "Namespace": "AWS/Lambda",
             "Dimensions": [
                 {
                     "Name": "FunctionName",
-                    "Value": `ap2020bot-${stage}-${func}`,
+                    "Value": calcFullname(func),
                 }
             ],
             "MetricName": "Errors",
@@ -37,15 +32,19 @@ const createAlarm = ({func, stage}) => ([
     },
 ]);
 
-const createAlarms = (stage) => Object.fromEntries(functions.map(func => createAlarm({func, stage})));
+const names = async (sls) => {
+    const functions = await getFuncShortnames(sls);
+    return functions.map(func => calcAlarmName(func)); 
+};
+module.exports.names = names;
 
-module.exports = Object.fromEntries(
-    stages.map(
-        stage => [
-            stage,
-            {
-                "Resources": createAlarms(stage),
-            },
-        ],
-    )
-);
+const arns = async (sls) => (await names(sls)).map(alarm => `arn:aws:cloudwatch:\${self:provider.region}:\${self:custom.accountId}:alarm:${alarm}`);
+module.exports.arns = arns;
+
+const cfn = async (sls) => {
+    const functions = await getFuncShortnames(sls);
+    return {
+        "Resources": Object.fromEntries(functions.map(func => createAlarm(func))),
+    };
+};
+module.exports.cfn = cfn;

@@ -1,0 +1,120 @@
+Resources:
+  Ap2020DeployLimitedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: Ap2020BotDeployLimited${self:custom.stage}
+      Description: Limited permissions to deploy service. Intended to be used in CI/CD.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ssm:GetParameter'
+            Resource: 'arn:aws:ssm:${self:provider.region}:${self:custom.accountId}:parameter/ap2020bot/${self:custom.stage}/*'
+          - Effect: Allow
+            Action:
+              - 'cloudformation:DescribeStacks'
+              - 'cloudformation:ListStackResources'
+              - 'cloudformation:DescribeStackEvents'
+              - 'cloudformation:DescribeStackResource'
+              - 'cloudformation:UpdateStack'
+              - 'cloudformation:CancelUpdateStack'
+            Resource: 'arn:aws:cloudformation:${self:provider.region}:${self:custom.accountId}:stack/ap2020bot-${self:custom.stage}/*'
+          - Effect: Allow
+            Action:
+              - 'cloudformation:ValidateTemplate'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'dynamodb:CreateTable'
+              - 'dynamodb:DeleteTable'
+              - 'dynamodb:DescribeTable'
+              - 'dynamodb:DescribeTimeToLive'
+              - 'dynamodb:UpdateTimeToLive'
+            Resource: '${file(serverless/lib/dynamodb.js):arns}'
+          - Effect: Allow
+            Action:
+              - 'iam:GetRole'
+              - 'iam:GetRolePolicy'
+            Resource: 'arn:aws:iam::${self:custom.accountId}:role/${self:custom.iam.lambdaRole}'
+          - Effect: Allow
+            Action:
+              - 'iam:PassRole'
+            Resource: 'arn:aws:iam::${self:custom.accountId}:role/${self:custom.iam.lambdaRole}'
+            Condition:
+              StringEquals:
+                'iam:PassedToService': lambda.amazonaws.com
+          - Effect: Allow
+            Action:
+              - 'lambda:CreateFunction'
+              - 'lambda:DeleteFunction'
+              - 'lambda:GetFunction'
+              - 'lambda:GetFunctionConfiguration'
+              - 'lambda:ListTags'
+              - 'lambda:UpdateFunctionCode'
+              - 'lambda:UpdateFunctionConfiguration'
+            Resource: '${file(serverless/lib/functions.js):arns}'
+          - Effect: Allow
+            Action:
+              - 'lambda:AddPermission'
+              - 'lambda:RemovePermission'
+            Resource: '${file(serverless/lib/functions.js):arns}'
+            Condition:
+              StringEquals:
+                'lambda:Principal': sns.amazonaws.com
+          - Effect: Allow
+            Action:
+              - 'lambda:AddPermission'
+              - 'lambda:RemovePermission'
+            Resource: '${file(serverless/lib/functions.js):arns}'
+            Condition:
+              StringEquals:
+                'lambda:Principal': apigateway.amazonaws.com
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:DeleteLogGroup'
+              - 'logs:DescribeLogGroups'
+            Resource: '${file(serverless/lib/functions.js):logGroupArns}'
+          - Action:
+              - 's3:CreateBucket'
+              - 's3:DeleteBucket'
+              - 's3:PutBucketPolicy'
+              - 's3:PutBucketTagging'
+              - 's3:PutEncryptionConfiguration'
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:PutObject'
+            Effect: Allow
+            Resource: 'arn:aws:s3:::ap2020bot-${self:custom.stage}-serverlessdeploymentbucket-*'
+          - Action:
+              - 'cloudwatch:PutMetricAlarm'
+              - 'cloudwatch:DeleteAlarms'
+            Effect: Allow
+            Resource: '${file(serverless/resources/error-alarms.js):arns}'
+          - Action:
+              - 'cloudwatch:DescribeAlarms'
+            Effect: Allow
+            Resource: 'arn:aws:cloudwatch:${self:provider.region}:${self:custom.accountId}:alarm:*'
+          - Action:
+              - 'sns:CreateTopic'
+              - 'sns:DeleteTopic'
+              - 'sns:GetTopicAttributes'
+              - 'sns:SetTopicAttributes'
+              - 'sns:Subscribe'
+              - 'sns:Unsubscribe'
+            Effect: Allow
+            Resource: '${file(serverless/lib/sns.js):arns}'
+          - Action:
+              - 'sns:ListTopics'
+            Effect: Allow
+            Resource: '*'
+          - Effect: Allow
+            Action: 'apigateway:*'
+            Resource:
+              - 'arn:aws:apigateway:${self:provider.region}::/apis'
+              - !Join
+                - ''
+                - - 'arn:aws:apigateway:${self:provider.region}::/apis/'
+                  - Ref: HttpApi
+                  - '/*'
