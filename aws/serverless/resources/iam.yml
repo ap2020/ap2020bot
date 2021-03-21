@@ -118,3 +118,55 @@ Resources:
                 - - 'arn:aws:apigateway:${self:provider.region}::/apis/'
                   - Ref: HttpApi
                   - '/*'
+
+  Ap2020BotDeployLimitedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'ap2020bot-deploy-limited-${self:custom.stage}'
+      Description: Limited permissions to deploy service. Intended to be used in CI/CD.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: '${self:custom.accountId}' # restrict access using IAM policy of Ap2020BotDeployLimitedGroup. not here
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - Ref: Ap2020DeployLimitedPolicy
+      Tags: 
+        - Key: project
+          Value: ap2020bot
+
+  Ap2020DeployLimitedAssumablePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: Ap2020BotDeployLimitedAssumable${self:custom.stage}
+      Description: Allow assuming ap2020bot deploy role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:aws:iam::${self:custom.accountId}:role/'
+                  - Ref: Ap2020BotDeployLimitedRole
+
+  Ap2020BotDeployLimitedGroup:
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: 'ap2020bot-deploy-limited-${self:custom.stage}'
+      ManagedPolicyArns:
+        - Ref: Ap2020DeployLimitedAssumablePolicy
+
+  Ap2020BotDeployGitHubActionsUser:
+    Type: AWS::IAM::User
+    Properties: 
+      UserName: ap2020bot-deploy-github-actions-${self:custom.stage}
+      Groups:
+        - user
+        - bot
+        - Ref: Ap2020BotDeployLimitedGroup
