@@ -47,11 +47,17 @@ jobs:
     - name: Test
       run: yarn run test:ci
 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        role-to-assume: ap2020bot-deploy-limited-prod
+        role-duration-seconds: 1200
+
     - name: Deploy
       run: yarn run serverless deploy --stage prod
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - uses: 8398a7/action-slack@v3
       with:
