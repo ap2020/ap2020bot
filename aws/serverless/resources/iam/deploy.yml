@@ -132,6 +132,7 @@ Resources:
               AWS: '${self:custom.accountId}' # restrict access using IAM policy of Ap2020BotDeployLimitedGroup. not here
             Action:
               - 'sts:AssumeRole'
+              - 'sts:TagSession'
       ManagedPolicyArns:
         - Ref: Ap2020DeployLimitedPolicy
       Tags: 
@@ -149,6 +150,7 @@ Resources:
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'
+              - 'sts:TagSession'
             Resource:
               - !Join
                 - ''
