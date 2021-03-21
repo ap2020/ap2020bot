@@ -1,0 +1,73 @@
+Resources:
+  Ap2020DeployAdminPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: Ap2020BotDeployAdmin${self:custom.stage}
+      Description: Additional permissions to deploy service. Only attach this to ap2020bot admins.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+            - 'iam:PutRolePolicy'
+            - 'iam:PutRolePermissionsBoundary'
+          Resource:
+            - !Join
+              - ''
+              - - 'arn:aws:iam::${self:custom.accountId}:role/'
+                - Ref: IamRoleLambdaExecution
+        - Effect: Allow
+          Action:
+            - 'iam:PassRole'
+          Resource:
+            - !Join
+              - ''
+              - - 'arn:aws:iam::${self:custom.accountId}:role/'
+                - Ref: IamRoleLambdaExecution
+          Condition:
+            StringEquals:
+              'iam:PassedToService': lambda.amazonaws.com
+
+  Ap2020BotDeployAdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'ap2020bot-deploy-admin-${self:custom.stage}'
+      Description: Full permissions to deploy service. Intended to be used in CI/CD.
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: '${self:custom.accountId}' # restrict access using IAM policy of Ap2020BotDeployAdminGroup. not here
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - Ref: Ap2020DeployLimitedPolicy
+        - Ref: Ap2020DeployAdminPolicy
+      Tags: 
+        - Key: project
+          Value: ap2020bot
+
+  Ap2020DeployAdminAssumablePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: Ap2020BotDeployAdminAssumable${self:custom.stage}
+      Description: Allow assuming ap2020bot deploy admin role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:aws:iam::${self:custom.accountId}:role/'
+                  - Ref: Ap2020BotDeployAdminRole
+
+  Ap2020BotDeployAdminGroup:
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: 'ap2020bot-deploy-admin-${self:custom.stage}'
+      ManagedPolicyArns:
+        - Ref: Ap2020DeployAdminAssumablePolicy

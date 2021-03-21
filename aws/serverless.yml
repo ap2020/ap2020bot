@@ -116,6 +116,7 @@ functions:
 resources:
   - '${file(serverless/resources/error-alarms.js):cfn}'
   - '${file(serverless/resources/iam/deploy.yml)}'
+  - '${file(serverless/resources/iam/deploy-admin.yml)}'
   - Resources:
       ErrorTopic:
         Type: AWS::SNS::Topic
