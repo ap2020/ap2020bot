@@ -1,0 +1,7 @@
+Resources:
+  Ap2020BotAdminGroup:
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: 'ap2020bot-admin-${self:custom.stage}'
+      ManagedPolicyArns:
+        - Ref: Ap2020DeployAdminAssumablePolicy
