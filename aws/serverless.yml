@@ -72,7 +72,6 @@ provider:
       Action:
         - "sns:Publish"
       Resource: "arn:aws:sns:${self:provider.region}:*:${self:custom.sns.topicName.slack-events}"
-  rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
   deploymentBucket:
     blockPublicAccess: true
   httpApi:
