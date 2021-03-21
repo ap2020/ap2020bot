@@ -1,6 +1,7 @@
 service: ap2020bot
 
 frameworkVersion: '2'
+variablesResolutionMode: 20210219
 
 plugins:
   - serverless-webpack
@@ -10,7 +11,10 @@ plugins:
 
 custom:
   stage: '${opt:stage, "local"}'
+  accountId: ${file(serverless/lib/sts.js):accountId}
   resourcePrefix: ap2020bot-${self:custom.stage}-
+  iam:
+    lambdaRole: ap2020bot-${self:custom.stage}-${self:provider.region}-lambdaRole
   webpack:
     webpackConfig: ./webpack.config.js
     packager: yarn
@@ -23,6 +27,7 @@ custom:
       watch-portal: ${self:custom.resourcePrefix}watch-portal
   sns:
     topicName:
+      error: ${self:custom.resourcePrefix}error
       slack-events: ${self:custom.resourcePrefix}slack-events
   # config for dynamodb-local
   dynamodb:
@@ -34,7 +39,7 @@ custom:
       migrate: true
   serverless-offline-sns:
     port: 3001 # a free port for the sns server to run on
-    accountId: ${ssm:/ap2020bot/aws/account-id} # TODO: use fake accountId
+    accountId: ${ssm:/ap2020bot/${self:custom.stage}/aws/account-id} # TODO: use fake accountId
       
 provider:
   name: aws
@@ -67,7 +72,6 @@ provider:
       Action:
         - "sns:Publish"
       Resource: "arn:aws:sns:${self:provider.region}:*:${self:custom.sns.topicName.slack-events}"
-  rolePermissionsBoundary: arn:aws:iam::${ssm:/ap2020bot/aws/account-id}:policy/ap2020botLambdaBoundary
   deploymentBucket:
     blockPublicAccess: true
   httpApi:
@@ -110,12 +114,13 @@ functions:
               - channel_unarchive
 
 resources:
-  - '${file(serverless/error-alarms.js):${self:custom.stage}}'
+  - '${file(serverless/resources/error-alarms.js):cfn}'
+  - '${file(serverless/resources/iam/deploy.yml)}'
   - Resources:
       ErrorTopic:
         Type: AWS::SNS::Topic
         Properties:
-          TopicName: ap2020bot-${self:custom.stage}-error
+          TopicName: ${self:custom.sns.topicName.error}
           DisplayName: ap2020bot errors
       WatchPortalDynamoDbTable:
         Type: 'AWS::DynamoDB::Table'
