@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention -- Type definitions are based on Slack API schema  */
+
 export type SlackEvent =
   | ChannelCreatedEvent
   | ChannelUnarchiveEvent

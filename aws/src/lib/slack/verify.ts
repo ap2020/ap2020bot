@@ -6,8 +6,13 @@ import { DateTime, Duration } from 'luxon';
 import { CaseInsensitiveMap } from '../case-insensitive-map';
 
 const logInvalidRequest = (req: APIGatewayProxyEventV2, message: string) => {
-  console.error('Slack signature verification failed.', message, req.requestContext.http.sourceIp, req.requestContext.http.userAgent);
-}
+  console.error(
+    'Slack signature verification failed.',
+    message,
+    req.requestContext.http.sourceIp,
+    req.requestContext.http.userAgent,
+  );
+};
 
 // TODO: use verify function of @slack/events-api ?
 export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {

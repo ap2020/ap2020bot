@@ -8,8 +8,10 @@ class EnvVarProd implements EnvVar {
 
   private async fetch(key: EnvVarKey): Promise<string> {
     const res = await this.ssm.getParameter({
+      /* eslint-disable @typescript-eslint/naming-convention */
       Name: `/ap2020bot/${process.env.STAGE}/${key}`,
       WithDecryption: true,
+      /* eslint-enable @typescript-eslint/naming-convention */
     }).promise();
     const value = res.Parameter.Value;
     return value;

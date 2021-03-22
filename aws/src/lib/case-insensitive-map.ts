@@ -15,10 +15,11 @@ export class CaseInsensitiveMap<Value> {
     return this.loweredMap.has(key.toLowerCase());
   }
 
-  set(key: string, value: Value) {
+  set(key: string, value: Value): void {
     this.loweredMap.set(key.toLowerCase(), value);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   static fromObject<Value>(obj: {[key: string]: Value}): CaseInsensitiveMap<Value> {
     return new CaseInsensitiveMap<Value>(new Map(Object.entries(obj)));
   }
