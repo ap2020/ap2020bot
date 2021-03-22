@@ -1,4 +1,4 @@
-import envvarObj from '@/../.env.local.json'
+import envvarObj from '@/../.env.local.json';
 import { EnvVar, EnvVarKey } from './base';
 
 class EnvVarLocal implements EnvVar {

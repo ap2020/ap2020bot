@@ -3,7 +3,7 @@ export class CaseInsensitiveMap<Value> {
 
   constructor(map: Map<string, Value>) {
     this.loweredMap = new Map(
-      [...map.entries()].map(([key, value]) => [key.toLowerCase(), value])
+      [...map.entries()].map(([key, value]) => [key.toLowerCase(), value]),
     );
   }
 

@@ -8,7 +8,8 @@ const toAttr = (str: string): MessageAttributeValue => ({
   /* eslint-enable @typescript-eslint/naming-convention */
 });
 
-// type ExtractEventSpecificAttributeFunc<Kind extends SlackEvent['type']> = (event: Extract<SlackEvent, {type: Kind}>) => MessageAttributeMap;
+// type ExtractEventSpecificAttributeFunc<Kind extends SlackEvent['type']> =
+//   (event: Extract<SlackEvent, {type: Kind}>) => MessageAttributeMap;
 
 // const extractAttributeFromKeys = <V, Keys extends keyof V & string[]>(obj: V, keys: Keys): MessageAttributeMap => {
 //   return Object.fromEntries(keys.map(key => [key, toAttr(obj[key])]))
