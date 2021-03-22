@@ -2,10 +2,10 @@ import { EventPayload } from '@/lib/slack/events/types';
 import type { MessageAttributeMap, MessageAttributeValue } from 'aws-sdk/clients/sns';
 
 const toAttr = (str: string): MessageAttributeValue => ({
-    /* eslint-disable @typescript-eslint/naming-convention */
-    DataType: 'String',
-    StringValue: str,
-    /* eslint-enable @typescript-eslint/naming-convention */
+  /* eslint-disable @typescript-eslint/naming-convention */
+  DataType: 'String',
+  StringValue: str,
+  /* eslint-enable @typescript-eslint/naming-convention */
 });
 
 // type ExtractEventSpecificAttributeFunc<Kind extends SlackEvent['type']> = (event: Extract<SlackEvent, {type: Kind}>) => MessageAttributeMap;
@@ -15,21 +15,21 @@ const toAttr = (str: string): MessageAttributeValue => ({
 // }
 
 const extractEventSpecificAttribute /*:  {[key in SlackEvent['type']]?: ExtractEventSpecificAttributeFunc<key>} */ = {
-    // 'message': (event) => extractAttributeFromKeys(event, ['channel', 'user', 'text'])
+  // 'message': (event) => extractAttributeFromKeys(event, ['channel', 'user', 'text'])
 } as const;
 
 export const extractAttribute = (payload: EventPayload): MessageAttributeMap => {
-    const commonAttribute = {
-        /* eslint-disable @typescript-eslint/naming-convention */
-        team_id: toAttr(payload.team_id),
-        event_name: toAttr(payload.event.type),
-        /* eslint-enable @typescript-eslint/naming-convention */
+  const commonAttribute = {
+    /* eslint-disable @typescript-eslint/naming-convention */
+    team_id: toAttr(payload.team_id),
+    event_name: toAttr(payload.event.type),
+    /* eslint-enable @typescript-eslint/naming-convention */
+  };
+  if (payload.event.type in extractEventSpecificAttribute) {
+    return {
+      ...commonAttribute,
+      ...extractEventSpecificAttribute[payload.event.type](payload.event),
     };
-    if (payload.event.type in extractEventSpecificAttribute) {
-        return {
-            ...commonAttribute,
-            ...extractEventSpecificAttribute[payload.event.type](payload.event),
-        };
-    }
-    return commonAttribute;
+  }
+  return commonAttribute;
 };

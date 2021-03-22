@@ -11,18 +11,18 @@ import { envvarLocal } from './local';
 
 
 export const envvar: EnvVar = (() => {
-    switch (process.env.STAGE) {
-        case 'prod':
-        case 'dev': {
-            return envvarProd;
-        }
-        /// #if STAGE === 'local'
-        case 'test': {
-            return envvarTest;
-        }
-        default: {
-            return envvarLocal;
-        }
-        /// #endif
+  switch (process.env.STAGE) {
+    case 'prod':
+    case 'dev': {
+      return envvarProd;
     }
+    /// #if STAGE === 'local'
+    case 'test': {
+      return envvarTest;
+    }
+    default: {
+      return envvarLocal;
+    }
+        /// #endif
+  }
 })();
