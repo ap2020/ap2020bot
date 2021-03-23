@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ScheduledHandler } from 'aws-lambda';
-import axios from 'axios';
+import { axios } from '@/lib/axios';
 import { source } from 'common-tags';
 import Parser from 'rss-parser';
 import 'source-map-support/register';
@@ -21,7 +21,7 @@ type Item = {
  * お知らせ一覧の文字列を取得する
  */
 const fetchRSS = async (): Promise<string> => {
-  const data = (await axios.get(
+  const res = await axios.get(
     'https://info.t.u-tokyo.ac.jp/rss/index.xml',
     {
       proxy: {
@@ -32,13 +32,9 @@ const fetchRSS = async (): Promise<string> => {
           password: await envvar.get('utokyo-proxy/password'),
         },
       },
-      headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        'User-Agent': await envvar.get('user-agent'),
-      },
     },
-  )).data as string;
-  return data;
+  );
+  return res.data as string;
 };
 
 /**
@@ -118,6 +114,7 @@ const main = async () => {
   const oldURLs = await fetchOldURLs();
   // 現在のお知らせ一覧ページを取得
   const data = await fetchRSS();
+  console.log(data)
   // お知らせ一覧ページをパースして URL とタイトルを抽出
   const items = await extractItems(data);
   // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出

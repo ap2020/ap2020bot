@@ -2,7 +2,6 @@
 
 export const envVarKeys = [
   'aws/account-id',
-  'user-agent',
   'utokyo-proxy/host',
   'utokyo-proxy/port',
   'utokyo-proxy/username',
