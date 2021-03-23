@@ -7,7 +7,7 @@
     "emulator:dynamodb": "serverless dynamodb start",
     "emulator:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
     "test": "jest --verbose",
-    "test:ci": "npm run build && jest --verbose --coverage"
+    "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
   "dependencies": {
     "@slack/web-api": "5",
