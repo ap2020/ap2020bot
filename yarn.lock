@@ -855,7 +855,7 @@
 
 "@pizzacat83/eslint-config@git+https://github.com/pizzacat83/eslint-config.git":
   version "0.1.0"
-  resolved "git+https://github.com/pizzacat83/eslint-config.git#2572f77a55aa0a21c8a0b67ae3cb2e2d04fad569"
+  resolved "git+https://github.com/pizzacat83/eslint-config.git#1a6020e6edc93be249223cbbbd13244e3df3e3a1"
 
 "@pizzacat83/eslint-config@github:pizzacat83/eslint-config":
   version "0.1.0"
@@ -4502,6 +4502,17 @@ eslint-import-resolver-node@^0.3.4:
     debug "^2.6.9"
     resolve "^1.13.1"
 
+eslint-import-resolver-typescript@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-2.4.0.tgz#ec1e7063ebe807f0362a7320543aaed6fe1100e1"
+  integrity sha512-useJKURidCcldRLCNKWemr1fFQL1SzB3G4a0li6lFGvlc5xGe1hY343bvG07cbpCzPuM/lK19FIJB3XGFSkplA==
+  dependencies:
+    debug "^4.1.1"
+    glob "^7.1.6"
+    is-glob "^4.0.1"
+    resolve "^1.17.0"
+    tsconfig-paths "^3.9.0"
+
 eslint-module-utils@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/eslint-module-utils/-/eslint-module-utils-2.6.0.tgz#579ebd094f56af7797d19c9866c9c9486629bfa6"
@@ -7862,7 +7873,7 @@ lru-queue@^0.1.0:
   dependencies:
     es5-ext "~0.10.2"
 
-luxon@^1.22.0, luxon@^1.25.0:
+luxon@^1.22.0:
   version "1.25.0"
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.25.0.tgz#d86219e90bc0102c0eb299d65b2f5e95efe1fe72"
   integrity sha512-hEgLurSH8kQRjY6i4YLey+mcKVAWXbDNlZRmM6AgWDJ1cY3atl8Ztf5wEY7VBReFbmGnwQPz7KYJblL8B2k0jQ==
