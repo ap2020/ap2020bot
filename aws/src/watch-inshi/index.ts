@@ -6,8 +6,8 @@ import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import cheerio from 'cheerio';
 import diff from 'diff';
-import type { SlackAttachment } from '@/lib/slack/types';
 import { getBucketName, s3 } from '@/lib/s3';
+import type { MessageAttachment } from '@slack/web-api';
 
 // TODO: ドキュメントが崩壊している
 
@@ -33,10 +33,17 @@ export const calcDiff = (oldText: string, newText: string): diff.Change[] => {
 /**
  * 差分をSlack用に整形
  */
-const formatDiff = (changes: diff.Change[]): SlackAttachment[] =>
-  // TODO: 流石に
+const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
+  // TODO: もっといい感じに
   changes
-    .map(change => ({
+    .filter(change => change.added || change.removed)
+    .map(change => (change.added ? {
+      color: '#28a745',
+      title: '追加',
+      text: change.value,
+    } : {
+      color: '#d73a49',
+      title: '削除',
       text: change.value,
     }));
 
@@ -66,7 +73,7 @@ const saveNewHTML = async (html: string): Promise<void> => {
  * お知らせを Slack に通知する
  * @param item 通知するお知らせ
  */
-const notify = async (attachments: SlackAttachment[]) => {
+const notify = async (attachments: MessageAttachment[]) => {
   await (await slack.bot).chat.postMessage({
     channel: await envvar.get('slack/channel/notify-temp'),
     username: '院試に詳しい芹沢あさひ',
