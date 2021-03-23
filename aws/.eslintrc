@@ -8,7 +8,7 @@
       "extends": ["@pizzacat83/eslint-config/nodeapp"]
     },
     {
-      "files": "./**.ts",
+      "files": "**.ts",
       "extends": ["@pizzacat83/eslint-config/typescript-nodeapp"],
       "parserOptions": {
         "project": "./tsconfig.json"
