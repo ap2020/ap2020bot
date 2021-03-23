@@ -32,7 +32,6 @@
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
-    "scrape-it": "^5.2.4",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {

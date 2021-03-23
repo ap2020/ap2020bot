@@ -5,9 +5,6 @@
     "aws",
     "azure"
   ],
-  "resolutions": {
-    "@types/cheerio": "0.22.15"
-  },
   "main": "index.js",
   "repository": "https://github.com/ap2020/ap2020bot.git",
   "author": "ap2020",
