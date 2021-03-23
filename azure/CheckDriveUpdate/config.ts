@@ -7,7 +7,7 @@ export const colors = {
   delete: '#ec565c',
   restore: '#51c69b',
   permissionChange: '#ec56a5',
-  settingsChange: '#ec56a5'
+  settingsChange: '#ec56a5',
 };
 export const japaneseTranslations = {
   create: '追加',
@@ -17,5 +17,5 @@ export const japaneseTranslations = {
   delete: '削除',
   restore: '復元',
   permissionChange: '権限変更',
-  settingsChange: '設定変更'
-}
+  settingsChange: '設定変更',
+};

@@ -1,3 +1,3 @@
 export interface LastDumpedMessage {
-    ts: string;
+  ts: string;
 }

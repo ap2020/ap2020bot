@@ -1,55 +1,55 @@
-import { AzureFunction, Context } from "@azure/functions"
-import scrapeIt from "scrape-it";
-import moment from "moment-timezone";
-import { slack } from "../utils/slack/clients";
+import type { AzureFunction, Context } from '@azure/functions';
+import scrapeIt from 'scrape-it';
+import moment from 'moment-timezone';
+import { slack } from '../utils/slack/clients';
 
 const checkTime = (): boolean => {
-    const now = moment().tz('Asia/Tokyo');
-    if (2 /* Tuesday */ <= now.day() && now.day() <= 4 /* Thursday */) {
-        return false; // once in an hour
-    }
-    return true;
-}
+  const now = moment().tz('Asia/Tokyo');
+  if (2 /* Tuesday */ <= now.day() && now.day() <= 4 /* Thursday */) {
+    return false; // once in an hour
+  }
+  return true;
+};
 
 /**
  * return A \ B
  */
 const disjoint = <T>(A: Set<T>, B: Set<T>): Set<T> =>
-    new Set([...A].filter(x => !B.has(x)));
+  new Set([...A].filter(x => !B.has(x)));
 
 const check: AzureFunction = async function (context: Context, timer: any, oldData: string[]): Promise<string[]> {
-    if (!checkTime()) {
-        return oldData;
-    }
-    context.log('last data:', oldData);
-    const oldProblems = new Set(oldData === undefined? [] : oldData);
-    const {problems} = (await scrapeIt<{ problems: string[] }>("http://133.11.136.29/public/", {
-        problems: {
-            listItem: "[title^=problem]",
-        }
-    })).data;
+  if (!checkTime()) {
+    return oldData;
+  }
+  context.log('last data:', oldData);
+  const oldProblems = new Set(oldData === undefined ? [] : oldData);
+  const { problems } = (await scrapeIt<{ problems: string[] }>('http://133.11.136.29/public/', {
+    problems: {
+      listItem: '[title^=problem]',
+    },
+  })).data;
 
-    context.log(`found problems: ${[...problems].join(', ')}`);
+  context.log(`found problems: ${[...problems].join(', ')}`);
 
-    const newProblems = disjoint(new Set(problems), new Set(oldProblems));
-    const deletedProblems = disjoint(new Set(oldProblems), new Set(problems));
-    
-    const messages = [];
-    if (newProblems.size > 0) {
-        messages.push(`:new:問題追加: ${[...newProblems].join(', ')}`) 
-    }
-    if (deletedProblems.size > 0) {
-        messages.push(`:innocent:問題削除: ${[...newProblems].join(', ')}`) 
-    }
+  const newProblems = disjoint(new Set(problems), new Set(oldProblems));
+  const deletedProblems = disjoint(new Set(oldProblems), new Set(problems));
 
-    if (messages.length > 0) {
-        await slack.bot.chat.postMessage({
-            channel: process.env.SLACK_CHANNEL_MIPRO,
-            text: messages.join('\n\n'),
-        });
-    }
+  const messages = [];
+  if (newProblems.size > 0) {
+    messages.push(`:new:問題追加: ${[...newProblems].join(', ')}`);
+  }
+  if (deletedProblems.size > 0) {
+    messages.push(`:innocent:問題削除: ${[...newProblems].join(', ')}`);
+  }
 
-    return problems;
+  if (messages.length > 0) {
+    await slack.bot.chat.postMessage({
+      channel: process.env.SLACK_CHANNEL_MIPRO,
+      text: messages.join('\n\n'),
+    });
+  }
+
+  return problems;
 };
 
 export default check;
