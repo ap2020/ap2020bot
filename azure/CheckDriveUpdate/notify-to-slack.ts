@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags';
-import type { driveactivity_v2, people_v1, drive_v3 } from 'googleapis';
+import type { driveactivity_v2, people_v1 } from 'googleapis';
 import moment from 'moment-timezone';
 import { ignoredActions, japaneseTranslations, colors } from './config';
 import type { Clients } from './lib';

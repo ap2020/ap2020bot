@@ -1,6 +1,6 @@
 import type { AzureFunction, Context } from '@azure/functions';
 import type { driveactivity_v2 } from 'googleapis';
-import { google, people_v1, drive_v3 } from 'googleapis';
+import { google } from 'googleapis';
 import { flatten } from 'lodash';
 import { getGoogleClient } from '../utils/google-client';
 import { slack } from '../utils/slack/clients';
@@ -34,6 +34,7 @@ const fetchAllDriveActivities = async (
   let response: driveactivity_v2.Schema$QueryDriveActivityResponse | null = null;
 
   do {
+    // eslint-disable-next-line no-await-in-loop
     response = (await driveActivity.activity.query({
       requestBody: {
         ancestorName: `items/${folderId}`,
@@ -43,7 +44,7 @@ const fetchAllDriveActivities = async (
       },
     })).data;
     if (response.activities !== undefined) {
-      activities = activities.concat(response.activities);
+      activities = [...activities, ...response.activities];
     }
   } while (response.nextPageToken);
 
@@ -58,7 +59,7 @@ const fetchAllDriveActivities = async (
   return activities;
 };
 
-const addCommentPermission = async ({ drive }: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress) => {
+const addCommentPermission = async ({ drive }: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string) => {
   await Promise.all(activity.actions.filter(({ detail }) => detail.create).filter(({ target }) => target.driveItem?.driveFile).map(async ({ target }) => {
     const item = await fetchDriveItem(drive, getDriveItemId(target));
     if (!item.content.permissions) {

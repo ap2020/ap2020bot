@@ -44,6 +44,7 @@ const _listRedundantMessages: {
     const threadMessages: Slack.ThreadMessage[][] =
             await Promise.all(
               messages
+                // eslint-disable-next-line unicorn/no-array-callback-reference
                 .filter(isThreadParent)
                 .filter(
                   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -76,6 +77,7 @@ const _listRedundantMessages: {
     const threadMessages: Slack.ThreadChild[][] = await Promise.all(
       messages
       // search for thread parents
+        // eslint-disable-next-line unicorn/no-array-callback-reference
         .filter(isThreadParent)
       // filter threads that may have replies in range
         .filter(
@@ -92,10 +94,11 @@ const _listRedundantMessages: {
               limit: args.limit ?? 1000, // TODO: handle has_more
             }) as Slack.Conversation.Replies).messages
             // filter out messages posted in channel
+              // eslint-disable-next-line unicorn/no-array-callback-reference
               .filter(isThreadChildHidden),
         ),
     );
-    return messages.concat(flatten(threadMessages))
+    return [...messages, ...flatten(threadMessages)]
     // filter message whose ts is in range
       .filter(
         ({ ts }) =>

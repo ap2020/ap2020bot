@@ -2,8 +2,6 @@ import type { drive_v3 } from 'googleapis';
 import { cacheCalls } from '../utils/utils';
 import { rootFolderId } from './lib';
 
-const driveItems = new Map<string, Promise<DriveItem>>();
-
 // TODO: drive-activity-apiと名前が衝突している
 // DriveItemはDrive Activityの概念なので↓を改名すべきか？
 // それともnamespaceで分けてあげるか
@@ -36,6 +34,7 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
      * path: path to item
      * valid: true if path has rootFolderId in ancestor
      */
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const rec = cacheCalls(async (client: drive_v3.Drive, folderId: string): Promise<{ path: string | null; valid: boolean }> => {
     const folder = await fetchDriveItem(client, folderId);
     if (!folder.content.parents) {

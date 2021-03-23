@@ -50,7 +50,7 @@ class NotFoundItem implements DriveItem {
   link: string | null;
   sentChannel = 'main' as const;
 
-  getPath(drive: drive_v3.Drive): Promise<string> {
+  getPath(): Promise<string> {
     return Promise.resolve(`???/${this.name}`);
   }
 

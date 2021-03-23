@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-namespace */
+
 import type { WebAPICallResult } from '@slack/web-api';
 
 export namespace Slack {
