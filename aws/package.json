@@ -12,6 +12,7 @@
   "dependencies": {
     "@slack/web-api": "^5.13.0",
     "@types/common-tags": "^1.8.0",
+    "aws-sdk": "^2.784.0",
     "axios": "~0.21.1",
     "common-tags": "^1.8.0",
     "luxon": "^1.25.0",
@@ -30,7 +31,6 @@
     "@types/tsscmp": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "aws-sdk": "^2.784.0",
     "change-case": "^4.1.1",
     "copy-webpack-plugin": "^6.1.1",
     "dynamodb-admin": "^4.0.0",
