@@ -75,7 +75,7 @@ const saveNewHTML = async (html: string): Promise<void> => {
  */
 const notify = async (attachments: MessageAttachment[]) => {
   await (await slack.bot).chat.postMessage({
-    channel: await envvar.get('slack/channel/notify-temp'),
+    channel: await envvar.get('slack/channel/inshi-ist'),
     username: '院試に詳しい芹沢あさひ',
     icon_emoji: ':serizawa-asahi:',
     text: '冬優子ちゃん大変っす！院試情報が更新されたっすよ！',
