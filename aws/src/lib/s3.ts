@@ -7,7 +7,7 @@ export const s3 = process.env.STAGE === 'prod' ?
     s3ForcePathStyle: true,
     accessKeyId: 'S3RVER',
     secretAccessKey: 'S3RVER',
-    endpoint: 'http://localhost:3002',
+    endpoint: 'http://localhost:3003',
   });
 
 export const bucketShortnames = ['default'] as const;
