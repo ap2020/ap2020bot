@@ -1,4 +1,4 @@
-import { EventPayload } from '@/lib/slack/events/types';
+import type { EventPayload } from '@/lib/slack/events/types';
 import type { MessageAttributeMap, MessageAttributeValue } from 'aws-sdk/clients/sns';
 
 const toAttr = (str: string): MessageAttributeValue => ({

@@ -1,5 +1,5 @@
 import envvarObj from '@/../.env.local.json';
-import { EnvVar, EnvVarKey } from './base';
+import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarLocal implements EnvVar {
   envvars: Map<EnvVarKey, string> = new Map(Object.entries(envvarObj).map(([k, v]) => [k as EnvVarKey, v.toString()]));

@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import 'source-map-support/register';
-import { EnvVar, EnvVarKey } from './base';
+import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarProd implements EnvVar {
   ssm = new AWS.SSM();

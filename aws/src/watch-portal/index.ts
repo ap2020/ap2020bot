@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ScheduledHandler } from 'aws-lambda';
+import type { ScheduledHandler } from 'aws-lambda';
 import axios from 'axios';
 import { source } from 'common-tags';
 import Parser from 'rss-parser';

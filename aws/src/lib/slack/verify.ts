@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import timingSafeCompare from 'tsscmp';
-import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { envvar } from '@/lib/envvar';
 import { DateTime, Duration } from 'luxon';
 import { CaseInsensitiveMap } from '../case-insensitive-map';

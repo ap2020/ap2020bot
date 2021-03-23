@@ -1,6 +1,6 @@
 import { envvar } from '@/lib/envvar';
-import { SNSHandler } from 'aws-lambda';
-import { SlackEvent, SlackSNSMessage } from './types';
+import type { SNSHandler } from 'aws-lambda';
+import type { SlackEvent, SlackSNSMessage } from './types';
 
 export const getSlackEventTopicARN = async (): Promise<string> =>
   `arn:aws:sns:us-east-1:${await envvar.get('aws/account-id')}:ap2020bot-${process.env.STAGE}-slack-events`;

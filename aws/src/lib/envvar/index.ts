@@ -1,4 +1,4 @@
-import { EnvVar } from './base';
+import type { EnvVar } from './base';
 import { envvarProd } from './prod';
 /// #if STAGE === 'local'
 import { envvarTest } from './test';

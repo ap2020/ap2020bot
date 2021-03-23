@@ -1,4 +1,4 @@
-import { EnvVar, EnvVarKey } from './base';
+import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarTest implements EnvVar {
   envvars = new Map<EnvVarKey, string>();

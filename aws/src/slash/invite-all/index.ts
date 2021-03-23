@@ -1,10 +1,10 @@
 import querystring from 'querystring';
-import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { WebAPICallResult } from '@slack/web-api';
+import type { WebAPICallResult } from '@slack/web-api';
 import { verify } from '@/lib/slack/verify';
-import { SlashParams } from '../lib/params';
+import type { SlashParams } from '../lib/params';
 
 // TODO: ライブラリに切り出す
 type Member = {

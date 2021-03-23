@@ -1,8 +1,8 @@
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import { createHandler } from '@/lib/slack/events';
-import { ChannelCreatedEvent, ChannelUnarchiveEvent, SlackSNSMessage } from '@/lib/slack/events/types';
-import { SNSHandler } from 'aws-lambda';
+import type { ChannelCreatedEvent, ChannelUnarchiveEvent, SlackSNSMessage } from '@/lib/slack/events/types';
+import type { SNSHandler } from 'aws-lambda';
 
 const channelCreatedMain = async ({ event: { channel } }: SlackSNSMessage<ChannelCreatedEvent>) => {
   await Promise.all([
