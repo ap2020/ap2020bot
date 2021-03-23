@@ -39,7 +39,7 @@ custom:
       migrate: true
   serverless-offline-sns:
     port: 3001 # a free port for the sns server to run on
-    accountId: ${ssm:/ap2020bot/${self:custom.stage}/aws/account-id} # TODO: use fake accountId
+    accountId: ${self:custom.accountId}
       
 provider:
   name: aws
