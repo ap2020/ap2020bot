@@ -1060,10 +1060,6 @@
   version "0.1.0"
   resolved "git+https://github.com/pizzacat83/eslint-config.git#7f9e2961aa7fd26057d7e695a1791272458738fc"
 
-"@pizzacat83/eslint-config@github:pizzacat83/eslint-config":
-  version "0.1.0"
-  resolved "https://codeload.github.com/pizzacat83/eslint-config/tar.gz/2572f77a55aa0a21c8a0b67ae3cb2e2d04fad569"
-
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -1466,7 +1462,7 @@
   resolved "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.2.tgz#f65d3d6389e01eeb458bd54dc8f52b95a9463bc8"
   integrity sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==
 
-"@types/cheerio@^0.22.15":
+"@types/cheerio@0.22.15", "@types/cheerio@^0.22.15":
   version "0.22.15"
   resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.15.tgz#69040ffa92c309beeeeb7e92db66ac3f80700c0b"
   integrity sha512-UGiiVtJK5niCqMKYmLEFz1Wl/3L5zF/u78lu8CwoUywWXRr9LDimeYuOzXVLXBMO758fcTdFtgjvqlztMH90MA==
@@ -8454,10 +8450,10 @@ mocha@^6.1.4:
     yargs-parser "13.1.2"
     yargs-unparser "1.6.0"
 
-moment-timezone@*, moment-timezone@^0.5.31:
-  version "0.5.31"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.31.tgz#9c40d8c5026f0c7ab46eda3d63e49c155148de05"
-  integrity sha512-+GgHNg8xRhMXfEbv81iDtrVeTcWt0kWmTEY1XQK14dICTXnWJnT0dxdlPspwqF3keKMVPXwayEsk1DI0AA/jdA==
+moment-timezone@*, moment-timezone@^0.5.31, moment-timezone@^0.5.33:
+  version "0.5.33"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.33.tgz#b252fd6bb57f341c9b59a5ab61a8e51a73bbd22c"
+  integrity sha512-PTc2vcT8K9J5/9rDEPe5czSIKgLoGsH8UNpA4qZTVw0Vd/Uz19geE9abbIOQKaAQFcnQ3v5YEXrbSc5BpshH+w==
   dependencies:
     moment ">= 2.9.0"
 
