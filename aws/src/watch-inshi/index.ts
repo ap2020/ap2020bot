@@ -5,7 +5,7 @@ import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import cheerio from 'cheerio';
-import diff from 'diff';
+import * as diff from 'diff';
 import { getBucketName, s3 } from '@/lib/s3';
 import type { MessageAttachment } from '@slack/web-api';
 
