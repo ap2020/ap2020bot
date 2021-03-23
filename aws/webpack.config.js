@@ -3,7 +3,7 @@ const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
 const CopyPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const {promises: fs} = require('fs')
+const { promises: fs } = require('fs');
 
 module.exports = (async () => ({
   context: __dirname,
@@ -16,7 +16,7 @@ module.exports = (async () => ({
     cacheWithContext: false,
     alias: {
       '@': path.resolve(__dirname, 'src'),
-    }
+    },
   },
   output: {
     libraryTarget: 'commonjs',
@@ -25,7 +25,7 @@ module.exports = (async () => ({
   },
   target: 'node',
   externals: [nodeExternals({
-    modulesDir: path.resolve(__dirname, '../node_modules')
+    modulesDir: path.resolve(__dirname, '../node_modules'),
   })],
   module: {
     rules: [
@@ -56,7 +56,7 @@ module.exports = (async () => ({
             loader: 'ifdef-loader',
             options: {
               STAGE: slsw.lib.serverless.service.custom.stage,
-            }
+            },
           },
         ],
         exclude: [
@@ -76,14 +76,14 @@ module.exports = (async () => ({
           return [
             new CopyPlugin({
               patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
-            })
+            }),
           ];
         }
         default: {
           return [];
         }
       }
-      })(),
+    })(),
     // new ForkTsCheckerWebpackPlugin({
     //   eslint: true,
     //   eslintOptions: {
