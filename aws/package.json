@@ -24,7 +24,7 @@
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
     "@types/aws-lambda": "^8.10.17",
     "@types/jest": "^26.0.15",
-    "@types/js-yaml": "^3.12.5",
+    "@types/js-yaml": "^4.0.0",
     "@types/luxon": "^1.25.0",
     "@types/node": "^12.19.3",
     "@types/serverless": "^1.78.6",
