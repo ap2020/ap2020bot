@@ -1,11 +1,33 @@
 {
-  "extends": ["@pizzacat83/eslint-config/typescript"],
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "ecmaVersion": 2019
   },
-  "env": {
-    "jest": true
-  },
-  "rules": {
-  }
+  "overrides": [
+    {
+      "files": "./**.js",
+      "extends": ["@pizzacat83/eslint-config/nodeapp"]
+    },
+    {
+      "files": "**.ts",
+      "extends": ["@pizzacat83/eslint-config/typescript-nodeapp"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      },
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "import/no-unresolved": [
+          "error",
+          {
+            "ignore": [
+               // aws-lambda and @types/aws-lambda is totally different and we only use the latter.
+               // There's no problem not to have aws-lambda because we only use type information.
+              "aws-lambda"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

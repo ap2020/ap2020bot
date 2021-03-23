@@ -1,10 +1,10 @@
 const ignorePatterns = [
-    '/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/tmp/',
-    '/coverage/',
-    '<rootDir>/aws/',
-  ];
+  '/node_modules/',
+  '<rootDir>/dist/',
+  '<rootDir>/tmp/',
+  '/coverage/',
+  '<rootDir>/aws/',
+];
 
 module.exports = {
   preset: 'ts-jest',
@@ -15,7 +15,7 @@ module.exports = {
   ],
   collectCoverageFrom: [
     '**/*.{js,ts}',
-    '!**/*.test.{js,ts}'
+    '!**/*.test.{js,ts}',
   ],
   coveragePathIgnorePatterns: [
     ...ignorePatterns,
