@@ -20,7 +20,7 @@ export class CaseInsensitiveMap<Value> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  static fromObject<Value>(obj: {[key: string]: Value}): CaseInsensitiveMap<Value> {
+  static fromObject<Value>(obj: { [key: string]: Value }): CaseInsensitiveMap<Value> {
     return new CaseInsensitiveMap<Value>(new Map(Object.entries(obj)));
   }
 }

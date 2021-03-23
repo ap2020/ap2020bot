@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention -- Type definitions are based on Slack API schema  */
 
-export type SlackEvent =
+export type SlackEvent = (
   | ChannelCreatedEvent
   | ChannelUnarchiveEvent
+);
 
 export type EventPayload<Event extends SlackEvent = SlackEvent> = {
   // token: string; // deprecated
@@ -20,13 +21,13 @@ export type EventPayload<Event extends SlackEvent = SlackEvent> = {
     user_id: string;
     is_bot: boolean;
   }[];
-}
+};
 
 export type UrlVerificationPayload = {
   // "token": string // deprecated
   'challenge': string;
   'type': 'url_verification';
-}
+};
 
 export type SlackSNSMessage<Event extends SlackEvent> = EventPayload<Event>;
 
@@ -38,10 +39,10 @@ export type ChannelCreatedEvent = {
     created: number;
     creator: string;
   };
-}
+};
 
 export type ChannelUnarchiveEvent = {
   type: 'channel_unarchive';
   channel: string;
   user: string;
-}
+};

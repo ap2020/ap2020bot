@@ -15,4 +15,4 @@ export type SlashParams = {
   text: string;
   response_url: string;
   trigger_id: string;
-}
+};
