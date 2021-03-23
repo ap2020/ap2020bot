@@ -2,7 +2,7 @@ import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { verify } from '@/lib/slack/verify';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
-import type { EventPayload } from '../../lib/slack/events/types';
+import type { EventPayload, UrlVerificationPayload } from '../../lib/slack/events/types';
 import { extractAttribute } from './attribute';
 
 const main = async (payload: EventPayload) => {
@@ -30,7 +30,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
   }
 
   // verifyをしたので、payload は EventPayload の値であることが保証される
-  const payload = JSON.parse(request.body);
+  const payload = JSON.parse(request.body) as EventPayload | UrlVerificationPayload;
 
   switch (payload.type) {
     case 'url_verification':
@@ -39,8 +39,11 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
     case 'event_callback':
       await main(payload);
       break;
-    default:
-      console.error('not recognized top-level event: ', payload.type);
+    default: {
+      // @ts-expect-error exhaustive check
+      const exhaustiveCheck: never = payload;
+      console.error('not recognized top-level event: ', (payload as { type: unknown })?.type);
+    }
   }
 
   return {

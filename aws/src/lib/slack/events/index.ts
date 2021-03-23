@@ -9,6 +9,6 @@ export const createHandler = <Event extends SlackEvent>(
   callback: ((message: SlackSNSMessage<Event>) => Promise<void>),
 ): SNSHandler =>
   async (snsEvent) => {
-    const message = JSON.parse(snsEvent.Records[0].Sns.Message);
+    const message = JSON.parse(snsEvent.Records[0].Sns.Message) as SlackSNSMessage<Event>;
     await callback(message);
   };

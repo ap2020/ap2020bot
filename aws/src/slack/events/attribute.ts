@@ -15,9 +15,9 @@ const toAttr = (str: string): MessageAttributeValue => ({
 //   return Object.fromEntries(keys.map(key => [key, toAttr(obj[key])]))
 // }
 
-const extractEventSpecificAttribute /*:  {[key in SlackEvent['type']]?: ExtractEventSpecificAttributeFunc<key>} */ = {
-  // 'message': (event) => extractAttributeFromKeys(event, ['channel', 'user', 'text'])
-} as const;
+// const extractEventSpecificAttribute:  {[key in SlackEvent['type']]?: ExtractEventSpecificAttributeFunc<key>} = {
+//   'message': (event) => extractAttributeFromKeys(event, ['channel', 'user', 'text'])
+// } as const;
 
 export const extractAttribute = (payload: EventPayload): MessageAttributeMap => {
   const commonAttribute = {
@@ -26,11 +26,11 @@ export const extractAttribute = (payload: EventPayload): MessageAttributeMap => 
     event_name: toAttr(payload.event.type),
     /* eslint-enable @typescript-eslint/naming-convention */
   };
-  if (payload.event.type in extractEventSpecificAttribute) {
-    return {
-      ...commonAttribute,
-      ...extractEventSpecificAttribute[payload.event.type](payload.event),
-    };
-  }
+  // if (payload.event.type in extractEventSpecificAttribute) {
+  //   return {
+  //     ...commonAttribute,
+  //     ...extractEventSpecificAttribute[payload.event.type](payload.event),
+  //   };
+  // }
   return commonAttribute;
 };

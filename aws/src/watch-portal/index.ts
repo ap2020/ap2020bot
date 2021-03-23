@@ -21,7 +21,7 @@ type Item = {
  * お知らせ一覧の文字列を取得する
  */
 const fetchRSS = async (): Promise<string> => {
-  const { data } = await axios.get(
+  const data = (await axios.get(
     'https://info.t.u-tokyo.ac.jp/rss/index.xml',
     {
       proxy: {
@@ -37,7 +37,7 @@ const fetchRSS = async (): Promise<string> => {
         'User-Agent': await envvar.get('user-agent'),
       },
     },
-  );
+  )).data as string;
   return data;
 };
 
@@ -76,7 +76,7 @@ const fetchOldURLs = async (): Promise<string[]> => {
     },
   }).promise();
 
-  return res?.Item?.urls ?? [];
+  return (res?.Item?.urls as string[] || undefined) ?? [];
 };
 
 /**

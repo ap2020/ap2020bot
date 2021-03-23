@@ -22,6 +22,12 @@ export type EventPayload<Event extends SlackEvent = SlackEvent> = {
   }[];
 }
 
+export type UrlVerificationPayload = {
+  // "token": string // deprecated
+  'challenge': string;
+  'type': 'url_verification';
+}
+
 export type SlackSNSMessage<Event extends SlackEvent> = EventPayload<Event>;
 
 export type ChannelCreatedEvent = {
