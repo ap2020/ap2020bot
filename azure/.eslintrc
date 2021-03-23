@@ -1,11 +1,24 @@
 {
-    "extends": ["@pizzacat83/eslint-config/typescript"],
     "parserOptions": {
-        "project": "./tsconfig.json"
+      "ecmaVersion": 2018
     },
-    "env": {
-        "jest": true
-    },
-    "rules": {
-    }
-}
+    "overrides": [
+      {
+        "files": "./**.js",
+        "extends": ["@pizzacat83/eslint-config/nodeapp"]
+      },
+      {
+        "files": "**.ts",
+        "extends": ["@pizzacat83/eslint-config/typescript-nodeapp"],
+        "parserOptions": {
+          "project": "./tsconfig.json"
+        },
+        "env": {
+          "jest": true
+        },
+        "rules": {
+        }
+      }
+    ]
+  }
+  
