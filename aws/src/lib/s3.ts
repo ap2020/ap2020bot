@@ -14,4 +14,4 @@ export const bucketShortnames = ['default'] as const;
 export type BucketShortname = typeof bucketShortnames[number];
 
 export const getBucketName = (shortname: BucketShortname): string =>
-  `ap2020-${process.env.STAGE}-${shortname}`;
+  `ap2020bot-${process.env.STAGE}-${shortname}`;
