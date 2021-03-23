@@ -8,11 +8,14 @@ import cheerio from 'cheerio';
 import * as diff from 'diff';
 import { getBucketName, s3 } from '@/lib/s3';
 import type { MessageAttachment } from '@slack/web-api';
+import { source } from 'common-tags';
 
 // TODO: ドキュメントが崩壊している
 
+const watchingUrl = 'https://www.i.u-tokyo.ac.jp/edu/entra/index.shtml';
+
 const fetchHTML = async (): Promise<string> =>
-  (await axios.get('https://www.i.u-tokyo.ac.jp/edu/entra/index.shtml')).data as string;
+  (await axios.get(watchingUrl)).data as string;
 
 /**
  * HTMLをパースしてテキストに変換
@@ -78,7 +81,10 @@ const notify = async (attachments: MessageAttachment[]) => {
     channel: await envvar.get('slack/channel/inshi-ist'),
     username: '院試に詳しい芹沢あさひ',
     icon_emoji: ':serizawa-asahi:',
-    text: '冬優子ちゃん大変っす！院試情報が更新されたっすよ！',
+    text: source`
+      冬優子ちゃん大変っす！院試情報が更新されたっすよ！
+      ${watchingUrl}
+    `,
     attachments,
   });
 };
