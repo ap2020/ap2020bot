@@ -29,7 +29,7 @@ export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {
     logInvalidRequest(req, 'X-Slack-Request-Timestamp not set.');
     return false;
   }
-  if (!/^[1-9][0-9]*$/.exec(timestamp)) {
+  if (!/^[1-9]\d*$/.test(timestamp)) {
     logInvalidRequest(req, 'X-Slack-Request-Timestamp is not a number.');
     return false;
   }
