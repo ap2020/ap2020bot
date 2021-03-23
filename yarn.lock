@@ -1058,7 +1058,7 @@
 
 "@pizzacat83/eslint-config@git+https://github.com/pizzacat83/eslint-config.git":
   version "0.1.0"
-  resolved "git+https://github.com/pizzacat83/eslint-config.git#0b8872144d02fff28ea8899623616d47bab158c3"
+  resolved "git+https://github.com/pizzacat83/eslint-config.git#7f9e2961aa7fd26057d7e695a1791272458738fc"
 
 "@pizzacat83/eslint-config@github:pizzacat83/eslint-config":
   version "0.1.0"
