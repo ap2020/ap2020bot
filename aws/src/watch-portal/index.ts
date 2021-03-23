@@ -114,7 +114,6 @@ const main = async () => {
   const oldURLs = await fetchOldURLs();
   // 現在のお知らせ一覧ページを取得
   const data = await fetchRSS();
-  console.log(data)
   // お知らせ一覧ページをパースして URL とタイトルを抽出
   const items = await extractItems(data);
   // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
