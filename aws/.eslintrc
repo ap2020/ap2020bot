@@ -1,5 +1,5 @@
 {
-  "extends": ["@pizzacat83/eslint-config/typescript"],
+  "extends": ["@pizzacat83/eslint-config/typescript-nodeapp"],
   "parserOptions": {
     "project": "./tsconfig.json"
   },
