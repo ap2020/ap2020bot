@@ -4,6 +4,7 @@ import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
 import type { EventPayload, UrlVerificationPayload } from '../../lib/slack/events/types';
 import { extractAttribute } from './attribute';
+import { proveUnreachable } from '@/lib/utils';
 
 const main = async (payload: EventPayload) => {
   const message = payload;
@@ -40,8 +41,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
       await main(payload);
       break;
     default: {
-      const exhaustiveCheck: never = payload;
       console.error('not recognized top-level event:', (payload as { type: unknown })?.type);
+      proveUnreachable(payload);
     }
   }
 
