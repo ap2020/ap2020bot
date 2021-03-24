@@ -40,7 +40,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
       await main(payload);
       break;
     default: {
-      // @ts-expect-error exhaustive check
       const exhaustiveCheck: never = payload;
       console.error('not recognized top-level event:', (payload as { type: unknown })?.type);
     }
