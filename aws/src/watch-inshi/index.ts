@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { ScheduledHandler } from 'aws-lambda';
 import { axios } from '@/lib/axios';
 import 'source-map-support/register';
@@ -55,8 +54,10 @@ const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
  */
 const loadOldHTML = async (): Promise<string> => {
   const res = await s3.getObject({
+    /* eslint-disable @typescript-eslint/naming-convention */
     Bucket: getBucketName('default'),
     Key: 'watch-inshi/ist/index.html',
+    /* eslint-enable @typescript-eslint/naming-convention */
   }).promise();
   return res.Body.toString();
 };
@@ -66,9 +67,11 @@ const loadOldHTML = async (): Promise<string> => {
  */
 const saveNewHTML = async (html: string): Promise<void> => {
   await s3.putObject({
+    /* eslint-disable @typescript-eslint/naming-convention */
     Bucket: getBucketName('default'),
     Key: 'watch-inshi/ist/index.html',
     Body: html,
+    /* eslint-enable @typescript-eslint/naming-convention */
   }).promise();
 };
 
@@ -78,6 +81,7 @@ const saveNewHTML = async (html: string): Promise<void> => {
  */
 const notify = async (attachments: MessageAttachment[]) => {
   await (await slack.bot).chat.postMessage({
+    /* eslint-disable @typescript-eslint/naming-convention */
     channel: await envvar.get('slack/channel/inshi-ist'),
     username: '院試に詳しい芹沢あさひ',
     icon_emoji: ':serizawa-asahi:',
@@ -86,6 +90,7 @@ const notify = async (attachments: MessageAttachment[]) => {
       ${watchingUrl}
     `,
     attachments,
+    /* eslint-enable @typescript-eslint/naming-convention */
   });
 };
 
