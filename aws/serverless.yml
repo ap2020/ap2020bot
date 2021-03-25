@@ -80,6 +80,12 @@ provider:
       Action:
         - "sns:Publish"
       Resource: "arn:aws:sns:${self:provider.region}:*:${self:custom.sns.topicName.slack-events}"
+    - Effect: Allow
+      Action:
+        - "s3:GetObject"
+        - "s3:PutObject"
+      Resource:
+        - "arn:aws:s3:::${self:custom.s3Config.bucketName.default}"
   deploymentBucket:
     blockPublicAccess: true
   httpApi:
