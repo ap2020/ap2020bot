@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
+import { isReal, stage } from './stages';
 
-// TODO: devはどうすんだ
-export const s3 = process.env.STAGE === 'prod' ?
+export const s3 = isReal(stage) ?
   new AWS.S3() :
   new AWS.S3({
     s3ForcePathStyle: true,
@@ -14,4 +14,4 @@ export const bucketShortnames = ['default'] as const;
 export type BucketShortname = typeof bucketShortnames[number];
 
 export const getBucketName = (shortname: BucketShortname): string =>
-  `ap2020bot-${process.env.STAGE}-${shortname}`;
+  `ap2020bot-${stage}-${shortname}`;

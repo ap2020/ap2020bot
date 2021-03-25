@@ -1,7 +1,8 @@
 import { SNS } from 'aws-sdk';
+import { isReal, stage } from './stages';
 
 export const sns = new SNS(
-  process.env.IS_OFFLINE ?
+  isReal(stage) ?
     {
       region: 'us-east-1',
       endpoint: 'http://localhost:3001',

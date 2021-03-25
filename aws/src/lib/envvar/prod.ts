@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import 'source-map-support/register';
+import { stage } from '../stages';
 import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarProd implements EnvVar {
@@ -9,7 +10,7 @@ class EnvVarProd implements EnvVar {
   private async fetch(key: EnvVarKey): Promise<string> {
     const res = await this.ssm.getParameter({
       /* eslint-disable @typescript-eslint/naming-convention */
-      Name: `/ap2020bot/${process.env.STAGE}/${key}`,
+      Name: `/ap2020bot/${stage}/${key}`,
       WithDecryption: true,
       /* eslint-enable @typescript-eslint/naming-convention */
     }).promise();
