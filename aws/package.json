@@ -22,12 +22,13 @@
     "rss-parser": "^3.12.0",
     "source-map-support": "~0.5.19",
     "ts-results": "^3.1.1",
+    "tslib": "^2.1.0",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
-    "@types/diff": "^5.0.0",
     "@types/aws-lambda": "^8.10.73",
+    "@types/diff": "^5.0.0",
     "@types/jest": "^26.0.21",
     "@types/luxon": "^1.26.2",
     "@types/node": "^14.14.35",
