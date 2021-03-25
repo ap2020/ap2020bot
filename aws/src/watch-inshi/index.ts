@@ -13,8 +13,6 @@ import { None, Some } from 'ts-results';
 import type { AWSError } from 'aws-sdk';
 import { Size, validateSize } from '@/lib/validate';
 
-// TODO: ドキュメントが崩壊している
-
 const watchingUrl = 'https://www.i.u-tokyo.ac.jp/edu/entra/index.shtml';
 
 const fetchHTML = async (): Promise<string> =>
@@ -98,7 +96,6 @@ const saveNewHTML = async (html: string): Promise<void> => {
 
 /**
  * お知らせを Slack に通知する
- * @param item 通知するお知らせ
  */
 const notify = async (attachments: MessageAttachment[]) => {
   await (await slack.bot).chat.postMessage({
@@ -124,6 +121,7 @@ export const main = async (): Promise<void> => {
   // 現在のお知らせ一覧ページを取得
   const newHTML = await fetchHTML();
   const newText = extractTextFromHTML(newHTML);
+  // 取得した HTML を保存
   await saveNewHTML(newHTML);
 
   if (!oldHTML.some) { // TODO: somehow option.none does not work as type guard
@@ -131,19 +129,17 @@ export const main = async (): Promise<void> => {
     return;
   }
 
-  // 以前保存したHTMLを取得する
   const oldText = extractTextFromHTML(oldHTML.val);
-  // お知らせ一覧ページをパースして URL とタイトルを抽出
+  // 差分を計算
   const changes = calcDiff(oldText, newText);
   if (!changes.some) {
     console.log('No changes. Skipping notification.');
     return;
   }
-  // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
+  // Slack 投稿用に差分を整形
   const attachments = formatDiff(changes.val);
   // 新規お知らせを Slack に通知
   await notify(attachments);
-  // 今回取得した URL 一覧を保存する
 };
 
 /**
