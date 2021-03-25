@@ -157,8 +157,9 @@ resources:
               AttributeName: key
               KeyType: HASH
         DeletionPolicy: 'Retain' # may need to backup before deletion
-      S3Bucket:
+      DefaultS3Bucket:
         Type: 'AWS::S3::Bucket'
         DeletionPolicy: Retain # may need to backup before deletion
         Properties:
           BucketName: ${self:custom.s3Config.bucketName.default}
+          # TODO: ACL
