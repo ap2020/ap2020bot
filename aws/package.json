@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
-    "@types/aws-lambda": "^8.10.72",
+    "@types/aws-lambda": "^8.10.73",
     "@types/jest": "^26.0.21",
     "@types/luxon": "^1.26.2",
     "@types/node": "^14.14.35",
