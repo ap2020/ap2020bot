@@ -30,9 +30,12 @@ const extractTextFromHTML = (html: string): string => {
 /**
  * 差分を計算
  */
-export const calcDiff = (oldText: string, newText: string): diff.Change[] => {
+export const calcDiff = (oldText: string, newText: string): Option<diff.Change[]> => {
   const changes = diff.diffLines(oldText, newText, { ignoreWhitespace: true });
-  return changes;
+  if (changes.length === 1) {
+    return None;
+  }
+  return Some(changes);
 };
 
 /**
@@ -109,26 +112,31 @@ const notify = async (attachments: MessageAttachment[]) => {
  * Lambda が呼ばれたときにする本質的な処理
  */
 export const main = async (): Promise<void> => {
+  const oldHTML = await loadOldHTML();
+
   // 現在のお知らせ一覧ページを取得
   const newHTML = await fetchHTML();
   const newText = extractTextFromHTML(newHTML);
-
-  const maybeOldHTML = await loadOldHTML();
-  if (maybeOldHTML.some) {
-    const oldHTML = maybeOldHTML.val;
-    // 以前保存したHTMLを取得する
-    const oldText = extractTextFromHTML(oldHTML);
-    // お知らせ一覧ページをパースして URL とタイトルを抽出
-    const changes = calcDiff(oldText, newText);
-    // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
-    const attachments = formatDiff(changes);
-    // 新規お知らせを Slack に通知
-    await notify(attachments);
-    // 今回取得した URL 一覧を保存する
-  } else {
-    console.log('No saved HTML found. Skipping notification.');
-  }
   await saveNewHTML(newHTML);
+
+  if (!oldHTML.some) { // TODO: somehow option.none does not work as type guard
+    console.log('No saved HTML found. Skipping notification.');
+    return;
+  }
+
+  // 以前保存したHTMLを取得する
+  const oldText = extractTextFromHTML(oldHTML.val);
+  // お知らせ一覧ページをパースして URL とタイトルを抽出
+  const changes = calcDiff(oldText, newText);
+  if (!changes.some) {
+    console.log('No changes. Skipping notification.');
+    return;
+  }
+  // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
+  const attachments = formatDiff(changes.val);
+  // 新規お知らせを Slack に通知
+  await notify(attachments);
+  // 今回取得した URL 一覧を保存する
 };
 
 /**
