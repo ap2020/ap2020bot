@@ -50,6 +50,9 @@ module.exports = (async () => ({
       },
     ],
   },
+  optimization: {
+    concatenateModules: false,
+  },
   plugins: [
     ...(() => {
       switch (slsw.lib.options.stage) {
