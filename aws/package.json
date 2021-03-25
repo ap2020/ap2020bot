@@ -12,7 +12,7 @@
   "dependencies": {
     "@slack/web-api": "5",
     "@types/common-tags": "^1.8.0",
-    "aws-sdk": "^2.870.0",
+    "aws-sdk": "^2.871.0",
     "axios": "~0.21.1",
     "common-tags": "^1.8.0",
     "luxon": "^1.26.0",
