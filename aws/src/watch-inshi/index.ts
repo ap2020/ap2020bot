@@ -8,6 +8,8 @@ import * as diff from 'diff';
 import { getBucketName, s3 } from '@/lib/s3';
 import type { MessageAttachment } from '@slack/web-api';
 import { source } from 'common-tags';
+import { None, None, Option, Some } from 'ts-results';
+import { AWSError } from 'aws-sdk';
 
 // TODO: ドキュメントが崩壊している
 
@@ -52,14 +54,22 @@ const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
 /**
  * 前回取得したHTMLを取得する
  */
-const loadOldHTML = async (): Promise<string> => {
-  const res = await s3.getObject({
-    /* eslint-disable @typescript-eslint/naming-convention */
-    Bucket: getBucketName('default'),
-    Key: 'watch-inshi/ist/index.html',
-    /* eslint-enable @typescript-eslint/naming-convention */
-  }).promise();
-  return res.Body.toString();
+const loadOldHTML = async (): Promise<Option<string>> => {
+  try {
+    const res = await s3.getObject({
+      /* eslint-disable @typescript-eslint/naming-convention */
+      Bucket: getBucketName('default'),
+      Key: 'watch-inshi/ist/index.html',
+      /* eslint-enable @typescript-eslint/naming-convention */
+    }).promise();
+    return Some(res.Body.toString());
+  } catch (error_) {
+    const error = error_ as AWSError;
+    if ([403, 404].includes(error.statusCode)) {
+      return None;
+    }
+    throw error;
+  }
 };
 
 /**
@@ -98,18 +108,25 @@ const notify = async (attachments: MessageAttachment[]) => {
  * Lambda が呼ばれたときにする本質的な処理
  */
 const main = async () => {
-  // 以前保存したHTMLを取得する
-  const oldText = extractTextFromHTML(await loadOldHTML());
   // 現在のお知らせ一覧ページを取得
   const newHTML = await fetchHTML();
   const newText = extractTextFromHTML(newHTML);
-  // お知らせ一覧ページをパースして URL とタイトルを抽出
-  const changes = calcDiff(oldText, newText);
-  // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
-  const attachments = formatDiff(changes);
-  // 新規お知らせを Slack に通知
-  await notify(attachments);
-  // 今回取得した URL 一覧を保存する
+
+  const maybeOldHTML = await loadOldHTML();
+  if (maybeOldHTML.some) {
+    const oldHTML = maybeOldHTML.val;
+    // 以前保存したHTMLを取得する
+    const oldText = extractTextFromHTML(oldHTML);
+    // お知らせ一覧ページをパースして URL とタイトルを抽出
+    const changes = calcDiff(oldText, newText);
+    // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
+    const attachments = formatDiff(changes);
+    // 新規お知らせを Slack に通知
+    await notify(attachments);
+    // 今回取得した URL 一覧を保存する
+  } else {
+    console.log('No saved HTML found. Skipping notification.');
+  }
   await saveNewHTML(newHTML);
 };
 
