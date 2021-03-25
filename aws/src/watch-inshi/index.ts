@@ -8,8 +8,9 @@ import * as diff from 'diff';
 import { getBucketName, s3 } from '@/lib/s3';
 import type { MessageAttachment } from '@slack/web-api';
 import { source } from 'common-tags';
-import { None, None, Option, Some } from 'ts-results';
-import { AWSError } from 'aws-sdk';
+import type { Option } from 'ts-results';
+import { None, Some } from 'ts-results';
+import type { AWSError } from 'aws-sdk';
 
 // TODO: ドキュメントが崩壊している
 
