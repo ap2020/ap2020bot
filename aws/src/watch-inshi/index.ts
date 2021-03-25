@@ -108,7 +108,7 @@ const notify = async (attachments: MessageAttachment[]) => {
 /**
  * Lambda が呼ばれたときにする本質的な処理
  */
-const main = async () => {
+export const main = async (): Promise<void> => {
   // 現在のお知らせ一覧ページを取得
   const newHTML = await fetchHTML();
   const newText = extractTextFromHTML(newHTML);
