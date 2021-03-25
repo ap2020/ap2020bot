@@ -20,6 +20,8 @@ custom:
     webpackConfig: ./webpack.config.js
     packager: yarn
     includeModules:
+      forceInclude:
+        - tslib # dependency of ts-results
       forceExclude:
         - aws-sdk
     excludeFiles: "**/*.test.ts"
