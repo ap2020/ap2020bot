@@ -11,6 +11,7 @@ import { source } from 'common-tags';
 import type { Option } from 'ts-results';
 import { None, Some } from 'ts-results';
 import type { AWSError } from 'aws-sdk';
+import { Size, validateSize } from '@/lib/validate';
 
 // TODO: ドキュメントが崩壊している
 
@@ -80,11 +81,17 @@ const loadOldHTML = async (): Promise<Option<string>> => {
  * 今回取得したHTMLを保存する
  */
 const saveNewHTML = async (html: string): Promise<void> => {
+  const buf = Buffer.from(html);
+
+  if (validateSize(buf, new Size(1, 'mb'))) {
+    throw new Error(`Buffer is too big: ${buf.length} bytes`);
+  }
+
   await s3.putObject({
     /* eslint-disable @typescript-eslint/naming-convention */
     Bucket: getBucketName('default'),
     Key: 'watch-inshi/ist/index.html',
-    Body: html,
+    Body: buf,
     /* eslint-enable @typescript-eslint/naming-convention */
   }).promise();
 };
