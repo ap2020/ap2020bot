@@ -86,8 +86,7 @@ Resources:
               - 's3:ListBucket'
               - 's3:PutObject'
             Effect: Allow
-            Resource:
-              - '${file(serverless/lib/s3.js):buckets.arns}'
+            Resource: '${file(serverless/lib/s3.js):buckets.arns}'
           - Action:
               - 'cloudwatch:PutMetricAlarm'
               - 'cloudwatch:DeleteAlarms'
