@@ -90,7 +90,7 @@ provider:
         - "s3:GetObject"
         - "s3:PutObject"
       Resource:
-        - "arn:aws:s3:::${self:custom.s3Config.bucketName.default}"
+        - "arn:aws:s3:::${self:custom.s3Config.bucketName.default}/*"
   deploymentBucket:
     blockPublicAccess: true
   httpApi:
