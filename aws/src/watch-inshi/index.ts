@@ -44,6 +44,7 @@ const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
   // TODO: もっといい感じに
   changes
     .filter(change => change.added || change.removed)
+    .filter(change => change.value.trim())
     .map(change => (change.added ? {
       color: '#28a745',
       title: '追加',
