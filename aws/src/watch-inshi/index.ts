@@ -81,7 +81,7 @@ const loadOldHTML = async (): Promise<Option<string>> => {
 const saveNewText = async (text: string): Promise<void> => {
   const buf = Buffer.from(text);
 
-  if (validateSize(buf, new Size(1, 'mb'))) {
+  if (!validateSize(buf, new Size(1, 'mb'))) {
     throw new Error(`Buffer is too big: ${buf.length} bytes`);
   }
 
