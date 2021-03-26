@@ -2,7 +2,8 @@ import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { verify } from '@/lib/slack/verify';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
-import type { EventPayload, UrlVerificationPayload } from '../../lib/slack/events/types';
+import { proveUnreachable } from '@/lib/utils';
+import type { EventPayload, UrlVerificationPayload } from '@/lib/slack/events/types';
 import { extractAttribute } from './attribute';
 
 const main = async (payload: EventPayload) => {
@@ -40,9 +41,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
       await main(payload);
       break;
     default: {
-      // @ts-expect-error exhaustive check
-      const exhaustiveCheck: never = payload;
       console.error('not recognized top-level event:', (payload as { type: unknown })?.type);
+      proveUnreachable(payload);
     }
   }
 

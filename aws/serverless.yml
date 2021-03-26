@@ -7,6 +7,7 @@ plugins:
   - serverless-webpack
   - serverless-dynamodb-local
   - serverless-offline-sns
+  - serverless-s3-local
   - serverless-offline
 
 custom:
@@ -19,6 +20,8 @@ custom:
     webpackConfig: ./webpack.config.js
     packager: yarn
     includeModules:
+      forceInclude:
+        - tslib # dependency of ts-results
       forceExclude:
         - aws-sdk
     excludeFiles: "**/*.test.ts"
@@ -29,6 +32,9 @@ custom:
     topicName:
       error: ${self:custom.resourcePrefix}error
       slack-events: ${self:custom.resourcePrefix}slack-events
+  s3Config:
+    bucketName:
+      default: ${self:custom.resourcePrefix}default
   # config for dynamodb-local
   dynamodb:
     stages:
@@ -40,7 +46,11 @@ custom:
   serverless-offline-sns:
     port: 3001 # a free port for the sns server to run on
     accountId: ${self:custom.accountId}
-      
+  s3:
+    host: localhost
+    port: 3003
+    directory: ./.buckets
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -75,6 +85,12 @@ provider:
       Action:
         - "sns:Publish"
       Resource: "arn:aws:sns:${self:provider.region}:*:${self:custom.sns.topicName.slack-events}"
+    - Effect: Allow
+      Action:
+        - "s3:GetObject"
+        - "s3:PutObject"
+      Resource:
+        - "arn:aws:s3:::${self:custom.s3Config.bucketName.default}/*"
   deploymentBucket:
     blockPublicAccess: true
   httpApi:
@@ -87,6 +103,11 @@ functions:
       - schedule:
           rate: 'cron(5 * * * ? *)'
     memorySize: 128
+  watch-inshi:
+    handler: src/watch-inshi/index.handler
+    events:
+      - schedule:
+          rate: 'cron(10 * * * ? *)'
   slash-invite-all:
     handler: src/slash/invite-all/index.handler
     events:
@@ -139,3 +160,13 @@ resources:
               AttributeName: key
               KeyType: HASH
         DeletionPolicy: 'Retain' # may need to backup before deletion
+      DefaultS3Bucket:
+        Type: 'AWS::S3::Bucket'
+        DeletionPolicy: Retain # may need to backup before deletion
+        Properties:
+          BucketName: ${self:custom.s3Config.bucketName.default}
+          PublicAccessBlockConfiguration:
+              BlockPublicAcls: true
+              BlockPublicPolicy: true
+              IgnorePublicAcls: true
+              RestrictPublicBuckets: true

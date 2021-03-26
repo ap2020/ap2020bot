@@ -1,7 +1,8 @@
 import AWS from 'aws-sdk';
+import { isReal, stage } from './stages';
 
 export const db = new AWS.DynamoDB.DocumentClient(
-  process.env.STAGE === 'prod' ?
+  isReal(stage) ?
     {} :
     {
       region: 'localhost',

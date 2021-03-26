@@ -2,7 +2,6 @@
 
 export const envVarKeys = [
   'aws/account-id',
-  'user-agent',
   'utokyo-proxy/host',
   'utokyo-proxy/port',
   'utokyo-proxy/username',
@@ -11,6 +10,7 @@ export const envVarKeys = [
   'slack/token/bot',
   'slack/channel/notify-others',
   'slack/channel/notify-temp',
+  'slack/channel/inshi-ist',
   'slack/user_id/bot',
 ] as const;
 

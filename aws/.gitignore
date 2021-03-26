@@ -8,5 +8,8 @@ jspm_packages
 # Webpack directories
 .webpack
 
+# S3 emulator
+.buckets
+
 # dotenv
 .env.local.json
