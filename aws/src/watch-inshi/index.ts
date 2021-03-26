@@ -78,8 +78,8 @@ const loadOldHTML = async (): Promise<Option<string>> => {
 /**
  * 今回取得したHTMLを保存する
  */
-const saveNewHTML = async (html: string): Promise<void> => {
-  const buf = Buffer.from(html);
+const saveNewText = async (text: string): Promise<void> => {
+  const buf = Buffer.from(text);
 
   if (validateSize(buf, new Size(1, 'mb'))) {
     throw new Error(`Buffer is too big: ${buf.length} bytes`);
@@ -122,7 +122,7 @@ export const main = async (): Promise<void> => {
   const newHTML = await fetchHTML();
   const newText = extractTextFromHTML(newHTML);
   // 取得した HTML を保存
-  await saveNewHTML(newHTML);
+  await saveNewText(newText);
 
   if (!oldHTML.some) { // TODO: somehow option.none does not work as type guard
     console.log('No saved HTML found. Skipping notification.');
