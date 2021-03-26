@@ -72,7 +72,10 @@ provider:
     - Effect: "Allow"
       Action:
         - "kms:Decrypt"
-      Resource: "arn:aws:kms:${self:provider.region}:*:alias/ap2020bot"
+      Resource: "*"
+      Condition:
+        'ForAnyValue:StringEquals':
+          'kms:ResourceAliases': alias/ap2020bot
     - Effect: Allow
       Action:
         - dynamodb:GetItem
