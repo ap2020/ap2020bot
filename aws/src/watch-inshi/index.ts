@@ -63,7 +63,7 @@ const loadOldText = async (): Promise<Option<string>> => {
     const res = await s3.getObject({
       /* eslint-disable @typescript-eslint/naming-convention */
       Bucket: getBucketName('default'),
-      Key: 'watch-inshi/ist/index.html',
+      Key: 'watch-inshi/ist/index.txt',
       /* eslint-enable @typescript-eslint/naming-convention */
     }).promise();
     return Some(res.Body.toString());
@@ -89,7 +89,7 @@ const saveNewText = async (text: string): Promise<void> => {
   await s3.putObject({
     /* eslint-disable @typescript-eslint/naming-convention */
     Bucket: getBucketName('default'),
-    Key: 'watch-inshi/ist/index.html',
+    Key: 'watch-inshi/ist/index.txt',
     Body: buf,
     /* eslint-enable @typescript-eslint/naming-convention */
   }).promise();
