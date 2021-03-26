@@ -57,7 +57,7 @@ const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
 /**
  * 前回取得したHTMLを取得する
  */
-const loadOldHTML = async (): Promise<Option<string>> => {
+const loadOldText = async (): Promise<Option<string>> => {
   try {
     const res = await s3.getObject({
       /* eslint-disable @typescript-eslint/naming-convention */
@@ -116,7 +116,7 @@ const notify = async (attachments: MessageAttachment[]) => {
  * Lambda が呼ばれたときにする本質的な処理
  */
 export const main = async (): Promise<void> => {
-  const oldHTML = await loadOldHTML();
+  const oldText = await loadOldText();
 
   // 現在のお知らせ一覧ページを取得
   const newHTML = await fetchHTML();
@@ -124,14 +124,13 @@ export const main = async (): Promise<void> => {
   // 取得した HTML を保存
   await saveNewText(newText);
 
-  if (!oldHTML.some) { // TODO: somehow option.none does not work as type guard
+  if (!oldText.some) { // TODO: somehow option.none does not work as type guard
     console.log('No saved HTML found. Skipping notification.');
     return;
   }
 
-  const oldText = extractTextFromHTML(oldHTML.val);
   // 差分を計算
-  const changes = calcDiff(oldText, newText);
+  const changes = calcDiff(oldText.val, newText);
   if (!changes.some) {
     console.log('No changes. Skipping notification.');
     return;
