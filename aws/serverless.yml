@@ -165,4 +165,8 @@ resources:
         DeletionPolicy: Retain # may need to backup before deletion
         Properties:
           BucketName: ${self:custom.s3Config.bucketName.default}
-          # TODO: ACL
+          PublicAccessBlockConfiguration:
+              BlockPublicAcls: true
+              BlockPublicPolicy: true
+              IgnorePublicAcls: true
+              RestrictPublicBuckets: true
