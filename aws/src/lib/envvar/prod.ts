@@ -1,3 +1,4 @@
+import assert from 'assert';
 import AWS from 'aws-sdk';
 import 'source-map-support/register';
 import { stage } from '../stages';
@@ -14,13 +15,15 @@ class EnvVarProd implements EnvVar {
       WithDecryption: true,
       /* eslint-enable @typescript-eslint/naming-convention */
     }).promise();
-    const value = res.Parameter.Value;
+    const value = res?.Parameter?.Value;
+    assert(value !== undefined);
     return value;
   }
 
   async get(key: EnvVarKey): Promise<string> {
-    if (this.cache.has(key)) {
-      return this.cache.get(key);
+    const cached = this.cache.get(key);
+    if (cached !== undefined) {
+      return cached;
     }
     const promise: Promise<string> = this.fetch(key);
     this.cache.set(key, promise);
