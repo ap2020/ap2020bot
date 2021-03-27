@@ -12,6 +12,7 @@ import type { Option } from 'ts-results';
 import { None, Some } from 'ts-results';
 import type { AWSError } from 'aws-sdk';
 import { Size, validateSize } from '@/lib/validate';
+import assert from 'assert';
 
 const watchingUrl = 'https://www.i.u-tokyo.ac.jp/edu/entra/index.shtml';
 
@@ -66,10 +67,11 @@ const loadOldText = async (): Promise<Option<string>> => {
       Key: 'watch-inshi/ist/index.txt',
       /* eslint-enable @typescript-eslint/naming-convention */
     }).promise();
+    assert(res.Body !== undefined);
     return Some(res.Body.toString());
   } catch (error_) {
     const error = error_ as AWSError;
-    if ([403, 404].includes(error.statusCode)) {
+    if (['AccessDenied', 'NoSuchKey'].includes(error.code)) {
       return None;
     }
     throw error;
