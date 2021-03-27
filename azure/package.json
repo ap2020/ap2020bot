@@ -37,6 +37,7 @@
   "devDependencies": {
     "@azure/functions": "^1.2.2",
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
+    "@tsconfig/node14": "^1.0.0",
     "@types/common-tags": "^1.8.0",
     "@types/jest": "^26.0.22",
     "@types/lodash": "^4.14.165",
