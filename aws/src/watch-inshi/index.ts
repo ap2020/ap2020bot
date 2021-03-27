@@ -13,6 +13,7 @@ import { None, Some } from 'ts-results';
 import type { AWSError } from 'aws-sdk';
 import { Size, validateSize } from '@/lib/validate';
 import assert from 'assert';
+import { getColor } from '@/lib/color';
 
 const watchingUrl = 'https://www.i.u-tokyo.ac.jp/edu/entra/index.shtml';
 
@@ -47,11 +48,11 @@ const formatDiff = (changes: diff.Change[]): MessageAttachment[] =>
     .filter(change => change.added || change.removed)
     .filter(change => change.value.trim())
     .map(change => (change.added ? {
-      color: '#28a745',
+      color: getColor('add', { hashed: true }),
       title: '追加',
       text: change.value,
     } : {
-      color: '#d73a49',
+      color: getColor('delete', { hashed: true }),
       title: '削除',
       text: change.value,
     }));
