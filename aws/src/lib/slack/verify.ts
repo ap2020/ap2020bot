@@ -38,6 +38,12 @@ export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {
     logInvalidRequest(req, 'X-Slack-Request-Timestamp is older than 5 minutes.');
     return false;
   }
+
+  if (req.body === undefined) {
+    logInvalidRequest(req, 'Request has no body.');
+    return false;
+  }
+
   const hmac = crypto.createHmac('sha256', await envvar.get('slack/signing-secret'));
   hmac.update(`${version}:${timestamp}:${req.body}`);
   const expected = `${version}=${hmac.digest('hex')}`;

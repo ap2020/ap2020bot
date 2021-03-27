@@ -1,11 +1,11 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import assert from 'assert';
 import { verify } from '@/lib/slack/verify';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
 import { proveUnreachable } from '@/lib/utils';
 import type { EventPayload, UrlVerificationPayload } from '@/lib/slack/events/types';
 import { extractAttribute } from './attribute';
-import assert from 'assert';
 
 const main = async (payload: EventPayload) => {
   const message = payload;
