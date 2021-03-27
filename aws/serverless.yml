@@ -57,6 +57,7 @@ provider:
   stage: ${self:custom.stage}
   region: us-east-1
   profile: ${opt:profile, ''}
+  memorySize: 128
   environment:
     # ! DO NOT WRITE CREDENTIALS HERE!
     # TODO: write docs about storign credentials
@@ -102,7 +103,6 @@ functions:
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
-    memorySize: 128
   watch-inshi:
     handler: src/watch-inshi/index.handler
     events:
