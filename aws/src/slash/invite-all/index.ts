@@ -5,6 +5,7 @@ import { slack } from '@/lib/slack/client';
 import type { WebAPICallResult } from '@slack/web-api';
 import { verify } from '@/lib/slack/verify';
 import type { SlashParams } from '../lib/params';
+import assert from 'assert';
 
 // TODO: ライブラリに切り出す
 type Member = {
@@ -32,6 +33,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       body: 'invalid request',
     };
   }
+
+  assert(event.body !== undefined);
 
   // TODO: use SQS to avoid timeout
   // verify をしたので，スキーマを満たしていることが保証される

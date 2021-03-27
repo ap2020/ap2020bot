@@ -5,6 +5,7 @@ import { sns } from '@/lib/sns';
 import { proveUnreachable } from '@/lib/utils';
 import type { EventPayload, UrlVerificationPayload } from '@/lib/slack/events/types';
 import { extractAttribute } from './attribute';
+import assert from 'assert';
 
 const main = async (payload: EventPayload) => {
   const message = payload;
@@ -30,6 +31,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
     };
   }
 
+  assert(request.body !== undefined);
   // verifyをしたので、payload は EventPayload の値であることが保証される
   const payload = JSON.parse(request.body) as EventPayload | UrlVerificationPayload;
 
