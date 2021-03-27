@@ -1,4 +1,5 @@
 import querystring from 'querystring';
+import assert from 'assert';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
@@ -32,6 +33,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       body: 'invalid request',
     };
   }
+
+  assert(event.body !== undefined);
 
   // TODO: use SQS to avoid timeout
   // verify をしたので，スキーマを満たしていることが保証される

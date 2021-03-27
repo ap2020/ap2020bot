@@ -16,7 +16,7 @@
       "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
-    "strict": false
+    "strict": true,
   },
   "include": ["./**/*.ts"],
   "exclude": [

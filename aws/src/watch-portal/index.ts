@@ -7,6 +7,7 @@ import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import { db } from '@/lib/dynamodb';
+import { resourcePrefix } from '@/lib/aws/utils';
 
 /**
  * お知らせ
@@ -44,7 +45,8 @@ const fetchRSS = async (): Promise<string> => {
 const extractItems = async (data: string): Promise<Item[]> => {
   const parser = new Parser();
   const rss = await parser.parseString(data);
-  return rss.items.map(({ title, link }) => ({ title, url: link }));
+  return rss.items
+    .flatMap((item) => (item.link ? [{ title: item.title ?? 'No title', url: item.link }] : []));
 };
 
 /**
@@ -65,7 +67,7 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
 const fetchOldURLs = async (): Promise<string[]> => {
   const res = await db.get({
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${process.env.DYNAMODB_TABLENAME_PREFIX}watch-portal`,
+    TableName: `${resourcePrefix}watch-portal`,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Key: {
       key: 'oldURLs',
@@ -82,7 +84,7 @@ const fetchOldURLs = async (): Promise<string[]> => {
 const setNewURLs = async (urls: string[]): Promise<void> => {
   await db.put({
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${process.env.DYNAMODB_TABLENAME_PREFIX}watch-portal`,
+    TableName: `${resourcePrefix}watch-portal`,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Item: {
       key: 'oldURLs',

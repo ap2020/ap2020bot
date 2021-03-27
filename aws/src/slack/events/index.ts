@@ -1,4 +1,5 @@
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
+import assert from 'assert';
 import { verify } from '@/lib/slack/verify';
 import { getSlackEventTopicARN } from '@/lib/slack/events';
 import { sns } from '@/lib/sns';
@@ -30,6 +31,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (request) => {
     };
   }
 
+  assert(request.body !== undefined);
   // verifyをしたので、payload は EventPayload の値であることが保証される
   const payload = JSON.parse(request.body) as EventPayload | UrlVerificationPayload;
 

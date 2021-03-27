@@ -1,3 +1,4 @@
+import assert from 'assert';
 import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarTest implements EnvVar {
@@ -12,7 +13,9 @@ class EnvVarTest implements EnvVar {
   }
 
   get(key: EnvVarKey) {
-    return Promise.resolve(this.envvars.get(key));
+    const value = this.envvars.get(key);
+    assert(value !== undefined);
+    return Promise.resolve(value);
   }
 }
 
