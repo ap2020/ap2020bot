@@ -60,7 +60,7 @@ module.exports = (async () => ({
           return [
             // use .env.local.json
             new CopyPlugin({
-              patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
+              patterns: [{ from: '.env.local.json', to: './.env.local.json' }],
             }),
           ];
         }
