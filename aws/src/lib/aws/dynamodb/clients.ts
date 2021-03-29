@@ -9,6 +9,8 @@ const options = (
     {
       region: 'localhost',
       endpoint: 'http://localhost:8000',
+      accessKeyId: 'FAKE',
+      secretAccessKey: 'FAKE',
     }
 );
 
