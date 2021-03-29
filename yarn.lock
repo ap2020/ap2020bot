@@ -9203,7 +9203,7 @@ serverless-offline-sns@^0.68.0:
     uuid "^3.1.0"
     xml "^1.0.1"
 
-serverless-offline@^6.5.0, serverless-offline@^6.9.0:
+serverless-offline@^6.9.0:
   version "6.9.0"
   resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-6.9.0.tgz#a87fee3561f34808be9ac8ab06db9278cea8fa5f"
   integrity sha512-toKcyXUv0rFM7nGk/0QcCxP1Zlv/37IAf3vQiUlOh5XHPl6pFWfHUVF4HelMkosAeWJqJt1SngNmK38uiAsLtg==
@@ -9238,17 +9238,16 @@ serverless-offline@^6.5.0, serverless-offline@^6.9.0:
     velocityjs "^2.0.3"
     ws "^7.4.2"
 
-serverless-s3-local@^0.6.7:
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.7.tgz#ee833078024d9711dacd221320d0b14facd879b2"
-  integrity sha512-0ZMFX6mYKF5MrF0Br3BiaqpYcaHdIpJQ3bjlj8bwclcz8YYazZcs+8ZDarfAazPKHvHUZ/s3c6X9xmyXtqj/KA==
+serverless-s3-local@^0.6.12:
+  version "0.6.12"
+  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.12.tgz#411b93282ab026d411c4e3ea26db2ab8493f8ae1"
+  integrity sha512-pkivzpHICH9RnuhxB7xp1BQUftQGQ9qZ0NzR5sCaIJU6OQRulXh87RoNMbsxYINNWVhiF6bpKQgufKMX3//xqA==
   dependencies:
     aws-sdk "^2.738.0"
     fs-extra "^9.0.0"
     rxjs "^6.6.2"
     rxjs-compat "^6.6.2"
     s3rver "^3.6.1"
-    serverless-offline "^6.5.0"
     shelljs "^0.8.3"
 
 serverless-webpack@^5.4.0:
