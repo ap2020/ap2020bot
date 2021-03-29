@@ -4,9 +4,9 @@
   "description": "bot for ap2020",
   "scripts": {
     "build": "serverless webpack",
-    "dev": "STAGE=local ts-node -r tsconfig-paths/register -O '{\"noUnusedLocals\": false}' -T",
+    "dev": "cross-env STAGE=local ts-node -r tsconfig-paths/register -O '{\"noUnusedLocals\": false}' -T",
     "emulator:dynamodb": "serverless dynamodb start",
-    "emulator:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
+    "emulator:dynamodb-admin": "cross-env DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
     "test": "jest --verbose",
     "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
@@ -42,6 +42,7 @@
     "@typescript-eslint/parser": "^4.19.0",
     "change-case": "^4.1.2",
     "copy-webpack-plugin": "^8.1.0",
+    "cross-env": "^7.0.3",
     "dynamodb-admin": "^4.0.1",
     "eslint": "^7.22.0",
     "eslint-config-airbnb": "^18.2.1",
