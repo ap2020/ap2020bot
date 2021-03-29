@@ -949,7 +949,7 @@
 
 "@pizzacat83/eslint-config@git+https://github.com/pizzacat83/eslint-config.git":
   version "0.1.0"
-  resolved "git+https://github.com/pizzacat83/eslint-config.git#98404d4a57c3cba22fae040b7afdb62ff1da3d88"
+  resolved "git+https://github.com/pizzacat83/eslint-config.git#2939388a7a8675add3575d7ba196b80c9e012d30"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
