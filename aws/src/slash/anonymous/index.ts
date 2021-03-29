@@ -1,12 +1,10 @@
-import querystring from 'querystring';
-import assert from 'assert';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { slack } from '@/lib/slack/client';
-import { verify } from '@/lib/slack/verify';
 import type { Chat, Conversation } from '@/lib/slack/web/types';
 import { reply } from '@/lib/slack/slash/reply';
 import { dynamoMapper } from '@/lib/aws/dynamodb/clients';
 import { AnonymousLog } from '@/lib/aws/dynamodb/models/anonymous-log';
+import { createHandler } from '@/lib/slack/slash';
 import type { SlashParams } from '../lib/params';
 
 
@@ -47,19 +45,4 @@ const main = async (params: SlashParams): Promise<void> => {
   await dynamoMapper.put(Object.assign(new AnonymousLog(), logEntry));
 };
 
-export const handler: APIGatewayProxyHandlerV2 = async (event) => {
-  if (!(await verify(event))) {
-    return {
-      statusCode: 400,
-      body: 'invalid request',
-    };
-  }
-
-  assert(event.body !== undefined);
-
-  // TODO: use SQS to avoid timeout
-  // verify をしたので，スキーマを満たしていることが保証される
-  await main(querystring.parse(event.body) as SlashParams);
-
-  return '';
-};
+export const handler: APIGatewayProxyHandlerV2 = createHandler(main);

@@ -1,10 +1,8 @@
-import querystring from 'querystring';
-import assert from 'assert';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import type { WebAPICallResult } from '@slack/web-api';
-import { verify } from '@/lib/slack/verify';
+import { createHandler } from '@/lib/slack/slash';
 import type { SlashParams } from '../lib/params';
 
 // TODO: ライブラリに切り出す
@@ -26,18 +24,5 @@ const main = async (params: SlashParams) => {
   }
 };
 
-export const handler: APIGatewayProxyHandlerV2 = async (event) => {
-  if (!(await verify(event))) {
-    return {
-      statusCode: 400,
-      body: 'invalid request',
-    };
-  }
+export const handler: APIGatewayProxyHandlerV2 = createHandler(main);
 
-  assert(event.body !== undefined);
-
-  // TODO: use SQS to avoid timeout
-  // verify をしたので，スキーマを満たしていることが保証される
-  await main(querystring.parse(event.body) as SlashParams);
-  return '';
-};
