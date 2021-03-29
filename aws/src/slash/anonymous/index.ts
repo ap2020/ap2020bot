@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import querystring from 'querystring';
 import assert from 'assert';
 import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';
@@ -36,11 +35,16 @@ const main = async (params: SlashParams): Promise<void> => {
     /* eslint-enable @typescript-eslint/naming-convention */
   })) as Chat.PostMessageResult;
 
-  await dynamoMapper.put(Object.assign(new AnonymousLog(), {
+  const logEntry = {
     channelID: channel_id,
     timestamp: messageTimeStamp,
     userID: user_id,
-  }));
+  };
+
+  // log in case of errors in DynamoDB
+  console.log(logEntry);
+
+  await dynamoMapper.put(Object.assign(new AnonymousLog(), logEntry));
 };
 
 export const handler: APIGatewayProxyHandlerV2 = async (event) => {
