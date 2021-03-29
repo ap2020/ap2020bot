@@ -40,7 +40,7 @@
     "change-case": "^4.1.2",
     "copy-webpack-plugin": "^8.1.0",
     "dynamodb-admin": "^4.0.1",
-    "eslint": "^7.22.0",
+    "eslint": "^7.23.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-import": "^2.22.1",
