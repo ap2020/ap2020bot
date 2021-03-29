@@ -4,12 +4,15 @@
   "description": "bot for ap2020",
   "scripts": {
     "build": "serverless webpack",
+    "dev": "cross-env STAGE=local ts-node -r tsconfig-paths/register -O '{\"noUnusedLocals\": false}' -T",
     "emulator:dynamodb": "serverless dynamodb start",
-    "emulator:dynamodb-admin": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
+    "emulator:dynamodb-admin": "cross-env DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
     "test": "jest --verbose",
     "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
   "dependencies": {
+    "@aws/dynamodb-data-mapper": "^0.7.3",
+    "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
     "@slack/web-api": "5",
     "@types/common-tags": "^1.8.0",
     "aws-sdk": "^2.873.0",
@@ -39,6 +42,7 @@
     "@typescript-eslint/parser": "^4.19.0",
     "change-case": "^4.1.2",
     "copy-webpack-plugin": "^8.1.0",
+    "cross-env": "^7.0.3",
     "dynamodb-admin": "^4.0.1",
     "eslint": "^7.23.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -62,8 +66,7 @@
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.3",
     "webpack": "^5.27.2",
-    "webpack-node-externals": "^2.5.2",
-    "webpack-virtual-modules": "^0.4.2"
+    "webpack-node-externals": "^2.5.2"
   },
   "author": "ap2020",
   "license": "MIT"

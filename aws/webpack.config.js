@@ -3,7 +3,6 @@ const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
 const CopyPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const VirtualModulesPlugin = require('webpack-virtual-modules');
 
 module.exports = (async () => ({
   context: __dirname,
@@ -60,17 +59,12 @@ module.exports = (async () => ({
           return [
             // use .env.local.json
             new CopyPlugin({
-              patterns: [{ from: '.env.local.json', to: '../.env.local.json' }],
+              patterns: [{ from: '.env.local.json', to: './.env.local.json' }],
             }),
           ];
         }
         default: {
           return [
-            // not using .env.local.json
-            // but we need a dummy module to require
-            new VirtualModulesPlugin({
-              './.env.local.json': '{}',
-            }),
           ];
         }
       }
