@@ -22,6 +22,7 @@ const main = async (params: SlashParams): Promise<void> => {
       text: 'anonymous post is only allowed in `#1.*` channel.',
     /* eslint-enable @typescript-eslint/naming-convention */
     });
+    return;
   }
 
   const { ts: messageTimeStamp } = (await (await slack.bot).chat.postMessage({
