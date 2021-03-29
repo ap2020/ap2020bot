@@ -10,6 +10,8 @@
     "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
   "dependencies": {
+    "@aws/dynamodb-data-mapper": "^0.7.3",
+    "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
     "@slack/web-api": "5",
     "@types/common-tags": "^1.8.0",
     "aws-sdk": "^2.873.0",
