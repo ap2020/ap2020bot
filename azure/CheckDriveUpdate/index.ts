@@ -138,7 +138,7 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
     async (activity) => await notifyToSlack(clients, activity, groupEmailAddress),
     async (activity) => await addCommentPermission(clients, activity, groupEmailAddress),
   ];
-  const results = await Promise.allSettled(
+  await Promise.all(
     flatten(
       activities
         .reverse()
@@ -147,16 +147,6 @@ const checkUpdate = async (context: Context, since: Date): Promise<Date> => {
         )),
     ),
   );
-
-  const failures = results.flatMap(result => (
-    result.status === 'rejected' ? [result] : []
-  ));
-
-  if (failures.length > 0) {
-    console.error('Some hooks failed.');
-    console.error(failures);
-  }
-
   return lastChecked;
 };
 
