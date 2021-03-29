@@ -28,6 +28,7 @@ custom:
   dynamodbConfig:
     tableName:
       watch-portal: ${self:custom.resourcePrefix}watch-portal
+      anonymous-log: ${self:custom.resourcePrefix}anonymous-log
   sns:
     topicName:
       error: ${self:custom.resourcePrefix}error
@@ -114,6 +115,12 @@ functions:
       - httpApi:
           path: /slack/slash/invite-all
           method: POST
+  slash-anonymous:
+    handler: src/slash/anonymous/index.handler
+    events:
+      - httpApi:
+          path: /slack/slash/anonymous
+          method: POST
   slack-events:
     handler: src/slack/events/index.handler
     events:
@@ -159,6 +166,22 @@ resources:
             -
               AttributeName: key
               KeyType: HASH
+        DeletionPolicy: 'Retain' # may need to backup before deletion
+      AnonymousLogDynamoDbTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: ${self:custom.dynamodbConfig.tableName.anonymous-log}
+          BillingMode: PAY_PER_REQUEST
+          AttributeDefinitions:
+            - AttributeName: channelID
+              AttributeType: S
+            - AttributeName: timestamp
+              AttributeType: S
+          KeySchema:
+            - AttributeName: channelID
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
         DeletionPolicy: 'Retain' # may need to backup before deletion
       DefaultS3Bucket:
         Type: 'AWS::S3::Bucket'
