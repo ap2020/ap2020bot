@@ -31,6 +31,7 @@ export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity,
   if (activity.actors!.length !== 1) {
     return false;
   }
+  // 単純に isCurrentUser だけで判定していい気もする
   if (!activity.actors![0].user?.knownUser?.isCurrentUser) {
     return false;
   }
@@ -40,7 +41,8 @@ export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity,
     return false;
   }
   return detail!.permissionChange.addedPermissions.every(permission =>
-    permission.role === 'COMMENTER' && permission.group?.email === groupEmailAddress);
+    ['COMMENTER', 'VIEWER'].includes(permission.role!) && permission.group?.email === groupEmailAddress
+  );
 };
 
 
