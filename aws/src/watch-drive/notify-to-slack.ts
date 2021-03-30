@@ -17,7 +17,9 @@ const getDate = (activity: driveactivity_v2.Schema$DriveActivity): string => {
   if (activity.timestamp) {
     return formatDate(activity.timestamp);
   } else if (activity.timeRange) {
-    return `${formatDate(activity.timeRange.startTime)} - ${formatDate(activity.timeRange.endTime)}`;
+    return `${formatDate(activity.timeRange.startTime!)} - ${formatDate(activity.timeRange.endTime!)}`;
+  } else {
+    throw Error('This code should be unreachable.');
   }
 };
 
@@ -25,18 +27,18 @@ export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity,
   // bot activity might be part of activity by ordinary user
   // but I'll think about that after it really occurres.
   // currently this returns true if the activity only contains adding permission by bot
-  if (activity.actors.length !== 1) {
+  if (activity.actors!.length !== 1) {
     return false;
   }
-  if (!activity.actors[0].user?.knownUser?.isCurrentUser) {
+  if (!activity.actors![0].user?.knownUser?.isCurrentUser) {
     return false;
   }
   // use primaryAction, not actions because it somehow contains edit
   const detail = activity.primaryActionDetail;
-  if (!detail.permissionChange?.addedPermissions) {
+  if (!detail!.permissionChange?.addedPermissions) {
     return false;
   }
-  return detail.permissionChange.addedPermissions.every(permission =>
+  return detail!.permissionChange.addedPermissions.every(permission =>
     permission.role === 'COMMENTER' && permission.group?.email === groupEmailAddress);
 };
 
@@ -64,7 +66,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
   // not notified in order!
   // maybe chat.scheduleMessage is useful to imitate notification in order
   // but I think the inorderness is ignorable if the frequency of execution is high enough
-  const actionName = getActionName(activity.primaryActionDetail);
+  const actionName = getActionName(activity.primaryActionDetail!);
   if (ignoredActions.includes(actionName)) {
     return;
   }
@@ -73,7 +75,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
   }
   const items: DriveItem[] = (
     await Promise.all(
-      activity.targets
+      activity.targets!
         .map(async target => await getDriveItem(drive, target)),
 
     )
@@ -82,7 +84,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
     return;
   }
   const actorsText = (await Promise.all(
-    activity.actors.map(async actor => `${await getPersonName(peopleAPI, actor.user.knownUser.personName)}  さん`),
+    activity.actors!.map(async actor => `${await getPersonName(peopleAPI, actor.user!.knownUser!.personName!)}  さん`),
   )).join(', ');
   const send = async ([sentChannel, channelId]: [SentChannel, string]) => {
     const sentItems = items.filter(({ sentChannel: c }) => c === sentChannel);
@@ -101,7 +103,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
         text: '', // TODO: include details
         title_link: item.link,
       })));
-      await slack.bot.chat.postMessage({
+      await slack.chat.postMessage({
         channel: channelId,
         text,
         icon_emoji: ':google_drive:',
@@ -110,7 +112,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
       });
     } else {
       // post snippet
-      await slack.bot.files.upload({
+      await slack.files.upload({
         channels: [drivelogId].join(','),
         content: (await Promise.all(sentItems.map(
           async item => `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`,

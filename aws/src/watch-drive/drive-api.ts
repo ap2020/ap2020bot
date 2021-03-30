@@ -1,5 +1,5 @@
+import { cacheCalls } from '@/lib/cache-calls';
 import type { drive_v3 } from 'googleapis';
-import { cacheCalls } from '../utils/utils';
 import { rootFolderId } from './lib';
 
 // TODO: drive-activity-apiと名前が衝突している
@@ -9,7 +9,7 @@ import { rootFolderId } from './lib';
 export class DriveItem {
   client: drive_v3.Drive;
   content: drive_v3.Schema$File;
-  private _path: string|null;
+  private _path: string|null; // これはなに
 
   constructor(client: drive_v3.Drive, content: drive_v3.Schema$File) {
     this.client = client;
@@ -21,7 +21,7 @@ export class DriveItem {
 export const fetchDriveItem = cacheCalls(
   async (client: drive_v3.Drive, id: string): Promise<DriveItem> =>
     new DriveItem(client, (await client.files.get({ fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions' })).data),
-  (c, id) => id,
+  (_, id) => id,
 );
 
 /**
@@ -54,9 +54,9 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
       // rootFolderId is not ancestor of folderId...
       return { path: null, valid: false };
     }
-  }, (c, id) => id, paths);
-  const path = await rec(client, item.content.id);
-  return path.valid ? path.path : item.content.name;
+  }, (_, id) => id, paths);
+  const path = await rec(client, item.content.id!);
+  return path.valid ? path.path! : item.content.name!;
 };
 
 export type SentChannel = 'main' | 'lms' | 'none';
@@ -75,8 +75,8 @@ export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, 
   if (parentSentChannels.has('main')) return 'main';
   if (parentSentChannels.has('lms')) return 'lms';
   return 'none';
-}, (c, id) => id, new Map([
+}, (_, id) => id, new Map([
   ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
   [rootFolderId, Promise.resolve('main')],
-  [process.env.GOOGLE_DRIVE_LMS_FOLDER_ID, Promise.resolve('lms')],
+  [process.env.GOOGLE_DRIVE_LMS_FOLDER_ID!, Promise.resolve('lms')],
 ]));
