@@ -1,3 +1,14 @@
+import { envvarTest } from '@/lib/envvar/test';
+
+envvarTest.set('google/drive/item/ap2020files', 'ap2020files-fake-id');
+envvarTest.set('google/drive/item/lms', 'lms-fake-id');
+envvarTest.set('google/drive/ignored-items', 'ignored-fake-id');
+envvarTest.set('slack/token/bot', 'fake-slack-token');
+
+afterAll(() => {
+  envvarTest.init();
+})
+
 import { set } from 'lodash';
 import type { driveactivity_v2 } from 'googleapis';
 import { isActivityByBot } from './notify-to-slack';
