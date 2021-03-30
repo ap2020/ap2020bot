@@ -6,6 +6,7 @@ import type { Clients } from './lib';
 import type { DriveItem } from './drive-activity-api';
 import { getDriveItem } from './drive-activity-api';
 import type { SentChannel } from './drive-api';
+import { envvar } from '@/lib/envvar';
 
 const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): ActionName =>
   Object.keys(actionDetail)[0] as ActionName;
@@ -59,9 +60,6 @@ const getEmoji = (mimeType: string): string => {
   }
 };
 
-const drivelogId = process.env.SLACK_CHANNEL_DRIVE!;
-const drivelogLMSId = process.env.SLACK_CHANNEL_DRIVE_LMS!;
-
 export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string) => {
   // not notified in order!
   // maybe chat.scheduleMessage is useful to imitate notification in order
@@ -113,7 +111,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
     } else {
       // post snippet
       await slack.files.upload({
-        channels: [drivelogId].join(','),
+        channels: [await envvar.get('slack/channel/notify-drive')].join(','),
         content: (await Promise.all(sentItems.map(
           async item => `${japaneseTranslations[actionName]}: ${await item.getPath(drive)} (${item.link})`,
         ))).join('\n'),
@@ -121,5 +119,12 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
       });
     }
   };
-  await Promise.all(([['main', drivelogId], ['lms', drivelogLMSId]] as const).map(send));
+
+  await Promise.all(
+    ([
+      ['main', await envvar.get('slack/channel/notify-drive')],
+      ['lms', await envvar.get('slack/channel/notify-drive-lms')]
+    ] as const)
+      .map(send)
+  );
 };

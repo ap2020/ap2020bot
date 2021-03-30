@@ -1,3 +1,4 @@
+import { envvar } from '@/lib/envvar';
 import { googleAuth } from '@/lib/google';
 import { slack } from '@/lib/slack/client';
 import type { ScheduledHandler } from 'aws-lambda';
@@ -5,7 +6,7 @@ import type { driveactivity_v2 } from 'googleapis';
 import { google } from 'googleapis';
 import { fetchDriveItem } from './drive-api';
 import type { Clients } from './lib';
-import { rootFolderId, getDriveItemId } from './lib';
+import { getDriveItemId } from './lib';
 import { notifyToSlack } from './notify-to-slack';
 
 
@@ -124,7 +125,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
   const drive = google.drive({ version: 'v3', auth });
   const driveActivity = google.driveactivity({ version: 'v2', auth });
   const peopleAPI = google.people({ version: 'v1', auth });
-  const groupEmailAddress = process.env.GOOGLE_GROUPS_EMAIL_ADDRESS!; // TODO: use ssm
+  const groupEmailAddress = await envvar.get('google/group/ap2020');
   const clients: Clients = {
     slack: await slack.bot,
     drive,
@@ -133,7 +134,7 @@ const checkUpdate = async (since: Date): Promise<Date> => {
   };
 
   const lastChecked = new Date();
-  const activities = (await fetchAllDriveActivities(driveActivity, rootFolderId, since)).map(activity => fillEmptyTarget(activity));
+  const activities = (await fetchAllDriveActivities(driveActivity, await envvar.get('google/drive/item/ap2020files'), since)).map(activity => fillEmptyTarget(activity));
   const hooks: ((activity: driveactivity_v2.Schema$DriveActivity) => unknown)[] = [
     async (activity) => await notifyToSlack(clients, activity, groupEmailAddress),
     async (activity) => await addCommentPermission(clients, activity, groupEmailAddress),

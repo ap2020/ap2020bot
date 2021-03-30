@@ -1,6 +1,6 @@
 import { cacheCalls } from '@/lib/cache-calls';
+import { envvar } from '@/lib/envvar';
 import type { drive_v3 } from 'googleapis';
-import { rootFolderId } from './lib';
 
 // TODO: drive-activity-apiと名前が衝突している
 // DriveItemはDrive Activityの概念なので↓を改名すべきか？
@@ -26,7 +26,7 @@ export const fetchDriveItem = cacheCalls(
  * cache for getPath
  * folderId => path
  */
-const paths: Map<string, Promise<{ path: string | null; valid: boolean }>> = new Map([[rootFolderId, Promise.resolve({ path: '/', valid: true })]]);
+const paths: Map<string, Promise<{ path: string | null; valid: boolean }>> = new Map([[await envvar.get('google/drive/item/ap2020files'), Promise.resolve({ path: '/', valid: true })]]);
 export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<string> => {
   /**
      * path: path to item
@@ -74,7 +74,7 @@ export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, 
   if (parentSentChannels.has('lms')) return 'lms';
   return 'none';
 }, (_, id) => id, new Map([
-  ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
-  [rootFolderId, Promise.resolve('main')],
-  [process.env.GOOGLE_DRIVE_LMS_FOLDER_ID!, Promise.resolve('lms')],
+  ...((await envvar.get('google/drive/ignored-items') ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
+  [await envvar.get('google/drive/item/ap2020files'), Promise.resolve('main')],
+  [await envvar.get('google/drive/item/lms'), Promise.resolve('lms')],
 ]));

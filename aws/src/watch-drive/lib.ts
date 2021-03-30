@@ -2,7 +2,6 @@ import type { WebClient } from '@slack/web-api';
 import assert from 'assert';
 import type { driveactivity_v2, people_v1, drive_v3 } from 'googleapis';
 
-export const rootFolderId = process.env.GOOGLE_ROOT_FOLDER_ID!; // TODO: use ssm
 
 export interface Clients {
   slack: WebClient;
