@@ -26,7 +26,8 @@ export const fetchDriveItem = cacheCalls(
  * cache for getPath
  * folderId => path
  */
-const paths: Map<string, Promise<{ path: string | null; valid: boolean }>> = new Map([[await envvar.get('google/drive/item/ap2020files'), Promise.resolve({ path: '/', valid: true })]]);
+const paths: Promise<Map<string, Promise<{ path: string | null; valid: boolean }>>> =
+  (async () => new Map([[await envvar.get('google/drive/item/ap2020files'), Promise.resolve({ path: '/', valid: true })]]))();
 export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<string> => {
   /**
      * path: path to item
@@ -59,22 +60,26 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
 
 export type SentChannel = 'main' | 'lms' | 'none';
 
-export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, string>(async (client: drive_v3.Drive, itemId: string): Promise<SentChannel> => {
-  const item = await fetchDriveItem(client, itemId);
-  if (!item.content.parents) {
-    // root of drive
+export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, string>(
+  async (client: drive_v3.Drive, itemId: string): Promise<SentChannel> => {
+    const item = await fetchDriveItem(client, itemId);
+    if (!item.content.parents) {
+      // root of drive
+      return 'none';
+    }
+    if (item.content.parents.length === 0) {
+      // we don't need to ignore this
+      return 'none';
+    }
+    const parentSentChannels = new Set(await Promise.all(item.content.parents.map(async parentId => getSentChannel(client, parentId))));
+    if (parentSentChannels.has('main')) return 'main';
+    if (parentSentChannels.has('lms')) return 'lms';
     return 'none';
-  }
-  if (item.content.parents.length === 0) {
-    // we don't need to ignore this
-    return 'none';
-  }
-  const parentSentChannels = new Set(await Promise.all(item.content.parents.map(async parentId => getSentChannel(client, parentId))));
-  if (parentSentChannels.has('main')) return 'main';
-  if (parentSentChannels.has('lms')) return 'lms';
-  return 'none';
-}, (_, id) => id, new Map([
-  ...((await envvar.get('google/drive/ignored-items') ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
-  [await envvar.get('google/drive/item/ap2020files'), Promise.resolve('main')],
-  [await envvar.get('google/drive/item/lms'), Promise.resolve('lms')],
-]));
+  },
+  (_, id) => id,
+  (async () => new Map([
+    ...((await envvar.get('google/drive/ignored-items') ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
+    [await envvar.get('google/drive/item/ap2020files'), Promise.resolve('main' as const)],
+    [await envvar.get('google/drive/item/lms'), Promise.resolve('lms' as const)],
+  ]))(),
+);
