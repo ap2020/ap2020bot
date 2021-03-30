@@ -45,10 +45,12 @@ export const isActivityByBot = (activity: driveactivity_v2.Schema$DriveActivity,
 
 
 // TODO: use batchGet https://developers.google.com/people/api/rest/v1/people/getBatchGet
-const getPersonName = async (client: people_v1.People, resourceName: string): Promise<string> => {
-  const person: people_v1.Schema$Person = (await client.people.get({ resourceName, personFields: 'names' })).data;
-  const name = person.names?.[0]?.displayName;
-  return name ?? resourceName; // TODO: a better approach?
+// もしくはpersonNameと名前との紐付けDBを作る (あんまり変化しなさそうなので)
+const getPersonName = async (_client: people_v1.People, resourceName: string): Promise<string> => {
+  // const person: people_v1.Schema$Person = (await client.people.get({ resourceName, personFields: 'names' })).data;
+  // const name = person.names?.[0]?.displayName;
+  // return name ?? resourceName; // TODO: a better approach?
+  return resourceName;
 };
 
 const getEmoji = (mimeType: string): string => {
