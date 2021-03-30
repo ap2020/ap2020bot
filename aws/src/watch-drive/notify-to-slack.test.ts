@@ -29,7 +29,7 @@ describe('isActivityByBot', () => {
     const activity = createActivity();
     activity.primaryActionDetail!.permissionChange!.addedPermissions!.push(
       {
-        role: 'VIEWER',
+        role: 'WRITER',
         group: {
           email: fakeGroupEmail,
         },
