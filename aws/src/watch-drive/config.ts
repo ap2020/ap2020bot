@@ -1,4 +1,18 @@
+export const actionNames = [
+  "create",
+  "edit",
+  "move",
+  "rename",
+  "delete",
+  "restore",
+  "permissionChange",
+  "settingsChange",
+] as const;
+
+export type ActionName = typeof actionNames[number];
+
 export const ignoredActions = ['comment', 'dlpChange', 'reference'];
+
 export const colors = {
   create: '#6dc651',
   edit: '#f5bc41',
@@ -9,6 +23,7 @@ export const colors = {
   permissionChange: '#ec56a5',
   settingsChange: '#ec56a5',
 };
+
 export const japaneseTranslations = {
   create: '追加',
   edit: '更新',

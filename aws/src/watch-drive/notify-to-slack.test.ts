@@ -27,7 +27,7 @@ describe('isActivityByBot', () => {
 
   it("doesn't ignore other permission changes", () => {
     const activity = createActivity();
-    activity.primaryActionDetail.permissionChange.addedPermissions.push(
+    activity.primaryActionDetail!.permissionChange!.addedPermissions!.push(
       {
         role: 'VIEWER',
         group: {
@@ -40,8 +40,8 @@ describe('isActivityByBot', () => {
 
   it("doesn't ignore removal of permission change", () => {
     const activity = createActivity();
-    delete activity.primaryActionDetail.permissionChange.addedPermissions;
-    activity.primaryActionDetail.permissionChange.removedPermissions = [{
+    delete activity.primaryActionDetail!.permissionChange!.addedPermissions;
+    activity.primaryActionDetail!.permissionChange!.removedPermissions = [{
       role: 'COMMENTER',
       group: {
         email: fakeGroupEmail,
@@ -52,7 +52,7 @@ describe('isActivityByBot', () => {
 
   it("doesn't ignore adding permission to non-group", () => {
     const activity = createActivity();
-    activity.primaryActionDetail.permissionChange.addedPermissions = [
+    activity.primaryActionDetail!.permissionChange!.addedPermissions = [
       {
         role: 'VIEWER',
         user: {},
@@ -63,7 +63,7 @@ describe('isActivityByBot', () => {
 
   it("doesn't ignore adding permission to other group", () => {
     const activity = createActivity();
-    activity.primaryActionDetail.permissionChange.addedPermissions = [
+    activity.primaryActionDetail!.permissionChange!.addedPermissions = [
       {
         role: 'VIEWER',
         group: {
@@ -76,14 +76,14 @@ describe('isActivityByBot', () => {
 
   it("doesn't ignore other activity type", () => {
     const activity = createActivity();
-    delete activity.primaryActionDetail.permissionChange;
-    activity.primaryActionDetail.create = {}; // activity type: create
+    delete activity.primaryActionDetail!.permissionChange;
+    activity.primaryActionDetail!.create = {}; // activity type: create
     expect(isActivityByBot(activity, fakeGroupEmail)).toBe(false);
   });
 
   it("doesn't ignore activity which has more than one actor", () => {
     const activity = createActivity();
-    activity.actors.push({ user: {} });
+    activity.actors!.push({ user: {} });
     expect(isActivityByBot(activity, fakeGroupEmail)).toBe(false);
   });
 

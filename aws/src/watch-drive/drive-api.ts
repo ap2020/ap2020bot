@@ -1,6 +1,6 @@
+import { cacheCalls } from '@/lib/cache-calls';
+import { envvar } from '@/lib/envvar';
 import type { drive_v3 } from 'googleapis';
-import { cacheCalls } from '../utils/utils';
-import { rootFolderId } from './lib';
 
 // TODO: drive-activity-apiと名前が衝突している
 // DriveItemはDrive Activityの概念なので↓を改名すべきか？
@@ -9,26 +9,25 @@ import { rootFolderId } from './lib';
 export class DriveItem {
   client: drive_v3.Drive;
   content: drive_v3.Schema$File;
-  private _path: string|null;
 
   constructor(client: drive_v3.Drive, content: drive_v3.Schema$File) {
     this.client = client;
     this.content = content;
-    this._path = null;
   }
 }
 
 export const fetchDriveItem = cacheCalls(
   async (client: drive_v3.Drive, id: string): Promise<DriveItem> =>
     new DriveItem(client, (await client.files.get({ fileId: id, fields: 'id,name,parents,mimeType,webViewLink,permissions' })).data),
-  (c, id) => id,
+  (_, id) => id,
 );
 
 /**
  * cache for getPath
  * folderId => path
  */
-const paths: Map<string, Promise<{ path: string | null; valid: boolean }>> = new Map([[rootFolderId, Promise.resolve({ path: '/', valid: true })]]);
+const paths: Promise<Map<string, Promise<{ path: string | null; valid: boolean }>>> =
+  (async () => new Map([[await envvar.get('google/drive/item/ap2020files'), Promise.resolve({ path: '/', valid: true })]]))();
 export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<string> => {
   /**
      * path: path to item
@@ -54,29 +53,33 @@ export const getPath = async (client: drive_v3.Drive, item: DriveItem): Promise<
       // rootFolderId is not ancestor of folderId...
       return { path: null, valid: false };
     }
-  }, (c, id) => id, paths);
-  const path = await rec(client, item.content.id);
-  return path.valid ? path.path : item.content.name;
+  }, (_, id) => id, paths);
+  const path = await rec(client, item.content.id!);
+  return path.valid ? path.path! : item.content.name!;
 };
 
 export type SentChannel = 'main' | 'lms' | 'none';
 
-export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, string>(async (client: drive_v3.Drive, itemId: string): Promise<SentChannel> => {
-  const item = await fetchDriveItem(client, itemId);
-  if (!item.content.parents) {
-    // root of drive
+export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, string>(
+  async (client: drive_v3.Drive, itemId: string): Promise<SentChannel> => {
+    const item = await fetchDriveItem(client, itemId);
+    if (!item.content.parents) {
+      // root of drive
+      return 'none';
+    }
+    if (item.content.parents.length === 0) {
+      // we don't need to ignore this
+      return 'none';
+    }
+    const parentSentChannels = new Set(await Promise.all(item.content.parents.map(async parentId => getSentChannel(client, parentId))));
+    if (parentSentChannels.has('main')) return 'main';
+    if (parentSentChannels.has('lms')) return 'lms';
     return 'none';
-  }
-  if (item.content.parents.length === 0) {
-    // we don't need to ignore this
-    return 'none';
-  }
-  const parentSentChannels = new Set(await Promise.all(item.content.parents.map(async parentId => getSentChannel(client, parentId))));
-  if (parentSentChannels.has('main')) return 'main';
-  if (parentSentChannels.has('lms')) return 'lms';
-  return 'none';
-}, (c, id) => id, new Map([
-  ...((process.env.GOOGLE_DRIVE_IGNORED_IDS ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
-  [rootFolderId, Promise.resolve('main')],
-  [process.env.GOOGLE_DRIVE_LMS_FOLDER_ID, Promise.resolve('lms')],
-]));
+  },
+  (_, id) => id,
+  (async () => new Map([
+    ...((await envvar.get('google/drive/ignored-items') ?? '').split(',').map(s => [s.trim(), Promise.resolve('none')] as [string, Promise<SentChannel>])),
+    [await envvar.get('google/drive/item/ap2020files'), Promise.resolve('main' as const)],
+    [await envvar.get('google/drive/item/lms'), Promise.resolve('lms' as const)],
+  ]))(),
+);
