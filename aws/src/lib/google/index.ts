@@ -9,6 +9,7 @@ export const googleAuth = async (): Promise<InstanceType<typeof google.auth.Goog
     },
     scopes: [
       'https://www.googleapis.com/auth/drive',
+      'https://www.googleapis.com/auth/drive.activity.readonly',
     ]
   });
   return auth;
