@@ -1,8 +1,8 @@
 Resources:
-  Ap2020DeployLimitedPolicy:
+  Ap2020DeployLimitedPolicy1:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: Ap2020BotDeployLimited${self:custom.stage}
+      ManagedPolicyName: Ap2020BotDeployLimited1${self:custom.stage}
       Description: Limited permissions to deploy service. Intended to be used in CI/CD.
       PolicyDocument:
         Version: '2012-10-17'
@@ -70,6 +70,14 @@ Resources:
             Condition:
               StringEquals:
                 'lambda:Principal': apigateway.amazonaws.com
+  Ap2020DeployLimitedPolicy2:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: Ap2020BotDeployLimited2${self:custom.stage}
+      Description: Limited permissions to deploy service. Intended to be used in CI/CD.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
           - Effect: Allow
             Action:
               - 'logs:CreateLogGroup'
@@ -134,7 +142,8 @@ Resources:
               - 'sts:AssumeRole'
               - 'sts:TagSession'
       ManagedPolicyArns:
-        - Ref: Ap2020DeployLimitedPolicy
+        - Ref: Ap2020DeployLimitedPolicy1
+        - Ref: Ap2020DeployLimitedPolicy2
       Tags: 
         - Key: project
           Value: ap2020bot
