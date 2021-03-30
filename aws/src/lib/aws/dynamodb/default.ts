@@ -4,7 +4,7 @@ import { resourcePrefix } from '../utils';
 import { dynamodb } from './clients';
 
 export type DefaultTableContent = {
-  'watch-portal': { url: string[] };
+  'watch-portal': { urls: string[] };
 };
 
 export type DefaultTableKey = keyof DefaultTableContent;

@@ -6,8 +6,8 @@ import Parser from 'rss-parser';
 import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { resourcePrefix } from '@/lib/aws/utils';
-import { dynamodb } from '@/lib/aws/dynamodb/clients';
+import { defaultTable } from '@/lib/aws/dynamodb/default';
+import type { Option } from 'ts-results';
 
 /**
  * お知らせ
@@ -64,17 +64,9 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
 /**
  * 以前保存した URL 一覧を取得する
  */
-const fetchOldURLs = async (): Promise<string[]> => {
-  const res = await dynamodb.get({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${resourcePrefix}default`,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Key: {
-      key: 'watch-portal',
-    },
-  }).promise();
-
-  return (res?.Item?.urls as string[] || undefined) ?? [];
+const fetchOldURLs = async (): Promise<Option<string[]>> => {
+  const res = await defaultTable.get('watch-portal');
+  return res.map(({ urls }) => urls);
 };
 
 /**
@@ -82,15 +74,7 @@ const fetchOldURLs = async (): Promise<string[]> => {
  * @param urls 保存する URL 一覧
  */
 const setNewURLs = async (urls: string[]): Promise<void> => {
-  await dynamodb.put({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${resourcePrefix}default`,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Item: {
-      key: 'watch-portal',
-      urls,
-    },
-  }).promise();
+  await defaultTable.set('watch-portal', { urls });
 };
 
 /**
@@ -114,16 +98,23 @@ const notifyItem = async (item: Item) => {
 const main = async () => {
   // 以前保存した URL 一覧を取得する
   const oldURLs = await fetchOldURLs();
+
   // 現在のお知らせ一覧ページを取得
   const data = await fetchRSS();
   // お知らせ一覧ページをパースして URL とタイトルを抽出
   const items = await extractItems(data);
-  // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
-  const newItems = filterNewItems(oldURLs, items);
-  // 新規お知らせを Slack に通知
-  await Promise.all(newItems.map(item => notifyItem(item)));
   // 今回取得した URL 一覧を保存する
   await setNewURLs(items.map(({ url }) => url));
+
+  if (!oldURLs.some) {
+    console.log('No saved URLs found. Skipping notification.');
+    return;
+  }
+
+  // 以前保存した URL 一覧と取得したデータを比較し，新規お知らせを抽出
+  const newItems = filterNewItems(oldURLs.val, items);
+  // 新規お知らせを Slack に通知
+  await Promise.all(newItems.map(item => notifyItem(item)));
 };
 
 /**
