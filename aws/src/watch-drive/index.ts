@@ -1,3 +1,4 @@
+import { defaultTable } from '@/lib/aws/dynamodb/default';
 import { envvar } from '@/lib/envvar';
 import { googleAuth } from '@/lib/google';
 import { slack } from '@/lib/slack/client';
@@ -151,10 +152,15 @@ const checkUpdate = async (since: Date): Promise<Date> => {
 
 
 export const main = async (): Promise<void> => {
-  const lastChecked = new Date(); // TODO
+  const state = await defaultTable.get('watch-drive');
 
-  // const newLastChecked = await 
-  await checkUpdate(lastChecked);
+  if (!state.some) {
+    throw new Error('state is not set.');
+  }
+
+  const newLastChecked = await checkUpdate(state.val.lastChecked);
+
+  await defaultTable.set('watch-drive', { lastChecked: newLastChecked } );
   // TODO: save
 };
 

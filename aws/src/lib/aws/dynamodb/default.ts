@@ -4,6 +4,7 @@ import { resourcePrefix } from '../utils';
 import { dynamodb } from './clients';
 
 export type DefaultTableContent = {
+  'watch-drive': { lastChecked: Date };
   'watch-portal': { urls: string[] };
 };
 
