@@ -152,7 +152,8 @@ const checkUpdate = async (since: Date): Promise<Date> => {
 export const main = async (): Promise<void> => {
   const lastChecked = new Date(); // TODO
 
-  const newLastChecked = await checkUpdate(lastChecked);
+  // const newLastChecked = await 
+  await checkUpdate(lastChecked);
   // TODO: save
 };
 

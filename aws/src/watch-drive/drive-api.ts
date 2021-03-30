@@ -9,12 +9,10 @@ import { rootFolderId } from './lib';
 export class DriveItem {
   client: drive_v3.Drive;
   content: drive_v3.Schema$File;
-  private _path: string|null; // これはなに
 
   constructor(client: drive_v3.Drive, content: drive_v3.Schema$File) {
     this.client = client;
     this.content = content;
-    this._path = null;
   }
 }
 
