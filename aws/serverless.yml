@@ -100,6 +100,11 @@ provider:
     payload: '2.0'
 
 functions:
+  watch-drive:
+    handler: src/watch-drive/index.handler
+    events:
+      - schedule:
+          rate: 'cron(0 * * * ? *)'
   watch-portal:
     handler: src/watch-portal/index.handler
     events:
