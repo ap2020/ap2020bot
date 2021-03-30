@@ -1,3 +1,16 @@
+export const actionNames = [
+  "create",
+  "edit",
+  "move",
+  "rename",
+  "delete",
+  "restore",
+  "permissionChange",
+  "settingsChange",
+] as const;
+
+export type ActionName = typeof actionNames[number];
+
 export const ignoredActions = ['comment', 'dlpChange', 'reference'];
 
 export const colors = {

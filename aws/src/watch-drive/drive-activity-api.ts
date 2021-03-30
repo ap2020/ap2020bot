@@ -74,7 +74,7 @@ export const getDriveItem = async (drive: drive_v3.Drive, target: driveactivity_
   }
   try {
     const driveItem = await fetchDriveItem(drive, getDriveItemId(target));
-    const sentChannel = await getSentChannel(drive, driveItem.content.id);
+    const sentChannel = await getSentChannel(drive, driveItem.content.id!);
     return new FoundItem(driveItem, sentChannel);
   } catch (error) {
     const errors: { reason: string }[] = error?.response?.data?.error?.errors;

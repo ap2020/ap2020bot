@@ -1,14 +1,14 @@
 import { stripIndent } from 'common-tags';
 import type { driveactivity_v2, people_v1 } from 'googleapis';
 import moment from 'moment-timezone';
-import { ignoredActions, japaneseTranslations, colors } from './config';
+import { ignoredActions, japaneseTranslations, colors, ActionName } from './config';
 import type { Clients } from './lib';
 import type { DriveItem } from './drive-activity-api';
 import { getDriveItem } from './drive-activity-api';
 import type { SentChannel } from './drive-api';
 
-const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): string =>
-  Object.keys(actionDetail)[0];
+const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): ActionName =>
+  Object.keys(actionDetail)[0] as ActionName;
 
 const formatDate = (timestamp: string): string =>
   moment(timestamp).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss');
@@ -59,8 +59,8 @@ const getEmoji = (mimeType: string): string => {
   }
 };
 
-const drivelogId = process.env.SLACK_CHANNEL_DRIVE;
-const drivelogLMSId = process.env.SLACK_CHANNEL_DRIVE_LMS;
+const drivelogId = process.env.SLACK_CHANNEL_DRIVE!;
+const drivelogLMSId = process.env.SLACK_CHANNEL_DRIVE_LMS!;
 
 export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients, activity: driveactivity_v2.Schema$DriveActivity, groupEmailAddress: string) => {
   // not notified in order!
@@ -86,7 +86,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
   const actorsText = (await Promise.all(
     activity.actors!.map(async actor => `${await getPersonName(peopleAPI, actor.user!.knownUser!.personName!)}  さん`),
   )).join(', ');
-  const send = async ([sentChannel, channelId]: [SentChannel, string]) => {
+  const send = async ([sentChannel, channelId]: readonly [SentChannel, string]) => {
     const sentItems = items.filter(({ sentChannel: c }) => c === sentChannel);
     if (sentItems.length === 0) {
       return;
@@ -101,7 +101,7 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
         color: colors[actionName],
         title: `${japaneseTranslations[actionName]}: ${getEmoji(item.mimeType)} ${await item.getPath(drive)}`,
         text: '', // TODO: include details
-        title_link: item.link,
+        title_link: item.link!,
       })));
       await slack.chat.postMessage({
         channel: channelId,
@@ -121,5 +121,5 @@ export const notifyToSlack = async ({ slack, drive, people: peopleAPI }: Clients
       });
     }
   };
-  await Promise.all([['main', drivelogId], ['lms', drivelogLMSId]].map(send));
+  await Promise.all(([['main', drivelogId], ['lms', drivelogLMSId]] as const).map(send));
 };

@@ -9,6 +9,28 @@ import { rootFolderId, getDriveItemId } from './lib';
 import { notifyToSlack } from './notify-to-slack';
 
 
+const fetchAllDriveActivitiesRec = async(
+  driveActivity: driveactivity_v2.Driveactivity,
+  folderId: string,
+  since: Date,
+  pageToken: string | null,
+): Promise<driveactivity_v2.Schema$DriveActivity[]> => {
+  const response = (await driveActivity.activity.query({
+    requestBody: {
+      ancestorName: `items/${folderId}`,
+      filter: `time > ${since.getTime()}`,
+      ...pageToken ? { pageToken } : {},
+      consolidationStrategy: { legacy: {} },
+    },
+  })).data;
+
+  const activities = response.activities ?? []
+
+  return response.nextPageToken ?
+    [...activities, ...await fetchAllDriveActivitiesRec(driveActivity, folderId, since, response.nextPageToken)] :
+    activities;
+}
+
 const fetchAllDriveActivities = async (
   driveActivity: driveactivity_v2.Driveactivity,
   folderId: string,
@@ -23,23 +45,7 @@ const fetchAllDriveActivities = async (
   // }
 
   // may take a while.
-  let activities: driveactivity_v2.Schema$DriveActivity[] = [];
-  let response: driveactivity_v2.Schema$QueryDriveActivityResponse | null = null;
-
-  do {
-    // eslint-disable-next-line no-await-in-loop
-    response = (await driveActivity.activity.query({
-      requestBody: {
-        ancestorName: `items/${folderId}`,
-        filter: `time > ${since.getTime()}`,
-        pageToken: response?.nextPageToken,
-        consolidationStrategy: { legacy: {} },
-      },
-    })).data;
-    if (response.activities !== undefined) {
-      activities = [...activities, ...response.activities];
-    }
-  } while (response.nextPageToken);
+  const activities = await fetchAllDriveActivitiesRec(driveActivity, folderId, since, null);
 
   // if (process.env.NODE_ENV === 'development') {
   //     try {
