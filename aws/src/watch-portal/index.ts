@@ -6,8 +6,8 @@ import Parser from 'rss-parser';
 import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { db } from '@/lib/dynamodb';
 import { resourcePrefix } from '@/lib/aws/utils';
+import { dynamodb } from '@/lib/aws/dynamodb/clients';
 
 /**
  * お知らせ
@@ -65,12 +65,12 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
  * 以前保存した URL 一覧を取得する
  */
 const fetchOldURLs = async (): Promise<string[]> => {
-  const res = await db.get({
+  const res = await dynamodb.get({
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${resourcePrefix}watch-portal`,
+    TableName: `${resourcePrefix}default`,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Key: {
-      key: 'oldURLs',
+      key: 'watch-portal',
     },
   }).promise();
 
@@ -82,12 +82,12 @@ const fetchOldURLs = async (): Promise<string[]> => {
  * @param urls 保存する URL 一覧
  */
 const setNewURLs = async (urls: string[]): Promise<void> => {
-  await db.put({
+  await dynamodb.put({
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    TableName: `${resourcePrefix}watch-portal`,
+    TableName: `${resourcePrefix}default`,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Item: {
-      key: 'oldURLs',
+      key: 'watch-portal',
       urls,
     },
   }).promise();
