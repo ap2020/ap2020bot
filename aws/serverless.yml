@@ -27,7 +27,7 @@ custom:
     excludeFiles: "**/*.test.ts"
   dynamodbConfig:
     tableName:
-      watch-portal: ${self:custom.resourcePrefix}watch-portal
+      default: ${self:custom.resourcePrefix}default
       anonymous-log: ${self:custom.resourcePrefix}anonymous-log
   sns:
     topicName:
@@ -64,7 +64,6 @@ provider:
     # TODO: write docs about storign credentials
     STAGE: ${self:custom.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    DYNAMODB_TABLENAME_PREFIX: ${self:custom.resourcePrefix}
   versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
@@ -83,7 +82,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource:
-        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.default}"
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.anonymous-log}"
     - Effect: Allow
       Action:
@@ -155,10 +154,10 @@ resources:
         Properties:
           TopicName: ${self:custom.sns.topicName.error}
           DisplayName: ap2020bot errors
-      WatchPortalDynamoDbTable:
+      DefaultDynamoDbTable:
         Type: 'AWS::DynamoDB::Table'
         Properties:
-          TableName: ${self:custom.dynamodbConfig.tableName.watch-portal}
+          TableName: ${self:custom.dynamodbConfig.tableName.default}
           BillingMode: PAY_PER_REQUEST
           AttributeDefinitions:
             -
