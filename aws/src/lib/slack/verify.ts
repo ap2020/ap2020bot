@@ -44,8 +44,12 @@ export const verify = async (req: APIGatewayProxyEventV2): Promise<boolean> => {
     return false;
   }
 
+  const body = req.isBase64Encoded ?
+    Buffer.from(req.body, 'base64').toString() :
+    req.body;
+
   const hmac = crypto.createHmac('sha256', await envvar.get('slack/signing-secret'));
-  hmac.update(`${version}:${timestamp}:${req.body}`);
+  hmac.update(`${version}:${timestamp}:${body}`);
   const expected = `${version}=${hmac.digest('hex')}`;
 
   const ok = timingSafeCompare(expected, actual);

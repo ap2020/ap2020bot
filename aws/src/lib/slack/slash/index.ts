@@ -17,9 +17,13 @@ export const createHandler = (main: SlashMainFunc): APIGatewayProxyHandlerV2 =>
 
     assert(event.body !== undefined);
 
+    const body = event.isBase64Encoded ?
+      Buffer.from(event.body, 'base64').toString() :
+      event.body;
+
     // TODO: use SQS to avoid timeout
     // verify をしたので，スキーマを満たしていることが保証される
-    await main(querystring.parse(event.body) as SlashParams);
+    await main(querystring.parse(body) as SlashParams);
 
     return '';
   };
