@@ -157,10 +157,11 @@ export const main = async (): Promise<void> => {
   if (!state.some) {
     throw new Error('state is not set.');
   }
+  const lastChecked = new Date(state.val.lastChecked);
 
-  const newLastChecked = await checkUpdate(state.val.lastChecked);
+  const newLastChecked = await checkUpdate(lastChecked);
 
-  await defaultTable.set('watch-drive', { lastChecked: newLastChecked } );
+  await defaultTable.set('watch-drive', { lastChecked: newLastChecked.getTime() } );
   // TODO: save
 };
 
