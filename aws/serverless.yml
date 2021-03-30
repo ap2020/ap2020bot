@@ -82,7 +82,9 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.watch-portal}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.dynamodbConfig.tableName.anonymous-log}"
     - Effect: Allow
       Action:
         - "sns:Publish"
