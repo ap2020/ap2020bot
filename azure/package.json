@@ -42,7 +42,7 @@
     "@types/jest": "^26.0.22",
     "@types/lodash": "^4.14.165",
     "@types/moment-timezone": "^0.5.30",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/eslint-plugin": "^4.20.0",
     "@typescript-eslint/parser": "^4.18.0",
     "azure-functions-core-tools": "^2.7.2936",
     "eslint": "^7.23.0",
