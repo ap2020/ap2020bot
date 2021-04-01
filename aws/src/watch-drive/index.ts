@@ -1,4 +1,4 @@
-import { TinyStorage } from '@/lib/aws/dynamodb/default';
+import { TinyStorage } from '@/lib/aws/dynamodb/tiny-storage';
 import { envvar } from '@/lib/envvar';
 import { googleAuth } from '@/lib/google';
 import { slack } from '@/lib/slack/client';

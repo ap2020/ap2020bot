@@ -6,7 +6,7 @@ import Parser from 'rss-parser';
 import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { TinyStorage } from '@/lib/aws/dynamodb/default';
+import { TinyStorage } from '@/lib/aws/dynamodb/tiny-storage';
 import type { Option } from 'ts-results';
 
 /**
