@@ -1,4 +1,4 @@
-import { defaultTable } from '@/lib/aws/dynamodb/default';
+import { TinyStorage } from '@/lib/aws/dynamodb/tiny-storage';
 import { envvar } from '@/lib/envvar';
 import { googleAuth } from '@/lib/google';
 import { slack } from '@/lib/slack/client';
@@ -150,9 +150,14 @@ const checkUpdate = async (since: Date): Promise<Date> => {
   return lastChecked;
 };
 
+type StorageContent = {
+  lastChecked: number;
+};
 
 export const main = async (): Promise<void> => {
-  const state = await defaultTable.get('watch-drive');
+  const storage = new TinyStorage<StorageContent>('watch-drive');
+
+  const state = await storage.get();
 
   if (!state.some) {
     throw new Error('state is not set.');
@@ -161,7 +166,7 @@ export const main = async (): Promise<void> => {
 
   const newLastChecked = await checkUpdate(lastChecked);
 
-  await defaultTable.set('watch-drive', { lastChecked: newLastChecked.getTime() } );
+  await storage.set({ lastChecked: newLastChecked.getTime() } );
   // TODO: save
 };
 

@@ -6,7 +6,7 @@ import Parser from 'rss-parser';
 import 'source-map-support/register';
 import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
-import { defaultTable } from '@/lib/aws/dynamodb/default';
+import { TinyStorage } from '@/lib/aws/dynamodb/tiny-storage';
 import type { Option } from 'ts-results';
 
 /**
@@ -61,11 +61,17 @@ export const filterNewItems = (oldURLs: string[], newItems: Item[]): Item[] => {
   return newItems.filter(({ url }) => !oldURLSet.has(url));
 };
 
+type StorageData = {
+  urls: string[];
+};
+
+const storage = new TinyStorage<StorageData>('watch-portal');
+
 /**
  * 以前保存した URL 一覧を取得する
  */
 const fetchOldURLs = async (): Promise<Option<string[]>> => {
-  const res = await defaultTable.get('watch-portal');
+  const res = await storage.get();
   return res.map(({ urls }) => urls);
 };
 
@@ -74,7 +80,7 @@ const fetchOldURLs = async (): Promise<Option<string[]>> => {
  * @param urls 保存する URL 一覧
  */
 const setNewURLs = async (urls: string[]): Promise<void> => {
-  await defaultTable.set('watch-portal', { urls });
+  await storage.set({ urls });
 };
 
 /**
