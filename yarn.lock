@@ -1539,10 +1539,10 @@
   resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
   integrity sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==
 
-"@types/serverless@^1.78.23":
-  version "1.78.23"
-  resolved "https://registry.yarnpkg.com/@types/serverless/-/serverless-1.78.23.tgz#0e8cd62a4dda1df52887d078c0520eaeefcfc71a"
-  integrity sha512-KG/zm36yAiC3dI9d84Lueu7TXIiOeMFBPSdd2Yr9bbnaXOBNksRuKEvr3xmIKmx1hXj39TWQw8voqQtHZUto5w==
+"@types/serverless@^1.78.24":
+  version "1.78.24"
+  resolved "https://registry.yarnpkg.com/@types/serverless/-/serverless-1.78.24.tgz#e4c4eebb889797f04879f781e4b175884fa90931"
+  integrity sha512-FyDAfwOmn6dGWT/nWA6d6TS1Ck7EQ38FUTplYMeHnqZkGjtl80oQdEHohAJ0h4pNzRIb/GXoao/xj9PHIvDbtQ==
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
@@ -2159,10 +2159,10 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-aws-sdk@^2.403.0, aws-sdk@^2.7.0, aws-sdk@^2.738.0, aws-sdk@^2.834.0, aws-sdk@^2.851.0, aws-sdk@^2.869.0, aws-sdk@^2.877.0:
-  version "2.877.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.877.0.tgz#e580c08aeba8cb148d1dc0ee16348a410bf6852e"
-  integrity sha512-cNp526SUmJ0WZs40R4Zyk19FYWyVpyidJHOLf+6a+Uv0zG0PvH5257iAWMp81Qz3Sjb11y+wMSOwzCIp7SAZig==
+aws-sdk@^2.403.0, aws-sdk@^2.7.0, aws-sdk@^2.738.0, aws-sdk@^2.834.0, aws-sdk@^2.851.0, aws-sdk@^2.869.0, aws-sdk@^2.878.0:
+  version "2.878.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.878.0.tgz#0c18f464766555c86bdd2e70a3db9f473702c4b2"
+  integrity sha512-Mi6ASjd6UugdIskkXqTBgn6tC5I61BlEPwKXYtC6FFrNyvxMF+USH7FHD0O3ZBwqDCSI+BR9a296ReRNzQ//tw==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
