@@ -1,8 +1,7 @@
-import type { Moment } from 'moment-timezone';
-import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 
-export const momentToSlackTS = (date: Moment): string =>
-  (date.valueOf() / 1000).toFixed(6);
+export const momentToSlackTS = (date: DateTime): string =>
+  (date.toMillis() / 1000).toFixed(6);
 
-export const slackTSToMoment = (ts: string): Moment =>
-  moment(Number(ts) * 1000).tz('Asia/Tokyo');
+export const slackTSToMoment = (ts: string): DateTime =>
+  DateTime.fromMillis(Number(ts) * 1000).setZone('Asia/Tokyo');
