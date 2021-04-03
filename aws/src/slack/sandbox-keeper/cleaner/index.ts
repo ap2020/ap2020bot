@@ -35,7 +35,7 @@ const cleanupSandbox = async (lastDumpedTimeStamp: string): Promise<void> => {
   await Promise.all(messages
     // eslint-disable-next-line @typescript-eslint/naming-convention
     .filter(({ pinned_to }) => !pinned_to?.includes(sandboxId))
-    .map(async message => await slack.admin.chat.delete({
+    .map(async message => await (await slack.admin()).chat.delete({
       channel: sandboxId,
       ts: message.ts,
       as_user: true,

@@ -14,6 +14,8 @@ export const envVarKeys = [
   'google/drive/ignored-items',
   'slack/signing-secret',
   'slack/token/bot',
+  'slack/token/user',
+  'slack/token/admin',
   'slack/channel/notify-others',
   'slack/channel/notify-temp',
   'slack/channel/notify-drive',

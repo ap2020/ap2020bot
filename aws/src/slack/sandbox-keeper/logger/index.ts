@@ -43,8 +43,8 @@ const dumpSandbox = async (lastDumpedTimeStamp: string): Promise<string> => {
     return lastDumpedTimeStamp;
   } else {
     const newLastDumpedMessage = messages[messages.length - 1];
-    await dumpMessages(drive, messages, dumpFolderId, lastDumpedTimeStamp.ts, newLastDumpedMessage.ts);
-    return newLastDumpedMessage;
+    await dumpMessages(drive, messages, dumpFolderId, lastDumpedTimeStamp, newLastDumpedMessage.ts);
+    return newLastDumpedMessage.ts;
   }
 };
 

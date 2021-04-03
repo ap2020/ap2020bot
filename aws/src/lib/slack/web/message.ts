@@ -54,7 +54,7 @@ const _listRedundantMessages: {
                 )
                 .map(
                   async message =>
-                    (await slack.user.conversations.replies({
+                    (await (await slack.user()).conversations.replies({
                       channel: args.channel,
                       ts: message.ts,
                       limit: 1000, // TODO: handle has_more
@@ -89,7 +89,7 @@ const _listRedundantMessages: {
         .map(
           async message =>
           // fetch children
-            (await slack.user.conversations.replies({
+            (await (await slack.user()).conversations.replies({
               ...args,
               ts: message.ts,
               limit: args.limit ?? 1000, // TODO: handle has_more
