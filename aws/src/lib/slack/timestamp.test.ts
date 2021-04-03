@@ -1,14 +1,14 @@
 import { DateTime } from 'luxon';
-import { momentToSlackTS, slackTSToMoment } from './timestamp';
+import { datetimeToSlackTS, slackTSToDateTime } from './timestamp';
 
-describe('dateToSlackTS', () => {
+describe('datetimeToSlackTS', () => {
   it('converts Date object to timestamp', () => {
-    expect(momentToSlackTS(DateTime.fromMillis(1234567890123).setZone('Asia/Tokyo'))).toBe('1234567890.123000');
+    expect(datetimeToSlackTS(DateTime.fromMillis(1234567890123).setZone('Asia/Tokyo'))).toBe('1234567890.123000');
   });
 });
 
-describe('slackTSToDate', () => {
+describe('slackTSToDateTime', () => {
   it('converts timestamp to Date object', () => {
-    expect(slackTSToMoment('1234567890.123000')).toEqual(DateTime.fromMillis(1234567890123).setZone('Asia/Tokyo'));
+    expect(slackTSToDateTime('1234567890.123000')).toEqual(DateTime.fromMillis(1234567890123).setZone('Asia/Tokyo'));
   });
 });

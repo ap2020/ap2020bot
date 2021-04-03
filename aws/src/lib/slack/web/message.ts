@@ -1,12 +1,18 @@
 import { slack } from '@/lib/slack/client';
+import { DateTime } from 'luxon';
+import { slackTSToDateTime } from '../timestamp';
+import type { Conversation } from './types';
 
-export const isThreadMessage = (message: Slack.Message): message is Slack.ThreadMessage =>
+export const isThreadMessage = (message: Conversation.Message): message is Conversation.ThreadMessage =>
   'thread_ts' in message && typeof message.thread_ts === 'string';
 
-export const isThreadParent = (message: Slack.Message): message is Slack.ThreadParent =>
+export const isThreadParent = (message: Conversation.Message): message is Conversation.ThreadParent =>
   isThreadMessage(message) && message.thread_ts === message.ts;
 
-export const isThreadChildHidden = (message: Slack.Conversation.Replies['messages'][number]): message is Slack.ThreadChild => // ThreadChildInChannelも除外するけど，TSの型システムでは無理
+// ThreadChildInChannelも除外するけど，TSの型システムでは無理
+export const isThreadChildHidden = (
+  message: Conversation.RepliesResult['messages'][number],
+): message is Conversation.ThreadChild =>
   message.thread_ts !== message.ts && message.subtype !== 'thread_broadcast';
 
 type ThreadPolicy = 'nothing' | 'all-or-nothing' | 'just-in-range';
@@ -23,20 +29,20 @@ type ListMessagesArgs = {
 type ListMessagesSubArgs = [
   ListMessagesArgs,
   {
-    latest: Moment;
-    oldest: Moment;
+    latest: DateTime;
+    oldest: DateTime;
   }
 ];
 
 const _listRedundantMessages: {
-  [key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Slack.Message[]>
+  [key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Conversation.Message[]>
 } = {
-  'all-or-nothing': async (args, moments) => {
-    const { messages } = (await slack.bot.conversations.history({
+  'all-or-nothing': async (args, datetimes) => {
+    const { messages } = (await (await slack.bot).conversations.history({
       ...args,
       count: args.limit ?? 1000, // TODO: handle has_more
-    })) as Slack.Conversation.History;
-    const threadMessages: Slack.ThreadMessage[][] =
+    })) as Conversation.HistoryResult;
+    const threadMessages: Conversation.ThreadMessage[][] =
             await Promise.all(
               messages
                 // eslint-disable-next-line unicorn/no-array-callback-reference
@@ -44,7 +50,7 @@ const _listRedundantMessages: {
                 .filter(
                   // eslint-disable-next-line @typescript-eslint/naming-convention
                   ({ latest_reply }) => // if latest reply is before latest
-                    slackTSToMoment(latest_reply) <= moments.latest,
+                    slackTSToDateTime(latest_reply) <= datetimes.latest,
                 )
                 .map(
                   async message =>
@@ -52,24 +58,24 @@ const _listRedundantMessages: {
                       channel: args.channel,
                       ts: message.ts,
                       limit: 1000, // TODO: handle has_more
-                    }) as Slack.Conversation.Replies).messages,
+                    }) as Conversation.RepliesResult).messages,
                 ),
             );
     return [
       ...messages.filter(message => !isThreadMessage(message)),
-      ...flatten(threadMessages),
+      ...threadMessages.flat(),
     ];
   },
   'just-in-range': async (args, moments) => {
-    const { messages } = (await slack.bot.conversations.history({
+    const { messages } = (await (await slack.bot).conversations.history({
       channel: args.channel,
       count: args.limit ?? 1000, // TODO: handle has_more
       inclusive: args.inclusive,
       latest: args.latest,
       // no oldest because child of outdated parent can be new
-    })) as Slack.Conversation.History;
+    })) as Conversation.HistoryResult;
     // get all hidden thread messages
-    const threadMessages: Slack.ThreadChild[][] = await Promise.all(
+    const threadMessages: Conversation.ThreadChild[][] = await Promise.all(
       messages
       // search for thread parents
         // eslint-disable-next-line unicorn/no-array-callback-reference
@@ -78,7 +84,7 @@ const _listRedundantMessages: {
         .filter(
           // eslint-disable-next-line @typescript-eslint/naming-convention
           ({ ts: oldest_reply, latest_reply }) =>
-            moments.oldest <= slackTSToMoment(latest_reply) && slackTSToMoment(oldest_reply) <= moments.latest,
+            moments.oldest <= slackTSToDateTime(latest_reply) && slackTSToDateTime(oldest_reply) <= moments.latest,
         )
         .map(
           async message =>
@@ -87,29 +93,29 @@ const _listRedundantMessages: {
               ...args,
               ts: message.ts,
               limit: args.limit ?? 1000, // TODO: handle has_more
-            }) as Slack.Conversation.Replies).messages
+            }) as Conversation.RepliesResult).messages
             // filter out messages posted in channel
               // eslint-disable-next-line unicorn/no-array-callback-reference
               .filter(isThreadChildHidden),
         ),
     );
-    return [...messages, ...flatten(threadMessages)]
+    return [...messages, ...threadMessages.flat()]
     // filter message whose ts is in range
       .filter(
         ({ ts }) =>
-          moments.oldest <= slackTSToMoment(ts) && slackTSToMoment(ts) <= moments.latest,
+          moments.oldest <= slackTSToDateTime(ts) && slackTSToDateTime(ts) <= moments.latest,
       );
   },
   nothing: async (args) =>
-    (await slack.bot.conversations.history({
+    (await (await slack.bot).conversations.history({
       ...args,
       count: args.limit ?? 1000, // TODO: handle has_more
-    }) as Slack.Conversation.History).messages,
+    }) as Conversation.HistoryResult).messages,
 };
 
-export const listMessages = async (args: ListMessagesArgs): Promise<Slack.Message[]> => {
-  const oldest = args.oldest === undefined ? moment(0).tz('Asia/Tokyo') : slackTSToMoment(args.oldest);
-  const latest = args.latest === undefined ? moment().add(1, 'days') : slackTSToMoment(args.latest); // 十分大きい時刻
+export const listMessages = async (args: ListMessagesArgs): Promise<Conversation.Message[]> => {
+  const oldest = args.oldest === undefined ? DateTime.fromMillis(0).setZone('Asia/Tokyo') : slackTSToDateTime(args.oldest);
+  const latest = args.latest === undefined ? DateTime.now().plus({ days: 1 }) : slackTSToDateTime(args.latest); // 十分大きい時刻
   const messages =
         (await _listRedundantMessages[args.threadPolicy](args, { oldest, latest }))
           .filter(({ ts }) => ( // if exclusive, remove exact match

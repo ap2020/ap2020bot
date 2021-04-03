@@ -1,34 +1,39 @@
 import { slack } from '@/lib/slack/client';
-import { listMessages } from '../utils/slack/message';
-import type { LastDumpedMessage } from '../DumpSandbox/output';
-import { ScheduledHandler } from 'aws-lambda';
-
-export const main = async (): Promise<void> => {
-
-}
+import { listMessages } from '@/lib/slack/web/message';
+import type { ScheduledHandler } from 'aws-lambda';
+import { storage } from '../common/storage';
 
 export const handler: ScheduledHandler = async () => {
   await main();
-  await cleanupSandbox(lastDumpedMessage);
 };
 
+export const main = async (): Promise<void> => {
+  const state = await storage.get();
 
+  if (state.none) {
+    console.log('Sandbox is not logged yet. Skippping cleaning.');
+    return;
+  }
+
+  await cleanupSandbox(state.val.lastDumpedTimeStamp);
+};
 
 // TODO: Queueでよくないか
 
-const cleanupSandbox = async (lastDumped: LastDumpedMessage): Promise<void> => {
-  const sandboxId = process.env.SLACK_CHANNEL_SANDBOX;
+const cleanupSandbox = async (lastDumpedTimeStamp: string): Promise<void> => {
+  const sandboxId = process.env.SLACK_CHANNEL_SANDBOX!; // TODO: use ssm
   const messages = (await listMessages(
     {
       channel: sandboxId,
-      latest: lastDumped.ts,
+      latest: lastDumpedTimeStamp,
       inclusive: true,
       limit: 40, // to avoid rate limit
       threadPolicy: 'all-or-nothing',
     },
-  )
-  ).filter(({ subtype }) => subtype !== 'tombstone');
+  )).filter(({ subtype }) => subtype !== 'tombstone');
+
   await Promise.all(messages
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     .filter(({ pinned_to }) => !pinned_to?.includes(sandboxId))
     .map(async message => await slack.admin.chat.delete({
       channel: sandboxId,
