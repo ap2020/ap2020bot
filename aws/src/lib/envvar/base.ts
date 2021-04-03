@@ -11,6 +11,7 @@ export const envVarKeys = [
   'google/group/ap2020',
   'google/drive/item/ap2020files',
   'google/drive/item/lms',
+  'google/drive/item/sandbox-dump',
   'google/drive/ignored-items',
   'slack/signing-secret',
   'slack/token/bot',
@@ -21,6 +22,7 @@ export const envVarKeys = [
   'slack/channel/notify-drive',
   'slack/channel/notify-drive-lms',
   'slack/channel/inshi-ist',
+  'slack/channel/sandbox',
   'slack/user_id/bot',
 ] as const;
 

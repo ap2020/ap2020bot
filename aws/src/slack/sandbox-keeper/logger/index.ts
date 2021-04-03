@@ -7,6 +7,7 @@ import type { ScheduledHandler } from 'aws-lambda';
 import { DateTime, Duration } from 'luxon';
 import type { Conversation } from '@/lib/slack/web/types';
 import { storage } from '../common/storage';
+import { envvar } from '@/lib/envvar';
 
 export const handler: ScheduledHandler = async () => {
   await main();
@@ -25,8 +26,8 @@ const main = async (): Promise<void> => {
 };
 
 const dumpSandbox = async (lastDumpedTimeStamp: string): Promise<string> => {
-  const sandboxId = process.env.SLACK_CHANNEL_SANDBOX!; // TODO: use ssm
-  const dumpFolderId = process.env.GOOGLE_FOLDER_SANDBOX_DUMP_ID!;
+  const sandboxId = await envvar.get('slack/channel/sandbox');
+  const dumpFolderId = await envvar.get('google/drive/item/sandbox-dump');
   const auth = await googleAuth();
   const drive = google.drive({ version: 'v3', auth });
   const deleteAfter = Duration.fromObject({ days: 1 });

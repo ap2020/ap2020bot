@@ -1,3 +1,4 @@
+import { envvar } from '@/lib/envvar';
 import { slack } from '@/lib/slack/client';
 import { listMessages } from '@/lib/slack/web/message';
 import type { ScheduledHandler } from 'aws-lambda';
@@ -21,7 +22,7 @@ export const main = async (): Promise<void> => {
 // TODO: Queueでよくないか
 
 const cleanupSandbox = async (lastDumpedTimeStamp: string): Promise<void> => {
-  const sandboxId = process.env.SLACK_CHANNEL_SANDBOX!; // TODO: use ssm
+  const sandboxId = await envvar.get('slack/channel/sandbox');
   const messages = (await listMessages(
     {
       channel: sandboxId,
