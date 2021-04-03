@@ -3,14 +3,14 @@ import { google } from 'googleapis';
 import { listMessages } from '@/lib/slack/web/message';
 import { datetimeToSlackTS, slackTSToDateTime } from '@/lib/slack/timestamp';
 import { googleAuth } from '@/lib/google';
-import { ScheduledHandler } from 'aws-lambda';
-import { storage } from '../common/storage';
+import type { ScheduledHandler } from 'aws-lambda';
 import { DateTime, Duration } from 'luxon';
-import { Conversation } from '@/lib/slack/web/types';
+import type { Conversation } from '@/lib/slack/web/types';
+import { storage } from '../common/storage';
 
 export const handler: ScheduledHandler = async () => {
   await main();
-}
+};
 
 const main = async (): Promise<void> => {
   const state = await storage.get();
