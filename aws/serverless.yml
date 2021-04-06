@@ -127,7 +127,7 @@ functions:
     handler: src/slack/sandbox/cleaner/index.handler
     events:
       - schedule:
-          rate: 'cron(*/10 * * * ? *)'
+          rate: 'cron(*/5 * * * ? *)'
     memorySize: 256
     timeout: 60
   slash-invite-all:
