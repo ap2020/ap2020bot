@@ -105,6 +105,7 @@ functions:
     events:
       - schedule:
           rate: 'cron(0 * * * ? *)'
+    memorySize: 256
   watch-portal:
     handler: src/watch-portal/index.handler
     events:
