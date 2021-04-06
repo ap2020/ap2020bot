@@ -34,14 +34,33 @@ type ListMessagesSubArgs = [
   }
 ];
 
+const fetchMainMessages = async (args: ListMessagesArgs): Promise<Conversation.HistoryResult['messages']> => {
+  if (args.limit && args.limit > 1000) {
+    throw new Error('limit cannot be over 1000');
+    // It is not possible to implement support for larger limits but we currently don't need them.
+  }
+
+  if (args.limit) {
+    const { messages } = (await (await slack.bot).conversations.history({
+      ...args,
+      count: args.limit,
+    })) as Conversation.HistoryResult;
+    return messages;
+  } else {
+    let messages: Conversation.HistoryResult['messages'] = [];
+    for await (const page_ of (await slack.bot).paginate('conversations.history', args)) {
+      const page = page_ as Conversation.HistoryResult;
+      messages = [...messages, ...page.messages];
+    }
+    return messages;
+  }
+};
+
 const _listRedundantMessages: {
   [key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Conversation.Message[]>
 } = {
   'all-or-nothing': async (args, datetimes) => {
-    const { messages } = (await (await slack.bot).conversations.history({
-      ...args,
-      count: args.limit ?? 1000, // TODO: handle has_more
-    })) as Conversation.HistoryResult;
+    const messages = await fetchMainMessages(args);
     const threadMessages: Conversation.ThreadMessage[][] =
             await Promise.all(
               messages
@@ -67,13 +86,7 @@ const _listRedundantMessages: {
     ];
   },
   'just-in-range': async (args, moments) => {
-    const { messages } = (await (await slack.bot).conversations.history({
-      channel: args.channel,
-      count: args.limit ?? 1000, // TODO: handle has_more
-      inclusive: args.inclusive,
-      latest: args.latest,
-      // no oldest because child of outdated parent can be new
-    })) as Conversation.HistoryResult;
+    const messages = await fetchMainMessages(args);
     // get all hidden thread messages
     const threadMessages: Conversation.ThreadChild[][] = await Promise.all(
       messages
@@ -106,11 +119,7 @@ const _listRedundantMessages: {
           moments.oldest <= slackTSToDateTime(ts) && slackTSToDateTime(ts) <= moments.latest,
       );
   },
-  nothing: async (args) =>
-    (await (await slack.bot).conversations.history({
-      ...args,
-      count: args.limit ?? 1000, // TODO: handle has_more
-    }) as Conversation.HistoryResult).messages,
+  nothing: async (args) => await fetchMainMessages(args),
 };
 
 export const listMessages = async (args: ListMessagesArgs): Promise<Conversation.Message[]> => {
