@@ -17,11 +17,11 @@ export const envVarKeys = [
   'slack/token/bot',
   'slack/token/user',
   'slack/token/admin',
+  'slack/channel/inshi-ist',
   'slack/channel/notify-others',
   'slack/channel/notify-temp',
   'slack/channel/notify-drive',
   'slack/channel/notify-drive-lms',
-  'slack/channel/inshi-ist',
   'slack/channel/sandbox',
   'slack/user_id/bot',
 ] as const;
