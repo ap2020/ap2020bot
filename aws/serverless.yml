@@ -116,6 +116,20 @@ functions:
     events:
       - schedule:
           rate: 'cron(10 * * * ? *)'
+  sandbox-logger:
+    handler: src/slack/sandbox/logger/index.handler
+    events:
+      - schedule:
+          rate: 'cron(15 * * * ? *)'
+    memorySize: 256
+    timeout: 60
+  sandbox-cleaner:
+    handler: src/slack/sandbox/cleaner/index.handler
+    events:
+      - schedule:
+          rate: 'cron(*/10 * * * ? *)'
+    memorySize: 256
+    timeout: 60
   slash-invite-all:
     handler: src/slash/invite-all/index.handler
     events:
