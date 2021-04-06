@@ -117,12 +117,12 @@ functions:
       - schedule:
           rate: 'cron(10 * * * ? *)'
   sandbox-logger:
-    handler: src/sandbox/logger/index.handler
+    handler: src/slack/sandbox/logger/index.handler
     events:
       - schedule:
           rate: 'cron(15 * * * ? *)'
   # sandbox-cleaner:
-  #   handler: src/sandbox/cleaner/index.handler
+  #   handler: src/slack/sandbox/cleaner/index.handler
   #   events:
   #     - schedule:
   #         rate: 'cron(*/10 * * * ? *)'
