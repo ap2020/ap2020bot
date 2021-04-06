@@ -28,7 +28,7 @@ const cleanupSandbox = async (lastDumpedTimeStamp: string): Promise<void> => {
       channel: sandboxId,
       latest: lastDumpedTimeStamp,
       inclusive: true,
-      limit: 40, // to avoid rate limit
+      limit: 10, // to avoid rate limit
       threadPolicy: 'all-or-nothing',
     },
   )).filter(({ subtype }) => subtype !== 'tombstone');
