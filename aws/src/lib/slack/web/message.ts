@@ -123,8 +123,14 @@ const _listRedundantMessages: {
 };
 
 export const listMessages = async (args: ListMessagesArgs): Promise<Conversation.Message[]> => {
-  const oldest = args.oldest === undefined ? DateTime.fromMillis(0).setZone('Asia/Tokyo') : slackTSToDateTime(args.oldest);
-  const latest = args.latest === undefined ? DateTime.now().plus({ days: 1 }) : slackTSToDateTime(args.latest); // 十分大きい時刻
+  const oldest = args.oldest === undefined ?
+    DateTime.fromMillis(0).setZone('Asia/Tokyo') :
+    slackTSToDateTime(args.oldest);
+
+  const latest = args.latest === undefined ?
+    DateTime.now().plus({ days: 1 }) : // 十分大きい時刻
+    slackTSToDateTime(args.latest);
+
   const messages =
         (await _listRedundantMessages[args.threadPolicy](args, { oldest, latest }))
           .filter(({ ts }) => ( // if exclusive, remove exact match
