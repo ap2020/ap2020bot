@@ -41,16 +41,13 @@ const fetchMainMessages = async (args: ListMessagesArgs): Promise<Conversation.H
   }
 
   if (args.limit) {
-    const { messages } = (await (await slack.bot).conversations.history({
-      ...args,
-      count: args.limit,
-    })) as Conversation.HistoryResult;
+    const { messages } = await (await slack.bot).conversations.history(args) as Conversation.HistoryResult;
     return messages;
   } else {
     let messages: Conversation.HistoryResult['messages'] = [];
     const pages = (await slack.bot).paginate('conversations.history', {
       ...args,
-      count: 1000,
+      limit: 1000,
     }) as AsyncIterable<Conversation.HistoryResult>;
     for await (const page of pages) {
       messages = [...messages, ...page.messages];
