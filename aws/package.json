@@ -32,7 +32,7 @@
   "devDependencies": {
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
     "@tsconfig/node14": "^1.0.0",
-    "@types/aws-lambda": "^8.10.73",
+    "@types/aws-lambda": "^8.10.75",
     "@types/diff": "^5.0.0",
     "@types/jest": "^26.0.22",
     "@types/luxon": "^1.26.3",
