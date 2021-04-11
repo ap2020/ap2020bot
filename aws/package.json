@@ -39,7 +39,7 @@
     "@types/node": "^14.14.35",
     "@types/serverless": "^1.78.24",
     "@types/tsscmp": "^1.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.20.0",
+    "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
     "change-case": "^4.1.2",
     "copy-webpack-plugin": "^8.1.0",
