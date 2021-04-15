@@ -57,7 +57,6 @@ provider:
   runtime: nodejs14.x
   stage: ${self:custom.stage}
   region: us-east-1
-  profile: ${opt:profile, ''}
   memorySize: 128
   environment:
     # ! DO NOT WRITE CREDENTIALS HERE!
