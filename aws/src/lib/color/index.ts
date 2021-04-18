@@ -1,5 +1,7 @@
+// TODO: 0xffffff のように数値リテラルにしたほうがtypoを防げるのでは？
+
 const basicColors = {
-  red: 'eo1f1f',
+  red: 'e01f1f',
   yellow: 'fddb1c',
   green: '16c72d',
   paleBlue: '13aff1',
