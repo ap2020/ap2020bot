@@ -8,3 +8,4 @@ updates:
       timezone: "Asia/Tokyo"
     allow:
       - dependency-type: "direct"
+    open-pull-requests-limit: 20
