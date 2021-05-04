@@ -7,6 +7,8 @@
     "dev": "cross-env STAGE=local ts-node -r tsconfig-paths/register -O '{\"noUnusedLocals\": false}' -T",
     "emulator:dynamodb": "serverless dynamodb start",
     "emulator:dynamodb-admin": "cross-env DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin",
+    "lint": "eslint .",
+    "lint:ci": "eslint . --max-warnings=0",
     "test": "jest --verbose",
     "test:ci": "tsc --noEmit && jest --verbose --coverage"
   },
