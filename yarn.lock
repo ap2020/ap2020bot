@@ -944,8 +944,8 @@
 
 "@pizzacat83/eslint-config@git+https://github.com/pizzacat83/eslint-config.git":
   version "0.1.0"
-  uid d8490e7cfd56dc27deb48ed133d88c7a82acf22c
-  resolved "git+https://github.com/pizzacat83/eslint-config.git#d8490e7cfd56dc27deb48ed133d88c7a82acf22c"
+  uid "11c4606f69bb191c60a0a747460d253cf9f079e9"
+  resolved "git+https://github.com/pizzacat83/eslint-config.git#11c4606f69bb191c60a0a747460d253cf9f079e9"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
