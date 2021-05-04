@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
     "test": "jest --verbose",
-    "test:ci": "tsc --noEmit && jest --verbose --coverage"
+    "test:ci": "tsc --noEmit && yarn run lint:ci && jest --verbose --coverage"
   },
   "dependencies": {
     "@aws/dynamodb-data-mapper": "^0.7.3",
