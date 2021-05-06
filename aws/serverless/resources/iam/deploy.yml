@@ -126,6 +126,12 @@ Resources:
                 - - 'arn:aws:apigateway:${self:provider.region}::/apis/'
                   - Ref: HttpApi
                   - '/*'
+          - Effect: Allow
+            Action:
+              - 'events:DescribeRule'
+              - 'events:PutRule'
+            Resource:
+              - 'arn:aws:events:${self:provider.region}:${self:custom.accountId}:rule/ap2020bot-prod-*'
 
   Ap2020BotDeployLimitedRole:
     Type: AWS::IAM::Role
