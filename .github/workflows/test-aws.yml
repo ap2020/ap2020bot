@@ -17,6 +17,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
 
     - name: Read .nvmrc
       run: echo ::set-output name=NVMRC::$(cat aws/.nvmrc)
