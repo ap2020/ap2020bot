@@ -29,6 +29,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: master
+        persist-credentials: false
 
     - name: Mask variables
       run: |
