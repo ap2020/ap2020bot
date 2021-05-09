@@ -12,6 +12,9 @@ on:
     - cron:  '0 0 * * 0'
   workflow_dispatch:
 
+permissions:
+  contents: write # we don't write, but we need this to read secrets
+
 defaults:
   run:
     working-directory: aws/
@@ -24,6 +27,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: master
+        persist-credentials: false
 
     - name: Mask variables
       run: |
