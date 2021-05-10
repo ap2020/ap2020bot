@@ -9185,10 +9185,10 @@ serverless-offline@^6.9.0:
     velocityjs "^2.0.3"
     ws "^7.4.2"
 
-serverless-s3-local@^0.6.14:
-  version "0.6.14"
-  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.14.tgz#84a370fd09f6e2925170dcb6a3bdcb92e8e007a3"
-  integrity sha512-jVchoTWKSdbeHFZfksms033GhE+sSgBwuzw4er/o/Tn8grUaVs/ALl4C7kyXoUlBS2KNOW45wW1HXjzQlOyWjA==
+serverless-s3-local@^0.6.15:
+  version "0.6.15"
+  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.15.tgz#c758dcec991a1a1b38f98bb443db404ce02c9949"
+  integrity sha512-VUDMlA6QecEo4nBxF6gBaSoV9a2PoaaxXWEjJOMlgRA+ffEYXpGW5fq+FigXstudiTkIRsNJIdyiyF219kN5iA==
   dependencies:
     aws-sdk "^2.738.0"
     fs-extra "^9.0.0"
