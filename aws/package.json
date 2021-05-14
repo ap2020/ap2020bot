@@ -27,7 +27,7 @@
     "luxon": "^1.27.0",
     "rss-parser": "^3.12.0",
     "source-map-support": "~0.5.19",
-    "ts-results": "^3.1.1",
+    "ts-results": "^3.2.1",
     "tslib": "^2.2.0",
     "tsscmp": "^1.0.6"
   },
