@@ -39,7 +39,7 @@
     "@types/jest": "^26.0.23",
     "@types/luxon": "^1.26.5",
     "@types/node": "^14.14.45",
-    "@types/serverless": "^1.78.27",
+    "@types/serverless": "^1.78.28",
     "@types/tsscmp": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
     "@typescript-eslint/parser": "^4.23.0",
