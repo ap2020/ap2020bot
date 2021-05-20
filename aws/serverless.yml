@@ -20,6 +20,7 @@ custom:
     webpackConfig: ./webpack.config.js
     packager: yarn
     includeModules:
+      nodeModulesRelativeDir: '..'
       forceExclude:
         - aws-sdk
     excludeFiles: "**/*.test.ts"
