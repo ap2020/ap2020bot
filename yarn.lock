@@ -2214,7 +2214,7 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-aws-sdk@^2.403.0, aws-sdk@^2.7.0, aws-sdk@^2.738.0, aws-sdk@^2.834.0, aws-sdk@^2.851.0, aws-sdk@^2.926.0, aws-sdk@^2.931.0:
+aws-sdk@^2.403.0, aws-sdk@^2.7.0, aws-sdk@^2.834.0, aws-sdk@^2.851.0, aws-sdk@^2.916.0, aws-sdk@^2.926.0, aws-sdk@^2.931.0:
   version "2.931.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.931.0.tgz#7fdc886fa7697095203fe7de16bc948a8b1c8daa"
   integrity sha512-Db97/aJq8zYl8mHzY6dNO6m9S89TqN4HEUUc2aCYQCTyMb/eNrjf+uZTnutnQbJkClqHzxFcWc3aqe5VlTac/A==
@@ -4944,6 +4944,15 @@ fs-constants@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs-constants/-/fs-constants-1.0.0.tgz#6be0de9be998ce16af8afc24497b9ee9b7ccd9ad"
   integrity sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==
+
+fs-extra@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-10.0.0.tgz#9ff61b655dde53fb34a82df84bb214ce802e17c1"
+  integrity sha512-C5owb14u9eJwizKGdchcDUQeFtlSHHthBk8pbX9Vc1PFZrLombudjDnNns88aYslCyF6IY5SUw3Roz6xShcEIQ==
+  dependencies:
+    graceful-fs "^4.2.0"
+    jsonfile "^6.0.1"
+    universalify "^2.0.0"
 
 fs-extra@^7.0.1:
   version "7.0.1"
@@ -8965,10 +8974,10 @@ rxjs@^6.4.0, rxjs@^6.6.0, rxjs@^6.6.2, rxjs@^6.6.7:
   dependencies:
     tslib "^1.9.0"
 
-s3rver@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/s3rver/-/s3rver-3.6.1.tgz#6e46a7f53029cc622f1426e09b983846608525f9"
-  integrity sha512-8PI1yIUJ6WQbDYjidZo/EOknMRxos3uukM1a70VQE2lqzH9A8FUTOhlUGaRiAU/K0teROou1mesUsfrYwpwkCw==
+s3rver@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/s3rver/-/s3rver-3.7.0.tgz#e0aed000d0c196d5eb9164623c696830d525e705"
+  integrity sha512-Y/omIxk13qeNmoitsRxbFD/ME9dlcbrais7biuKtdQX43WSufc8P2A482j3BpkjrkoA1F57oBq4skMgeljKzcg==
   dependencies:
     "@koa/router" "^9.0.0"
     busboy "^0.3.1"
@@ -9201,18 +9210,18 @@ serverless-offline@^6.9.0:
     velocityjs "^2.0.3"
     ws "^7.4.2"
 
-serverless-s3-local@^0.6.15:
-  version "0.6.15"
-  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.15.tgz#c758dcec991a1a1b38f98bb443db404ce02c9949"
-  integrity sha512-VUDMlA6QecEo4nBxF6gBaSoV9a2PoaaxXWEjJOMlgRA+ffEYXpGW5fq+FigXstudiTkIRsNJIdyiyF219kN5iA==
+serverless-s3-local@^0.6.17:
+  version "0.6.17"
+  resolved "https://registry.yarnpkg.com/serverless-s3-local/-/serverless-s3-local-0.6.17.tgz#24266ff79c182576aaf315224e1f9759d8fa507e"
+  integrity sha512-arL7jMnvbFM2cKhUf4yo7JQCVaKtPGJ/URtXJ4objbasWO/6dlBlqzxU0vKxGnp6P7YI0+D98V3y0+FN6axkgw==
   dependencies:
-    aws-sdk "^2.738.0"
-    fs-extra "^9.0.0"
+    aws-sdk "^2.916.0"
+    fs-extra "^10.0.0"
     rxjs "^6.6.7"
     rxjs-compat "^6.6.7"
-    s3rver "^3.6.1"
+    s3rver "^3.7.0"
     serverless-offline "^6.9.0"
-    shelljs "^0.8.3"
+    shelljs "^0.8.4"
 
 serverless-webpack@^5.5.1:
   version "5.5.1"
@@ -9338,7 +9347,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shelljs@^0.8.3:
+shelljs@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.4.tgz#de7684feeb767f8716b326078a8a00875890e3c2"
   integrity sha512-7gk3UZ9kOfPLIAbslLzyWeGiEqx9e3rxwZM0KE6EL8GlGwjym9Mrlx5/p33bWTu9YG6vcS4MBxYZDHYr5lr8BQ==
