@@ -23,7 +23,7 @@
     "common-tags": "^1.8.0",
     "diff": "^5.0.0",
     "envalid": "^7.1.0",
-    "googleapis": "^78.0.0",
+    "googleapis": "^80.1.0",
     "luxon": "^1.27.0",
     "rss-parser": "^3.12.0",
     "source-map-support": "~0.5.19",
