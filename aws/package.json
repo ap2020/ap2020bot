@@ -35,7 +35,7 @@
     "@pizzacat83/eslint-config": "git+https://github.com/pizzacat83/eslint-config.git",
     "@tsconfig/node14": "^1.0.1",
     "@types/aws-lambda": "^8.10.78",
-    "@types/diff": "^5.0.0",
+    "@types/diff": "^5.0.1",
     "@types/jest": "^26.0.23",
     "@types/luxon": "^1.27.1",
     "@types/node": "^14.17.4",
