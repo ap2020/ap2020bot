@@ -109,6 +109,7 @@ functions:
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
+          enabled: false
   watch-inshi:
     handler: src/watch-inshi/index.handler
     events:
