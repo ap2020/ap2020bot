@@ -22,7 +22,7 @@
     "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
     "diff": "^5.0.0",
-    "envalid": "^7.1.0",
+    "envalid": "^7.2.0",
     "googleapis": "^78.0.0",
     "luxon": "^1.27.0",
     "rss-parser": "^3.12.0",
