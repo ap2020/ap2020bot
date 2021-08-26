@@ -1,6 +1,6 @@
 import type { drive_v3, driveactivity_v2 } from 'googleapis';
 import { getDriveItemId } from './lib';
-import type { DriveItem as DriveItem_, SentChannel } from './drive-api';
+import { DriveItem as DriveItem_, getLinkWithResourceKey, SentChannel } from './drive-api';
 import { fetchDriveItem, getPath, getSentChannel } from './drive-api'; // TODO: 名前衝突なんとかしろ
 
 export interface DriveItem {
@@ -38,7 +38,7 @@ class FoundItem implements DriveItem {
     }
     this.mimeType = item.content.mimeType;
     this.name = item.content.name;
-    this.link = item.content.webViewLink ?? null;
+    this.link = getLinkWithResourceKey(item);
     this.sentChannel = sentChannel;
     this.driveItem = item;
   }
