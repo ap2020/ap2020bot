@@ -1,6 +1,7 @@
 import { cacheCalls } from '@/lib/cache-calls';
 import { envvar } from '@/lib/envvar';
 import type { drive_v3 } from 'googleapis';
+import { URL } from 'url';
 
 // TODO: drive-activity-apiと名前が衝突している
 // DriveItemはDrive Activityの概念なので↓を改名すべきか？
@@ -83,3 +84,20 @@ export const getSentChannel = cacheCalls<[drive_v3.Drive, string], SentChannel, 
     [await envvar.get('google/drive/item/lms'), Promise.resolve('lms' as const)],
   ]))(),
 );
+
+export const getLinkWithResourceKey = (item: DriveItem): string | null => {
+  const originalURL = item.content.webViewLink;
+  if (!originalURL) {
+    return null;
+  }
+  const url = new URL(originalURL);
+  // query parameter の resourcekey に設定するものだと仮定して実装
+  // この仮定は↓がソース。公式情報は見つけられず。
+  // https://arstechnica.com/gadgets/2021/07/heres-what-that-google-drive-security-update-message-means/
+  // TODO: resource key つき URL を UI から取得できるようになった際、形式を確認する
+  const resourceKey = item.content.resourceKey;
+  if (resourceKey) {
+    url.searchParams.set('resourcekey', resourceKey);
+  }
+  return url.toString();
+}
