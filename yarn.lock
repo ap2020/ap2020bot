@@ -944,7 +944,6 @@
 
 "@pizzacat83/eslint-config@git+https://github.com/pizzacat83/eslint-config.git":
   version "0.1.0"
-  uid "580d353532005fe1ad8618e11e68613f5191414e"
   resolved "git+https://github.com/pizzacat83/eslint-config.git#580d353532005fe1ad8618e11e68613f5191414e"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
@@ -5264,10 +5263,10 @@ googleapis-common@^5.0.2:
     url-template "^2.0.8"
     uuid "^8.0.0"
 
-googleapis@^78.0.0:
-  version "78.0.0"
-  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-78.0.0.tgz#434fe572ea3547a5d10566c8d909d23fe161b88f"
-  integrity sha512-Qx3WyG0kP1EHMc5z5lHDZyNg/u/1T9P0yudfp9y/ZrtQTpCLQM+7hH2Ca/C3Gnnn0qwN8hsn9E5Os03L46fldA==
+googleapis@^84.0.0:
+  version "84.0.0"
+  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-84.0.0.tgz#55b534b234c2df1af0b0f33c0394f31ac23a20d0"
+  integrity sha512-5WWLwmraulw3p55lu0gNpLz2FME1gcuR7QxgmUdAVHMiVN4LEasYjJV9p36gxcf2TMe6bn6+PgQ/63+CvBEgoQ==
   dependencies:
     google-auth-library "^7.0.2"
     googleapis-common "^5.0.2"
