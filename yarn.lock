@@ -1593,10 +1593,10 @@
   resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
   integrity sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==
 
-"@types/serverless@^1.78.29":
-  version "1.78.29"
-  resolved "https://registry.yarnpkg.com/@types/serverless/-/serverless-1.78.29.tgz#f4be8d640aca75e08516e654fadba565137dedb2"
-  integrity sha512-D5AKuT+KIV/51U2i97ytg7GngHQPf9d7+LqZ4dI7GeNhSryDT55aIqaHzREW3kmuTRhbvCxPSgU5eWTlPnDKOw==
+"@types/serverless@^1.78.36":
+  version "1.78.36"
+  resolved "https://registry.yarnpkg.com/@types/serverless/-/serverless-1.78.36.tgz#a7cf3b22825caa815de845f215aa20ca9379ff1a"
+  integrity sha512-ciFBz5IPFuWKWlZH1ZKc+fYdE5Eo4MYrcavstuKWbQxpCKT9XIenoXQhmYtQ0PG166EjQ+OQz8qynMCJNykEsQ==
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
