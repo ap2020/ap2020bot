@@ -10273,10 +10273,10 @@ ts-results@^3.3.0:
   resolved "https://registry.yarnpkg.com/ts-results/-/ts-results-3.3.0.tgz#68623a6c18e65556287222dab76498a28154922f"
   integrity sha512-FWqxGX2NHp5oCyaMd96o2y2uMQmSu8Dey6kvyuFdRJ2AzfmWo3kWa4UsPlCGlfQ/qu03m09ZZtppMoY8EMHuiA==
 
-tsconfig-paths@^3.9.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.9.0.tgz#098547a6c4448807e8fcb8eae081064ee9a3c90b"
-  integrity sha512-dRcuzokWhajtZWkQsDVKbWyY+jgcLC5sqJhg2PSgf4ZkH2aHPvaOY8YWGhmjb68b5qqTfasSsDO9k7RUiEmZAw==
+tsconfig-paths@^3.11.0, tsconfig-paths@^3.9.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.11.0.tgz#954c1fe973da6339c78e06b03ce2e48810b65f36"
+  integrity sha512-7ecdYDnIdmv639mmDwslG6KQg1Z9STTz1j7Gcz0xa+nshh/gKDAHcPxRbWOsA3SPp0tXP2leTcY9Kw+NAkfZzA==
   dependencies:
     "@types/json5" "^0.0.29"
     json5 "^1.0.1"
