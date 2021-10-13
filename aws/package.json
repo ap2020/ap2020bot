@@ -26,6 +26,7 @@
     "googleapis": "^84.0.0",
     "luxon": "^2.0.2",
     "rss-parser": "^3.12.0",
+    "serverless-webpack": "^5.5.4",
     "source-map-support": "~0.5.19",
     "ts-results": "^3.3.0",
     "tslib": "^2.3.0",
