@@ -18,7 +18,7 @@
     "@slack/web-api": "6",
     "@types/common-tags": "^1.8.1",
     "aws-sdk": "^2.1023.0",
-    "axios": "~0.23.0",
+    "axios": "~0.24.0",
     "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
     "diff": "^5.0.0",
