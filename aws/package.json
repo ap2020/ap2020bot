@@ -17,7 +17,7 @@
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
     "@slack/web-api": "6",
     "@types/common-tags": "^1.8.1",
-    "aws-sdk": "^2.1023.0",
+    "aws-sdk": "^2.1080.0",
     "axios": "~0.23.0",
     "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
