@@ -1,4 +1,4 @@
-import { SNS } from 'aws-sdk';
+import { SNS } from '@aws-sdk/client-sns';
 import { isReal, stage } from './stages';
 
 export const sns = new SNS(

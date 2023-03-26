@@ -22,7 +22,12 @@ custom:
     includeModules:
       nodeModulesRelativeDir: '..'
       forceExclude:
-        - aws-sdk
+        - '@aws-sdk/client-dynamodb'
+        - '@aws-sdk/client-s3'
+        - '@aws-sdk/client-sns'
+        - '@aws-sdk/client-ssm'
+        - '@aws-sdk/client-sts'
+        - '@aws-sdk/lib-dynamodb'
     excludeFiles: "**/*.test.ts"
   dynamodbConfig:
     tableName:
@@ -53,7 +58,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   stage: ${self:custom.stage}
   region: us-east-1
   memorySize: 128

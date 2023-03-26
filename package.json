@@ -1,7 +1,9 @@
 {
   "name": "@ap2020/bot",
   "version": "1.0.0",
-  "workspaces": ["aws"],
+  "workspaces": [
+    "aws"
+  ],
   "main": "index.js",
   "repository": "https://github.com/ap2020/ap2020bot.git",
   "author": "ap2020",
