@@ -28,6 +28,8 @@ custom:
         - '@aws-sdk/client-ssm'
         - '@aws-sdk/client-sts'
         - '@aws-sdk/lib-dynamodb'
+        - '@aws-sdk/types'
+        - '@aws-sdk/smithy-client'
     excludeFiles: "**/*.test.ts"
   dynamodbConfig:
     tableName:

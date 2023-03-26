@@ -1,18 +1,18 @@
 import { stripIndent } from 'common-tags';
 import type { driveactivity_v2, people_v1 } from 'googleapis';
-import moment from 'moment-timezone';
 import { ignoredActions, japaneseTranslations, colors, ActionName } from './config';
 import type { Clients } from './lib';
 import type { DriveItem } from './drive-activity-api';
 import { getDriveItem } from './drive-activity-api';
 import type { SentChannel } from './drive-api';
 import { envvar } from '@/lib/envvar';
+import { DateTime } from 'luxon';
 
 const getActionName = (actionDetail: driveactivity_v2.Schema$ActionDetail): ActionName =>
   Object.keys(actionDetail)[0] as ActionName;
 
 const formatDate = (timestamp: string): string =>
-  moment(timestamp).tz('Asia/Tokyo').format('YYYY/MM/DD HH:mm:ss');
+  DateTime.fromISO(timestamp).setZone('Asia/Tokyo').toFormat('yyyy/MM/dd HH:mm:ss');
 
 const getDate = (activity: driveactivity_v2.Schema$DriveActivity): string => {
   if (activity.timestamp) {
