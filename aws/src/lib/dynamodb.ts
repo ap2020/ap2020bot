@@ -1,4 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient as DocumentClient } from '@aws-sdk/lib-dynamodb';
 import { isReal, stage } from './stages';
 
