@@ -69,7 +69,7 @@ const loadOldText = async (): Promise<Option<string>> => {
       /* eslint-enable @typescript-eslint/naming-convention */
     });
     assert(res.Body !== undefined);
-    return Some(res.Body.toString());
+    return Some(await res.Body.transformToString());
   } catch (error) {
     if (error instanceof NoSuchKey) {
       return None;

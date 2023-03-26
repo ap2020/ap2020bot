@@ -3,7 +3,7 @@ import { cacheCalls } from './cache-calls';
 
 // async identity function
 const slowAsync_ = async (result: number) => {
-  await promisify((...args) => process.nextTick(...args))();
+  await promisify((...args) => { process.nextTick(...args); })();
   return result;
 };
 
