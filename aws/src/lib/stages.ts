@@ -19,4 +19,4 @@ const env = envalid.cleanEnv(
   },
 );
 
-export const stage = env.STAGE as Stage;
+export const stage: Stage = env.STAGE;

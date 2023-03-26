@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { envvar } from '../envvar';
 
-export const googleAuth = async (): Promise<InstanceType<typeof google.auth.GoogleAuth>> => {
+export const googleAuth = async () => {
   const auth = new google.auth.GoogleAuth({
     credentials: {
       /* eslint-disable @typescript-eslint/naming-convention */
