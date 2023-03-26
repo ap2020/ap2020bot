@@ -59,7 +59,6 @@ const fetchMainMessages = async (args: ListMessagesArgs): Promise<Conversation.H
 const _listRedundantMessages: {
   [key in ThreadPolicy]: (...a: ListMessagesSubArgs) => Promise<Conversation.Message[]>
 } = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   'all-or-nothing': async (args, datetimes) => {
     const messages = await fetchMainMessages(args);
     const threadMessages: Conversation.ThreadMessage[][] =
@@ -86,7 +85,6 @@ const _listRedundantMessages: {
       ...threadMessages.flat(),
     ];
   },
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   'just-in-range': async (args, moments) => {
     const messages = await fetchMainMessages(args);
     // get all hidden thread messages

@@ -30,7 +30,7 @@ jobs:
         node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
     - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      run: yarn set version berry && yarn install --immutable
 
     - name: Setup test
       run: bash ci/test-setup.sh
