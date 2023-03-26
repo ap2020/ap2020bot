@@ -1,7 +1,6 @@
 import { isReal, stage } from '@/lib/stages';
-import DynamoDB from 'aws-sdk/clients/dynamodb';
-import { DataMapper } from '@aws/dynamodb-data-mapper';
-import { resourcePrefix } from '../utils';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient as DocumentClient } from '@aws-sdk/lib-dynamodb';
 
 const options = (
   isReal(stage) ?
@@ -14,11 +13,5 @@ const options = (
     }
 );
 
-const dynamodbRaw = new DynamoDB(options);
-
-export const dynamodb = new DynamoDB.DocumentClient(options);
-
-export const dynamoMapper = new DataMapper({
-  client: dynamodbRaw,
-  tableNamePrefix: resourcePrefix,
-});
+const client = new DynamoDBClient(options);
+export const dynamodb = DocumentClient.from(client);

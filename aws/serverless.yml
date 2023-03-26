@@ -139,12 +139,6 @@ functions:
       - httpApi:
           path: /slack/slash/invite-all
           method: POST
-  slash-anonymous:
-    handler: src/slash/anonymous/index.handler
-    events:
-      - httpApi:
-          path: /slack/slash/anonymous
-          method: POST
   slack-events:
     handler: src/slack/events/index.handler
     events:
