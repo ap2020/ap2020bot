@@ -10,7 +10,7 @@ import type { MessageAttachment } from '@slack/web-api';
 import { source } from 'common-tags';
 import type { Option } from 'ts-results';
 import { None, Some } from 'ts-results';
-import type { AWSError } from 'aws-sdk';
+import { S3ServiceException, NoSuchKey } from '@aws-sdk/client-s3';
 import { Size, validateSize } from '@/lib/validate';
 import assert from 'assert';
 import { getColor } from '@/lib/color';
@@ -67,12 +67,14 @@ const loadOldText = async (): Promise<Option<string>> => {
       Bucket: getBucketName('default'),
       Key: 'watch-inshi/ist/index.txt',
       /* eslint-enable @typescript-eslint/naming-convention */
-    }).promise();
+    });
     assert(res.Body !== undefined);
-    return Some(res.Body.toString());
-  } catch (error_) {
-    const error = error_ as AWSError;
-    if (['AccessDenied', 'NoSuchKey'].includes(error.code)) {
+    return Some(await res.Body.transformToString());
+  } catch (error) {
+    if (error instanceof NoSuchKey) {
+      return None;
+    }
+    if (error instanceof S3ServiceException && error.name === 'AccessDenied') {
       return None;
     }
     throw error;
@@ -95,7 +97,7 @@ const saveNewText = async (text: string): Promise<void> => {
     Key: 'watch-inshi/ist/index.txt',
     Body: buf,
     /* eslint-enable @typescript-eslint/naming-convention */
-  }).promise();
+  });
 };
 
 /**

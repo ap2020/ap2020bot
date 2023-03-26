@@ -1,12 +1,14 @@
-import AWS from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import { isReal, stage } from './stages';
 
 export const s3 = isReal(stage) ?
-  new AWS.S3() :
-  new AWS.S3({
-    s3ForcePathStyle: true,
-    accessKeyId: 'S3RVER',
-    secretAccessKey: 'S3RVER',
+  new S3({}) :
+  new S3({
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: 'S3RVER',
+      secretAccessKey: 'S3RVER',
+    },
     endpoint: 'http://localhost:3003',
   });
 

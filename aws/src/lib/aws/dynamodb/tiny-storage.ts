@@ -1,3 +1,4 @@
+import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import type { Option } from 'ts-results';
 import { None, Some } from 'ts-results';
 import { resourcePrefix } from '../utils';
@@ -12,14 +13,14 @@ export class TinyStorage<Content> {
   ) {}
 
   async get(): Promise<Option<Item<Content>>> {
-    const result = await dynamodb.get({
+    const result = await dynamodb.send(new GetCommand({
       /* eslint-disable @typescript-eslint/naming-convention */
       TableName: tableName,
       Key: {
         key: this.key,
       },
       /* eslint-enable @typescript-eslint/naming-convention */
-    }).promise();
+    }));
 
     return result.Item === undefined ?
       None :
@@ -27,7 +28,7 @@ export class TinyStorage<Content> {
   }
 
   async set(value: Content): Promise<void> {
-    await dynamodb.put({
+    await dynamodb.send(new PutCommand({
       /* eslint-disable @typescript-eslint/naming-convention */
       TableName: tableName,
       Item: {
@@ -35,6 +36,6 @@ export class TinyStorage<Content> {
         ...value,
       },
       /* eslint-enable @typescript-eslint/naming-convention */
-    }).promise();
+    }));
   }
 }

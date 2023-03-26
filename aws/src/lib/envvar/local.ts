@@ -10,6 +10,7 @@ class EnvVarLocal implements EnvVar {
   async loadEnv() {
     const envvarObj = JSON.parse(await fs.readFile(
       path.join(
+        // eslint-disable-next-line unicorn/prefer-module
         __dirname, // envvar
         '..', // lib
         '..', // src

@@ -1,7 +1,8 @@
-import AWS from 'aws-sdk';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient as DocumentClient } from '@aws-sdk/lib-dynamodb';
 import { isReal, stage } from './stages';
 
-export const db = new AWS.DynamoDB.DocumentClient(
+const client = new DynamoDBClient(
   isReal(stage) ?
     {} :
     {
@@ -9,3 +10,4 @@ export const db = new AWS.DynamoDB.DocumentClient(
       endpoint: 'http://localhost:8000',
     },
 );
+export const db = DocumentClient.from(client);

@@ -1,11 +1,11 @@
 import assert from 'assert';
-import AWS from 'aws-sdk';
+import { SSM } from '@aws-sdk/client-ssm';
 import 'source-map-support/register';
 import { stage } from '../stages';
 import type { EnvVar, EnvVarKey } from './base';
 
 class EnvVarProd implements EnvVar {
-  ssm = new AWS.SSM();
+  ssm = new SSM({});
   cache = new Map<EnvVarKey, Promise<string>>();
 
   private async fetch(key: EnvVarKey): Promise<string> {
@@ -14,7 +14,7 @@ class EnvVarProd implements EnvVar {
       Name: `/ap2020bot/${stage}/${key}`,
       WithDecryption: true,
       /* eslint-enable @typescript-eslint/naming-convention */
-    }).promise();
+    });
     const value = res?.Parameter?.Value;
     assert(value !== undefined);
     return value;

@@ -1,5 +1,7 @@
 import type { EventPayload } from '@/lib/slack/events/types';
-import type { MessageAttributeMap, MessageAttributeValue } from 'aws-sdk/clients/sns';
+import type { MessageAttributeValue } from '@aws-sdk/client-sns';
+
+type MessageAttributeMap = Record<string, MessageAttributeValue>;
 
 const toAttr = (str: string): MessageAttributeValue => ({
   /* eslint-disable @typescript-eslint/naming-convention */

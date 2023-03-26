@@ -18,7 +18,7 @@ const main = async (payload: EventPayload) => {
     MessageAttributes: messageAttributes,
     // MessageDeduplicationId: payload.event_id, // type definition of sns.publish is incomplete…
     /* eslint-enable @typescript-eslint/naming-convention */
-  }).promise();
+  });
 };
 
 // TODO: preload envvars
