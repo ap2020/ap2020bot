@@ -116,11 +116,6 @@ functions:
     events:
       - schedule:
           rate: 'cron(5 * * * ? *)'
-  watch-inshi:
-    handler: src/watch-inshi/index.handler
-    events:
-      - schedule:
-          rate: 'cron(10 * * * ? *)'
   sandbox-logger:
     handler: src/slack/sandbox/logger/index.handler
     events:
