@@ -60,7 +60,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs22.x
   stage: ${self:custom.stage}
   region: us-east-1
   memorySize: 128
