@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write # we don't write, but we need this to read secrets
+  id-token: write # to authenticate with AWS
 
 defaults:
   run:
