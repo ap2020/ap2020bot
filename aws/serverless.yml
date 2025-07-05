@@ -111,11 +111,6 @@ functions:
       - schedule:
           rate: 'cron(0 * * * ? *)'
     memorySize: 256
-  watch-portal:
-    handler: src/watch-portal/index.handler
-    events:
-      - schedule:
-          rate: 'cron(5 * * * ? *)'
   sandbox-logger:
     handler: src/slack/sandbox/logger/index.handler
     events:
