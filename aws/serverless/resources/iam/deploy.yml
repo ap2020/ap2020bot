@@ -147,6 +147,15 @@ Resources:
             Action:
               - 'sts:AssumeRole'
               - 'sts:TagSession'
+          - Effect: Allow
+            Principal:
+              Federated: "arn:aws:iam::${self:custom.accountId}:oidc-provider/token.actions.githubusercontent.com"
+            Action:
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                "token.actions.githubusercontent.com:sub": "repo:ap2020/ap2020bot:ref:refs/heads/master"
       ManagedPolicyArns:
         - Ref: Ap2020DeployLimitedPolicy1
         - Ref: Ap2020DeployLimitedPolicy2
