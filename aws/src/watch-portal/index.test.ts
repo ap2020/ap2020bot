@@ -1,4 +1,3 @@
-/* eslint-disable import/first */
 import { envvarTest } from '@/lib/envvar/test';
 
 envvarTest.set('slack/token/bot', 'fake-slack-token');

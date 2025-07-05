@@ -63,24 +63,23 @@ const _listRedundantMessages: {
   'all-or-nothing': async (args, datetimes) => {
     const messages = await fetchMainMessages(args);
     const threadMessages: Conversation.ThreadMessage[][] =
-            await Promise.all(
-              messages
-                // eslint-disable-next-line unicorn/no-array-callback-reference
-                .filter(isThreadParent)
-                .filter(
-                  // eslint-disable-next-line @typescript-eslint/naming-convention
-                  ({ latest_reply }) => // if latest reply is before latest
-                    slackTSToDateTime(latest_reply) <= datetimes.latest,
-                )
-                .map(
-                  async message =>
-                    (await (await slack.user()).conversations.replies({
-                      channel: args.channel,
-                      ts: message.ts,
-                      limit: 1000, // TODO: handle has_more
-                    }) as Conversation.RepliesResult).messages,
-                ),
-            );
+      await Promise.all(
+        messages
+          .filter(isThreadParent)
+          .filter(
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            ({ latest_reply }) => // if latest reply is before latest
+              slackTSToDateTime(latest_reply) <= datetimes.latest,
+          )
+          .map(
+            async message =>
+              (await (await slack.user()).conversations.replies({
+                channel: args.channel,
+                ts: message.ts,
+                limit: 1000, // TODO: handle has_more
+              }) as Conversation.RepliesResult).messages,
+          ),
+      );
     return [
       ...messages.filter(message => !isThreadMessage(message)),
       ...threadMessages.flat(),
@@ -92,10 +91,9 @@ const _listRedundantMessages: {
     // get all hidden thread messages
     const threadMessages: Conversation.ThreadChild[][] = await Promise.all(
       messages
-      // search for thread parents
-        // eslint-disable-next-line unicorn/no-array-callback-reference
+        // search for thread parents
         .filter(isThreadParent)
-      // filter threads that may have replies in range
+        // filter threads that may have replies in range
         .filter(
           // eslint-disable-next-line @typescript-eslint/naming-convention
           ({ ts: oldest_reply, latest_reply }) =>
@@ -103,19 +101,18 @@ const _listRedundantMessages: {
         )
         .map(
           async message =>
-          // fetch children
+            // fetch children
             (await (await slack.user()).conversations.replies({
               ...args,
               ts: message.ts,
               limit: args.limit ?? 1000, // TODO: handle has_more
             }) as Conversation.RepliesResult).messages
-            // filter out messages posted in channel
-              // eslint-disable-next-line unicorn/no-array-callback-reference
+              // filter out messages posted in channel
               .filter(isThreadChildHidden),
         ),
     );
     return [...messages, ...threadMessages.flat()]
-    // filter message whose ts is in range
+      // filter message whose ts is in range
       .filter(
         ({ ts }) =>
           moments.oldest <= slackTSToDateTime(ts) && slackTSToDateTime(ts) <= moments.latest,
@@ -134,12 +131,12 @@ export const listMessages = async (args: ListMessagesArgs): Promise<Conversation
     slackTSToDateTime(args.latest);
 
   const messages =
-        (await _listRedundantMessages[args.threadPolicy](args, { oldest, latest }))
-          .filter(({ ts }) => ( // if exclusive, remove exact match
-            args.inclusive ?
-              true :
-              ts !== args.latest && ts !== args.oldest
-          ));
+    (await _listRedundantMessages[args.threadPolicy](args, { oldest, latest }))
+      .filter(({ ts }) => ( // if exclusive, remove exact match
+        args.inclusive ?
+          true :
+          ts !== args.latest && ts !== args.oldest
+      ));
   messages.sort(({ ts: ts1 }, { ts: ts2 }) => Number(ts1) - Number(ts2));
   return messages;
 };
