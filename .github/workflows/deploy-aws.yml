@@ -61,7 +61,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-region: us-east-1
-        role-to-assume: ap2020bot-deploy-limited-prod
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ap2020bot-deploy-limited-prod
         role-duration-seconds: 1200
 
     - name: Deploy
