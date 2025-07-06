@@ -8,8 +8,6 @@ on:
     paths-ignore: # don't trigger if all changes matches these paths
       - 'azure/**'
       - '**.md'
-  schedule:
-    - cron:  '0 0 * * 0'
   workflow_dispatch:
 
 permissions:
